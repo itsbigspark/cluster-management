@@ -9,10 +9,14 @@ import org.apache.hadoop.hive.metastore.api.Database;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.Partition;
 import org.apache.hadoop.hive.metastore.api.Table;
+import org.apache.hadoop.hive.serde2.io.DateWritable;
 import org.apache.thrift.TException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.naming.ConfigurationException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -20,6 +24,8 @@ import java.util.List;
  */
 public class MetadataHelper extends HiveConfiguration {
 
+
+    Logger log = LoggerFactory.getLogger(getClass());
     private static HiveMetaStoreClient client;
 
     public MetadataHelper() throws MetaException, ConfigurationException {
@@ -89,7 +95,7 @@ public class MetadataHelper extends HiveConfiguration {
     }
 
     public List<Partition> getTablePartitions(String dbName, String tableName) throws SourceException{
-        List<Partition> partitions = Lists.newArrayList();
+        List<Partition> partitions;
         try {
             partitions = client.listPartitions(dbName,tableName, (short) 10000);
         } catch (TException e) {
@@ -113,4 +119,22 @@ public class MetadataHelper extends HiveConfiguration {
          return client.getAllDatabases();
     }
 
+    public Date getPartitionDate(Partition partition) {
+        //SH - /prod/source-history/ADB/ADB_BRANCH/edi_business_day=2020-01-20/
+        //EAS - /prod/enterprise-analytics-store/data/AGREEMENT/src_sys_id=ADB/src_sys_inst_id=NWB/edi_business_day=2020-01-20/
+        Date partitionDate = new Date();
+        for (int i = 0; i <= partition.getValues().size(); i = i + 1) {
+            if (partition.getValues().get(i).contains("edi_business_day")){
+                    log.debug(String.format("Date key found at level %s/%s for table: %s.%s, partition: %s"
+                            ,i,partition.getValues().size(),partition.getDbName(),partition.getTableName(),partition.toString()));
+                    partitionDate=stringToDate(partition.getValues().get(i).split("=")[1]);
+            }
+        }
+        return partitionDate;
+    }
+
+    public Date stringToDate (String dateStr){
+        DateWritable writableVal = new DateWritable(java.sql.Date.valueOf(dateStr));
+        return new Date(writableVal.getDays());
+    }
 }

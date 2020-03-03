@@ -25,6 +25,7 @@ public class ClusterManagementJob {
 
     public ClusterManagementJob() throws IOException, MetaException, ConfigurationException {
         this.spark=SparkSession.builder()
+                .appName("EDH CLUSTER MANAGEMENT - "+this.getClass().getName())
                 .enableHiveSupport()
                 .getOrCreate();
         this.hadoopConfiguration =(spark.sparkContext().hadoopConfiguration());
