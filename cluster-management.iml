@@ -193,16 +193,6 @@
     <orderEntry type="library" name="Maven: org.apache.hive.shims:hive-shims-common:1.1.1" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.hive.shims:hive-shims-0.20S:1.1.1" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.hive.shims:hive-shims-0.23:1.1.1" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.hadoop:hadoop-yarn-server-resourcemanager:2.6.0" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: com.sun.jersey:jersey-json:1.9" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: com.sun.xml.bind:jaxb-impl:2.2.3-1" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: com.sun.jersey.contribs:jersey-guice:1.9" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: com.sun.jersey:jersey-server:1.9" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: asm:asm:3.1" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: org.codehaus.jettison:jettison:1.1" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: com.sun.jersey:jersey-core:1.9" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: com.sun.jersey:jersey-client:1.9" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.hadoop:hadoop-yarn-server-applicationhistoryservice:2.6.0" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.hive.shims:hive-shims-scheduler:1.1.1" level="project" />
     <orderEntry type="library" name="Maven: com.google.guava:guava:14.0.1" level="project" />
     <orderEntry type="library" name="Maven: com.jolbox:bonecp:0.8.0.RELEASE" level="project" />
@@ -233,5 +223,31 @@
     <orderEntry type="library" name="Maven: org.junit.jupiter:junit-jupiter-params:5.6.0" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.junit.jupiter:junit-jupiter-engine:5.6.0" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.junit.platform:junit-platform-engine:1.6.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.apache.hadoop:hadoop-minicluster:2.6.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.apache.hadoop:hadoop-common:test-jar:tests:2.6.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: javax.servlet:servlet-api:2.5" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.sun.jersey:jersey-core:1.9" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.sun.jersey:jersey-json:1.9" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: org.codehaus.jettison:jettison:1.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.sun.xml.bind:jaxb-impl:2.2.3-1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.sun.jersey:jersey-server:1.9" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: asm:asm:3.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: tomcat:jasper-compiler:5.5.23" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: tomcat:jasper-runtime:5.5.23" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: javax.servlet.jsp:jsp-api:2.1" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: commons-el:commons-el:1.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: net.java.dev.jets3t:jets3t:0.9.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: com.jamesmurty.utils:java-xmlbuilder:0.4" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: com.jcraft:jsch:0.1.42" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.apache.hadoop:hadoop-hdfs:test-jar:tests:2.6.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: commons-daemon:commons-daemon:1.0.13" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.apache.hadoop:hadoop-yarn-server-tests:test-jar:tests:2.6.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.apache.hadoop:hadoop-yarn-server-nodemanager:2.6.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.sun.jersey:jersey-client:1.9" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.sun.jersey.contribs:jersey-guice:1.9" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.hadoop:hadoop-yarn-server-resourcemanager:2.6.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.hadoop:hadoop-yarn-server-applicationhistoryservice:2.6.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.apache.hadoop:hadoop-mapreduce-client-jobclient:test-jar:tests:2.6.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.apache.hadoop:hadoop-mapreduce-client-hs:2.6.0" level="project" />
   </component>
 </module>

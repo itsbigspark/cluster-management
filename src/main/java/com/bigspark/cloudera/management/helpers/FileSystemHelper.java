@@ -13,8 +13,13 @@ import org.apache.hadoop.fs.Path;
 
 public class FileSystemHelper {
 
-	public static FileSystem getConnection() throws IOException{ 
-		return FileSystem.get(SparkHelper.getSparkSession().sparkContext().hadoopConfiguration());
+	static FileSystem fs;
+
+	public static FileSystem getConnection() throws IOException{
+		if (fs != null)
+			return fs;
+		else
+			return FileSystem.get(SparkHelper.getSparkSession().sparkContext().hadoopConfiguration());
 	}
 
 	public static String getFileContent(String path) throws IllegalArgumentException, IOException, InterruptedException {
@@ -33,7 +38,6 @@ public class FileSystemHelper {
 		}
 	}
 
-
 	public static void writeFileContent(String targetPath, String fileName, String payload, Boolean deleteFile) throws IllegalArgumentException, IOException {
 		String fullPath = String.format("%s/%s", targetPath, fileName);
 		try(FileSystem fs = getConnection()) {
@@ -46,7 +50,7 @@ public class FileSystemHelper {
 				fs.delete(new Path(fullPath), false);
 			}
 
-			try (FSDataOutputStream fso = FileSystemHelper.getFile(fs, fullPath)) {;
+			try (FSDataOutputStream fso = getFile(fs, fullPath)) {;
 			fso.write(payload.getBytes());
 			}
 		}

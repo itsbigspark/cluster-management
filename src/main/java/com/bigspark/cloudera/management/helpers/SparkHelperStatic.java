@@ -1,11 +1,12 @@
 package com.bigspark.cloudera.management.helpers;
 
+import org.apache.hadoop.security.UserGroupInformation;
+import org.apache.spark.sql.SparkSession;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.hadoop.security.UserGroupInformation;
-import org.apache.spark.sql.SparkSession;
 
 /**
  * Entry point facade class to aid with complex operations within a SparkSession not supported by Spark DataFrame operations.
@@ -15,14 +16,14 @@ import org.apache.spark.sql.SparkSession;
  * @author Rich Hay
  *
  */
-public class SparkHelper {
+public class SparkHelperStatic {
 	
 	/**
 	 * Nested Facade class to expose HDFS operations to a Spark Session
 	 * @author Rich Hay
 	 *
 	 */
-	public class Hdfs {
+	public static class Hdfs {
 		/**
 		 * Method to append content to a file
 		 * @param targetPath The path of the file to which content will be appended
@@ -31,7 +32,7 @@ public class SparkHelper {
 		 * @throws IllegalArgumentException
 		 * @throws IOException
 		 */
-		public void appendFileContent(String targetPath, String fileName, String payload) throws IllegalArgumentException, IOException {
+		public static void appendFileContent(String targetPath, String fileName, String payload) throws IllegalArgumentException, IOException {
 			FileSystemHelper.writeFileContent(targetPath, fileName, payload, false);
 		}
 		
@@ -43,7 +44,7 @@ public class SparkHelper {
 		 * @throws IOException
 		 * @throws InterruptedException
 		 */
-		public String getFileContent(String path) throws IllegalArgumentException, IOException, InterruptedException {
+		public static String getFileContent(String path) throws IllegalArgumentException, IOException, InterruptedException {
 			return FileSystemHelper.getFileContent(path);
 		}
 		
@@ -55,7 +56,7 @@ public class SparkHelper {
 		 * @throws IllegalArgumentException
 		 * @throws IOException
 		 */
-		public void writeFileContent(String targetPath, String fileName, String payload) throws IllegalArgumentException, IOException {
+		public static void 	writeFileContent(String targetPath, String fileName, String payload) throws IllegalArgumentException, IOException {
 			FileSystemHelper.writeFileContent(targetPath, fileName, payload, true);
 		}
 		
@@ -64,7 +65,7 @@ public class SparkHelper {
 		 * @return
 		 * @throws IOException
 		 */
-		public String getUserHomeArea() throws IOException {
+		public static String getUserHomeArea() throws IOException {
 			return FileSystemHelper.getUserHomeArea();
 		}
 		
@@ -74,7 +75,7 @@ public class SparkHelper {
 		 * @param tgtPath The Target HDFS file or directory
 		 * @throws IOException
 		 */
-		public void copyFromLocal(String srcPath, String tgtPath) throws IOException {
+		public static void copyFromLocal(String srcPath, String tgtPath) throws IOException {
 			FileSystemHelper.copyFromLocal(srcPath, tgtPath);
 		}
 		
@@ -84,7 +85,7 @@ public class SparkHelper {
 		 * @param tgtPath The Target local FS file or directory
 		 * @throws IOException
 		 */
-		public void CopyToLocal(String srcPath, String tgtPath) throws IOException {
+		public static void CopyToLocal(String srcPath, String tgtPath) throws IOException {
 			FileSystemHelper.copyToLocal(srcPath, tgtPath);
 		}
 		
@@ -93,7 +94,7 @@ public class SparkHelper {
 		 * @param path The Path to delete
 		 * @throws IOException
 		 */
-		public void delete(String path) throws IOException {
+		public static void delete(String path) throws IOException {
 			FileSystemHelper.delete(path, false);
 		}
 		
@@ -103,7 +104,7 @@ public class SparkHelper {
 		 * @param recursive Whether to delete recursively or not
 		 * @throws IOException
 		 */
-		public void delete(String path, Boolean recursive) throws IOException {
+		public static void delete(String path, Boolean recursive) throws IOException {
 			FileSystemHelper.delete(path, recursive);
 		}
 		
@@ -113,7 +114,7 @@ public class SparkHelper {
 		 * @param tgtPath The Path to move to
 		 * @throws IOException
 		 */
-		public void move(String srcPath, String tgtPath) throws IOException {
+		public static void move(String srcPath, String tgtPath) throws IOException {
 			FileSystemHelper.move(srcPath, tgtPath);
 		}
 		
@@ -124,7 +125,7 @@ public class SparkHelper {
 		 * @throws IllegalArgumentException
 		 * @throws IOException
 		 */
-		public ArrayList<String> list(String path) throws IllegalArgumentException, IOException {
+		public static ArrayList<String> list(String path) throws IllegalArgumentException, IOException {
 			return FileSystemHelper.list(path);
 		}
 	}
@@ -134,7 +135,7 @@ public class SparkHelper {
 	 * @author Rich Hay
 	 *
 	 */
-	public class Security {
+	public static class Security {
 		/**
 		 * Method to list aliases within the specified keystore
 		 * @param pathToKeyStore The path to the keystore
@@ -143,8 +144,8 @@ public class SparkHelper {
 		 * @throws IOException
 		 * @throws InterruptedException
 		 */
-		public List<String> getAliasesFromHadoopKeyStore(String pathToKeyStore) throws URISyntaxException, IOException, InterruptedException {
-			return HadoopKeyStoreHelper.getAliasesFromHadoopKeyStore(SparkHelper.getSparkSession(), pathToKeyStore);
+		public static List<String> getAliasesFromHadoopKeyStore(String pathToKeyStore) throws URISyntaxException, IOException, InterruptedException {
+			return HadoopKeyStoreHelper.getAliasesFromHadoopKeyStore(SparkHelperStatic.getSparkSession(), pathToKeyStore);
 		}
 		
 		/**
@@ -152,7 +153,7 @@ public class SparkHelper {
 		 * @return 
 		 * @throws IOException
 		 */
-		public String getCurrentUser() throws IOException {
+		public static String getCurrentUser() throws IOException {
 			return UserGroupInformation.getCurrentUser().getUserName();
 		}
 		
@@ -165,8 +166,8 @@ public class SparkHelper {
 		 * @throws IOException
 		 * @throws InterruptedException
 		 */
-		public String getFromHadoopKeyStore(String pathToKeyStore, String passwordAlias) throws URISyntaxException, IOException, InterruptedException {
-			return HadoopKeyStoreHelper.getFromHadoopKeyStore(SparkHelper.getSparkSession(), pathToKeyStore, passwordAlias);
+		public static String getFromHadoopKeyStore(String pathToKeyStore, String passwordAlias) throws URISyntaxException, IOException, InterruptedException {
+			return HadoopKeyStoreHelper.getFromHadoopKeyStore(SparkHelperStatic.getSparkSession(), pathToKeyStore, passwordAlias);
 		}
 		
 		/**
@@ -174,7 +175,7 @@ public class SparkHelper {
 		 * @return
 		 * @throws IOException
 		 */
-		public String getLoginUser() throws IOException {
+		public static String getLoginUser() throws IOException {
 			return UserGroupInformation.getLoginUser().getUserName();
 		}
 		
@@ -187,8 +188,8 @@ public class SparkHelper {
 		 * @throws IOException
 		 * @throws InterruptedException
 		 */
-		public void writeToHadoopKeyStore(String pathToKeyStore, String passwordAlias, String password) throws URISyntaxException, IOException, InterruptedException {
-			HadoopKeyStoreHelper.writeToHadoopKeyStore(SparkHelper.getSparkSession(), pathToKeyStore, passwordAlias, password);
+		public static void writeToHadoopKeyStore(String pathToKeyStore, String passwordAlias, String password) throws URISyntaxException, IOException, InterruptedException {
+			HadoopKeyStoreHelper.writeToHadoopKeyStore(SparkHelperStatic.getSparkSession(), pathToKeyStore, passwordAlias, password);
 		}
 	}
 	
@@ -202,7 +203,7 @@ public class SparkHelper {
 	 * @param connectionString The connection String for Impala
 	 * @return The Impala Helper
 	 */
-	public ImpalaHelper getImpalaHelper(String connectionString) {
+	public static ImpalaHelper getImpalaHelper(String connectionString) {
 		return new ImpalaHelper(connectionString);
 	}
 	
@@ -210,7 +211,7 @@ public class SparkHelper {
 	 * Method to return the Spark Application ID used in logs etc.
 	 * @return Application ID
 	 */
-	public String getSparkApplicationId() {
+	public static String getSparkApplicationId() {
 		return getSparkSession().sparkContext().applicationId();
 	}
 	
@@ -218,7 +219,7 @@ public class SparkHelper {
 	 * Method to Find the SparkSession within which we are operation
 	 * @return SparkSession created by spark-submit within which this process is running
 	 */
-	public static synchronized  SparkSession getSparkSession() {
+	public synchronized static SparkSession getSparkSession() {
 		if(sparkSession == null) {
 			sparkSession = SparkSession.builder()
 					.enableHiveSupport()
@@ -231,8 +232,8 @@ public class SparkHelper {
 	 * Method to get the Spark username (which is the "Executing user")
 	 * @return Spark User name
 	 */
-	public String getSparkUser() {
-		return SparkHelper.getSparkSession().sparkContext().sparkUser();
+	public static String getSparkUser() {
+		return SparkHelperStatic.getSparkSession().sparkContext().sparkUser();
 	}
 	
 	/**
@@ -240,7 +241,7 @@ public class SparkHelper {
 	 * @param payload The String to work on
 	 * @return
 	 */
-	public String toZeppelinOutput(String payload) {
+	public static String toZeppelinOutput(String payload) {
 		return String.format("%%html %s", payload.replace("\r\n", "<br/>").replace("\r", "<br/>").replace("\n", "<br/>"));
 	}
 }

@@ -4,6 +4,7 @@ import com.bigspark.cloudera.management.common.configuration.HiveConfiguration;
 import com.bigspark.cloudera.management.common.exceptions.SourceException;
 import com.bigspark.cloudera.management.common.model.TableDescriptor;
 import com.google.common.collect.Lists;
+import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.Database;
 import org.apache.hadoop.hive.metastore.api.MetaException;
@@ -15,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.naming.ConfigurationException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -22,14 +24,21 @@ import java.util.List;
 /**
  * Created by chris on 12/12/2019.
  */
-public class MetadataHelper extends HiveConfiguration {
+public class MetadataHelper {
 
 
     Logger log = LoggerFactory.getLogger(getClass());
     private static HiveMetaStoreClient client;
 
     public MetadataHelper() throws MetaException, ConfigurationException {
-        client = super.hiveMetaStoreClient();
+
+    }
+
+    public HiveMetaStoreClient getHiveMetaStoreClient() throws MetaException {
+        if (client == null) {
+            client = new HiveMetaStoreClient(new HiveConf());
+        }
+        return client;
     }
 
     public TableDescriptor getTableDescriptor(Table table) throws SourceException {

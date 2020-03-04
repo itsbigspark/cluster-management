@@ -2,11 +2,13 @@ package com.bigspark.cloudera.management.services.compaction;
 
 import com.bigspark.cloudera.management.helpers.FileSystemHelper;
 import com.bigspark.cloudera.management.helpers.SparkHelper;
+import com.bigspark.cloudera.management.services.ClusterManagementJob;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.hadoop.fs.ContentSummary;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.spark.sql.AnalysisException;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -20,18 +22,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Some;
 
+import javax.naming.ConfigurationException;
 import java.io.IOException;
 
 /**
- * Compaction job class
+ * Compaction job
+ * Used to discover and compact small parquet files within partitioned tables
  * @author Chris Finlayson
  *
  */
-public class CompactionJob {
+public class CompactionJob extends ClusterManagementJob {
 
     Logger log = LoggerFactory.getLogger(getClass());
     SparkSession spark;
     FileSystem fs;
+
+    public CompactionJob() throws IOException, MetaException, ConfigurationException {
+    }
 
     /**
      * Method to get currently configured blocksize from Hadoop configuration
@@ -111,26 +118,30 @@ public class CompactionJob {
     }
 
     /**
-     * Method to detemrine if compaction is required or not
+     * Method to determine if compaction is required or not
      * Criteria
      * 1 - Average file size must be less than 50% of the configured blocksize
      * 2 - There must be more than 2 files in the directory (1 + accounting for any _SUCCESS notify files etc)
-     * @param numFIles
+     * @param numFiles
      * @param totalSize
      * @return Boolean
      */
-    private Boolean isCompactionCandidate(Long numFIles, Long totalSize) {
-        if (numFIles == 0 || totalSize == 0) {
+    private Boolean isCompactionCandidate(Long numFiles, Long totalSize) {
+        if (numFiles <= 1 || totalSize == 0) {
             return false;
         }
-            Long averageSize = totalSize / numFIles;
-            //Check if average file size < 50% of blocksize
+            long averageSize = totalSize / numFiles;
+            double blocksizethreshold = Double.parseDouble(
+                    jobProperties.getProperty("com.bigspark.cloudera.management.services.compaction.blocksizethreshold")
+            );
+
+            //Check if average file size < parameterise % threshold of blocksize
             //Only compact if there is a small file issue
-            return (averageSize < getBlocksize() * 0.5) && numFIles > 2;
+            return (averageSize < getBlocksize() * blocksizethreshold) && numFiles > 2;
         }
 
     /**
-     * Method to calauclate the factor that we should repartition to
+     * Method to calculate the factor that we should repartition to
      * rounded up integer - total size of location / blocksize
      * @param totalSize
      * @return Integer
@@ -243,7 +254,6 @@ public class CompactionJob {
      */
     void executeMist(String database, String table, SparkSession spark) throws IOException, NoSuchTableException,NoSuchDatabaseException{
         this.spark = SparkHelper.getSparkSession();
-        this.fs = FileSystemHelper.getConnection();
         processTable(database,table);
     }
     /**
@@ -254,7 +264,6 @@ public class CompactionJob {
      */
     void execute() throws IOException, NoSuchTableException,NoSuchDatabaseException{
         this.spark = SparkHelper.getSparkSession();
-        this.fs = FileSystemHelper.getConnection();
         processTable("bddlsold01p","cf_small_files");
     }
 }
