@@ -33,7 +33,7 @@ import java.io.IOException;
  */
 public class CompactionJob extends ClusterManagementJob {
 
-    Logger log = LoggerFactory.getLogger(getClass());
+    Logger logger = LoggerFactory.getLogger(getClass());
     SparkSession spark;
     FileSystem fs;
 
@@ -103,7 +103,7 @@ public class CompactionJob extends ClusterManagementJob {
     }
 
     /**
-     *Method to return object count and total size of contents for a given HDFS location i
+     * Method to return object count and total size of contents for a given HDFS location
      * @param location
      * @return long[]
      * @throws IOException
@@ -211,8 +211,8 @@ public class CompactionJob extends ClusterManagementJob {
      */
     private void reconcileOutput(Dataset src, Dataset tmp){
         if (src.except(tmp).count()>0){
-            log.error("FATAL: Compacted file has not reconciled to source location");
-            log.error("FATAL: Exiting abnormally");
+            logger.error("FATAL: Compacted file has not reconciled to source location");
+            logger.error("FATAL: Exiting abnormally");
             System.exit(3);
         }
     }
@@ -238,8 +238,8 @@ public class CompactionJob extends ClusterManagementJob {
             try {
                 fs.rename(new Path(partitionLocation+"_delete"),new Path(partitionLocation));
             } catch (Exception e_){
-                log.error("FATAL: Error while reinstating partition at "+partitionLocation);
-                log.error("FATAL: Partition is now inoperable");
+                logger.error("FATAL: Error while reinstating partition at "+partitionLocation);
+                logger.error("FATAL: Partition is now inoperable");
                 e_.printStackTrace();
                 System.exit(1);
             }

@@ -49,9 +49,9 @@ class MetadataHelperTest {
         tableEAS = tableBase;
         tableEAS.setTableName("testTableEAS");
         tableEAS.setPartitionKeys(Arrays.asList(
+                new FieldSchema("edi_business_day", "date", null),
                 new FieldSchema("source_sys_id", "string", null),
-                new FieldSchema("source_sys_inst_id", "string", null),
-                new FieldSchema("edi_business_day", "date", null)
+                new FieldSchema("source_sys_inst_id", "string", null)
         ));
         hiveMetaStoreClient.createTable(tableEAS);
         hiveMetaStoreClient.appendPartition("testDB","testTableEAS",Arrays.asList("ADB","UBR","2020-01-20"));
@@ -73,7 +73,7 @@ class MetadataHelperTest {
         TableDescriptor tdEAS = this.metadataHelper.getTableDescriptor(this.tableEAS);
         assert(tdEAS.isPartitioned().equals(true));
         assert(tdSH.getPartitionList().size() == 1);
-//        assert(tdSH.getPartitionList().get(0).equals("src_sys_id=ADB","src_sys_inst_id=UBR","edi_business_day=2020-01-20"));
+//        assert(tdSH.getPartitionList().get(0).equals("edi_business_day=2020-01-20","src_sys_id=ADB","src_sys_inst_id=UBR"));
         assert(tdEAS.getTableName().equals("testTableEAS"));
     }
 

@@ -22,6 +22,7 @@ public class ClusterManagementJob {
     protected Configuration hadoopConfiguration;
     protected HiveMetaStoreClient hiveMetaStoreClient;
     protected MetadataHelper metadataHelper;
+    protected Boolean isDryRun;
 
     public ClusterManagementJob() throws IOException, MetaException, ConfigurationException {
         String appPrefix = jobProperties.getProperty("com.bigspark.cloudera.management.services.sparkAppNamePrefix");
@@ -34,9 +35,13 @@ public class ClusterManagementJob {
         this.hiveMetaStoreClient = new HiveMetaStoreClient(new HiveConf());
         this.metadataHelper = new MetadataHelper();
         this.jobProperties = getClusterManagementProperties();
+        this.isDryRun = Boolean.valueOf(String.valueOf(
+                jobProperties.getProperty("com.bigspark.cloudera.management.services.isDryRun")
+                )
+        );
     }
 
-    public static ClusterManagementJob getInstance() throws IOException, MetaException, ConfigurationException {
+    public synchronized static ClusterManagementJob getInstance() throws IOException, MetaException, ConfigurationException {
         if(INSTANCE == null) INSTANCE = new ClusterManagementJob();
         return INSTANCE;
     }

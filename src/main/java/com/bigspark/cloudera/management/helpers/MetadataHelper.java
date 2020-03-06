@@ -27,11 +27,10 @@ import java.util.List;
 public class MetadataHelper {
 
 
-    Logger log = LoggerFactory.getLogger(getClass());
+    Logger logger = LoggerFactory.getLogger(getClass());
     private static HiveMetaStoreClient client;
 
     public MetadataHelper() throws MetaException, ConfigurationException {
-
     }
 
     public HiveMetaStoreClient getHiveMetaStoreClient() throws MetaException {
@@ -128,22 +127,29 @@ public class MetadataHelper {
          return client.getAllDatabases();
     }
 
-    public Date getPartitionDate(Partition partition) {
+    public String getPartitionDateString(Partition partition) {
         //SH - /prod/source-history/ADB/ADB_BRANCH/edi_business_day=2020-01-20/
-        //EAS - /prod/enterprise-analytics-store/data/AGREEMENT/src_sys_id=ADB/src_sys_inst_id=NWB/edi_business_day=2020-01-20/
-        Date partitionDate = new Date();
+        //EAS - /prod/enterprise-analytics-store/data/AGREEMENT/edi_business_day=2020-01-20/src_sys_id=ADB/src_sys_inst_id=NWB/
         for (int i = 0; i <= partition.getValues().size(); i = i + 1) {
             if (partition.getValues().get(i).contains("edi_business_day")){
-                    log.debug(String.format("Date key found at level %s/%s for table: %s.%s, partition: %s"
-                            ,i,partition.getValues().size(),partition.getDbName(),partition.getTableName(),partition.toString()));
-                    partitionDate=stringToDate(partition.getValues().get(i).split("=")[1]);
+                logger.debug(String.format("Date key found at level %s/%s for table: %s.%s, partition: %s"
+                        ,i,partition.getValues().size(),partition.getDbName(),partition.getTableName(),partition.toString()));
+                return partition.getValues().get(i).split("=")[1];
             }
         }
-        return partitionDate;
+        logger.debug("No date found in partition keys, returning null");
+        return null;
+    }
+
+    public Date getPartitionDate(Partition partition) {
+        String partitionDateString = getPartitionDateString(partition);
+        return stringToDate(partitionDateString);
     }
 
     public Date stringToDate (String dateStr){
         DateWritable writableVal = new DateWritable(java.sql.Date.valueOf(dateStr));
         return new Date(writableVal.getDays());
     }
+
+
 }
