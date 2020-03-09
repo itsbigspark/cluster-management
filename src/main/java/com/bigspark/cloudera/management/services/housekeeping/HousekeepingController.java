@@ -17,6 +17,7 @@ import java.util.List;
 public class HousekeepingController extends ClusterManagementJob {
 
     public HousekeepingController() throws IOException, MetaException, ConfigurationException {
+        super();
     }
 
     Logger logger = LoggerFactory.getLogger(getClass());
@@ -44,8 +45,8 @@ public class HousekeepingController extends ClusterManagementJob {
      *
      * @return List<Row>
      */
-    private List<Row> getRetentionGroup(String group) {
-        return spark.sql("SELECT DISTINCT DATABASE FROM " + getRetentionTable()+ "WHERE GROUP="+group).collectAsList();
+    private List<Row> getRetentionGroup(int group) {
+        return spark.sql("SELECT DISTINCT DATABASE FROM " + getRetentionTable()+ " WHERE GROUP="+group).collectAsList();
     }
 
 
@@ -150,8 +151,8 @@ public class HousekeepingController extends ClusterManagementJob {
      * Method to retrieve a specified group of databases held in the metadata and return a list of RetentionMetadataContainers
      * @return List<RetentionMetadataContainer>
      */
-    private List<RetentionMetadataContainer> sourceGroupDatabasesFromMetaTable(String executionGroup) {
-        List<Row> allDatabasesInMetaTable = getRetentionDataForDatabase(executionGroup);
+    private List<RetentionMetadataContainer> sourceGroupDatabasesFromMetaTable(int executionGroup) {
+        List<Row> allDatabasesInMetaTable = getRetentionGroup(executionGroup);
         List<RetentionMetadataContainer> allPurgeMetadataItems = null;
         for (Row database : allDatabasesInMetaTable) {
             RetentionMetadataContainer RetentionMetadataContainer = sourceDatabaseFromMetaTable(database.get(0).toString());
@@ -175,7 +176,7 @@ public class HousekeepingController extends ClusterManagementJob {
         return allPurgeMetadataItems;
     }
 
-    void executeHousekeepingGroupForAll() throws ConfigurationException, IOException, MetaException {
+    private void executeHousekeepingGroupForAll() throws ConfigurationException, IOException, MetaException {
         List<RetentionMetadataContainer> allPurgeMetadata = sourceAllDatabasesFromMetaTable();
         HousekeepingJob housekeepingJob = new HousekeepingJob();
         allPurgeMetadata.forEach(database -> {
@@ -188,7 +189,7 @@ public class HousekeepingController extends ClusterManagementJob {
         });
     }
 
-    void executeHousekeepingGroup(String executionGroup) throws ConfigurationException, IOException, MetaException{
+    public void executeHousekeepingGroup(int executionGroup) throws ConfigurationException, IOException, MetaException{
         List<RetentionMetadataContainer> allPurgeMetadata = sourceGroupDatabasesFromMetaTable(executionGroup);
         HousekeepingJob housekeepingJob = new HousekeepingJob();
         allPurgeMetadata.forEach(database -> {

@@ -33,12 +33,6 @@ public class MetadataHelper {
     public MetadataHelper() throws MetaException, ConfigurationException {
     }
 
-    public HiveMetaStoreClient getHiveMetaStoreClient() throws MetaException {
-        if (client == null) {
-            client = new HiveMetaStoreClient(new HiveConf());
-        }
-        return client;
-    }
 
     public TableDescriptor getTableDescriptor(Table table) throws SourceException {
         if (table.getPartitionKeys().size() == 0) {

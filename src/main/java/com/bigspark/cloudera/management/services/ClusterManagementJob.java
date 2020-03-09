@@ -11,28 +11,32 @@ import org.apache.spark.sql.SparkSession;
 
 import javax.naming.ConfigurationException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 public class ClusterManagementJob {
 
     private static ClusterManagementJob INSTANCE;
-    protected Properties jobProperties;
-    protected SparkSession spark;
-    protected FileSystem fileSystem;
-    protected Configuration hadoopConfiguration;
-    protected HiveMetaStoreClient hiveMetaStoreClient;
-    protected MetadataHelper metadataHelper;
-    protected Boolean isDryRun;
+    public Properties jobProperties;
+    public SparkSession spark;
+    public FileSystem fileSystem;
+    public Configuration hadoopConfiguration;
+    public HiveMetaStoreClient hiveMetaStoreClient;
+    public MetadataHelper metadataHelper;
+    public Boolean isDryRun;
 
     public ClusterManagementJob() throws IOException, MetaException, ConfigurationException {
+        getClusterManagementProperties();
         String appPrefix = jobProperties.getProperty("com.bigspark.cloudera.management.services.sparkAppNamePrefix");
-        this.spark=SparkSession.builder()
-                .appName(appPrefix+this.getClass().getName())
-                .enableHiveSupport()
-                .getOrCreate();
+        if (this.spark == null)
+            this.spark=SparkSession.builder()
+                    .appName(appPrefix+this.getClass().getName())
+                    .enableHiveSupport()
+                    .getOrCreate();
         this.hadoopConfiguration =(spark.sparkContext().hadoopConfiguration());
         this.fileSystem =FileSystem.get(hadoopConfiguration);
-        this.hiveMetaStoreClient = new HiveMetaStoreClient(new HiveConf());
+        if (this.hiveMetaStoreClient == null)
+            this.hiveMetaStoreClient = new HiveMetaStoreClient(new HiveConf());
         this.metadataHelper = new MetadataHelper();
         this.jobProperties = getClusterManagementProperties();
         this.isDryRun = Boolean.valueOf(String.valueOf(
@@ -41,14 +45,23 @@ public class ClusterManagementJob {
         );
     }
 
+
     public synchronized static ClusterManagementJob getInstance() throws IOException, MetaException, ConfigurationException {
-        if(INSTANCE == null) INSTANCE = new ClusterManagementJob();
+        if(INSTANCE == null) {
+            synchronized (ClusterManagementJob.class) {
+                INSTANCE = new ClusterManagementJob();
+            }
+        }
         return INSTANCE;
     }
 
     public synchronized Properties getClusterManagementProperties() throws IOException {
         if(this.jobProperties == null) {
-            jobProperties = PropertyUtils.getPropertiesFile("src/main/resources/config.properties");
+//            jobProperties = PropertyUtils.getPropertiesFile("/config.properties");
+            InputStream input=ClusterManagementJob.class.getClassLoader().getResourceAsStream("config.properties");
+            Properties prop = new Properties();
+            prop.load(input);
+            jobProperties=prop;
         }
         return jobProperties;
     }

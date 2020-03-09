@@ -5,6 +5,6 @@ import com.bigspark.cloudera.management.services.compaction.CompactionJob;
 public class HousekeepingRunner {
     public static void main(String[] args) throws Exception {
         HousekeepingController housekeepingController = new HousekeepingController();
-        housekeepingController.executeHousekeepingGroupForAll();
+//        housekeepingController.executeHousekeepingGroupForAll();
     }
 }
