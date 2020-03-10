@@ -4,13 +4,18 @@ import com.bigspark.cloudera.management.common.enums.Pattern;
 import com.bigspark.cloudera.management.common.exceptions.SourceException;
 import com.bigspark.cloudera.management.common.model.TableDescriptor;
 import com.bigspark.cloudera.management.helpers.FileSystemHelper;
+import com.bigspark.cloudera.management.helpers.MetadataHelper;
 import com.bigspark.cloudera.management.services.ClusterManagementJob;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.Partition;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
+import org.apache.spark.sql.SparkSession;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,8 +23,11 @@ import org.slf4j.LoggerFactory;
 import javax.naming.ConfigurationException;
 import java.io.IOException;
 import java.sql.Date;
+import java.text.ParseException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 
@@ -29,18 +37,32 @@ import java.util.stream.Collectors;
  *
  * @author Chris Finlayson
  */
-class HousekeepingJob extends ClusterManagementJob {
+class HousekeepingJob {
 
-    Logger logger = LoggerFactory.getLogger(getClass());
+    public Properties jobProperties;
+    public SparkSession spark;
+    public FileSystem fileSystem;
+    public Configuration hadoopConfiguration;
+    public HiveMetaStoreClient hiveMetaStoreClient;
+    public MetadataHelper metadataHelper;
+    public Boolean isDryRun;
+
     String trashBaseLocation;
-    boolean dryRun;
     Pattern pattern;
     Dataset<Row> partitionMonthEnds;
-    private List<Row> partitionMonthEndsList;
+//    private List<Row> partitionMonthEndsList;
 
+    Logger logger = LoggerFactory.getLogger(getClass());
 
     HousekeepingJob() throws IOException, MetaException, ConfigurationException {
-        super();
+        ClusterManagementJob clusterManagementJob = ClusterManagementJob.getInstance();
+        this.spark = clusterManagementJob.spark;
+        this.fileSystem = clusterManagementJob.fileSystem;
+        this.hadoopConfiguration = clusterManagementJob.hadoopConfiguration;
+        this.metadataHelper = clusterManagementJob.metadataHelper;
+        this.isDryRun = clusterManagementJob.isDryRun;
+        this.jobProperties = clusterManagementJob.jobProperties;
+        this.hiveMetaStoreClient = clusterManagementJob.hiveMetaStoreClient;
     }
 
     private void getTablePartitionMonthEnds(String dbName, String tableName){
@@ -57,7 +79,7 @@ class HousekeepingJob extends ClusterManagementJob {
                     "GROUP BY SOURCE_SYS_ID, SOURCE_SYS_INST_ID, year(EDI_BUSINESS_DAY), month(EDI_BUSINESS_DAY)"
                     , dbName, tableName));
              partitionMonthEnds = spark.sql(sb.toString());
-             partitionMonthEndsList = spark.sql(sb.toString()).collectAsList();
+//             partitionMonthEndsList = spark.sql(sb.toString()).collectAsList();
         }
         else if (pattern == pattern.SH){
             sb.append(String.format("SELECT DISTINCT" +
@@ -69,40 +91,40 @@ class HousekeepingJob extends ClusterManagementJob {
                             "GROUP BY SOURCE_SYS_INST_ID, year(EDI_BUSINESS_DAY), month(EDI_BUSINESS_DAY)"
                     , dbName,tableName));
             partitionMonthEnds = spark.sql(sb.toString());
-            partitionMonthEndsList = spark.sql(sb.toString()).collectAsList();
+//            partitionMonthEndsList = spark.sql(sb.toString()).collectAsList();
         }
     }
 
 
 
-    /**
-     * Method to verify if partition key is a month end
-     * @param partition
-     * @return
-     */
-    @Deprecated
-    private boolean isPartitionKeyMonthEnd(Partition partition) {
-        boolean isPartitionKeyMonthEnd = false;
-        for (Row row : partitionMonthEndsList){
-            if (pattern == Pattern.EAS){
-                String businessDate = partition.getValues().get(0).split("=")[1];
-                String sourceSysId = partition.getValues().get(1).split("=")[1];
-                String sourceSysInstId = partition.getValues().get(2).split("=")[1];
-                if (    row.get(0).equals(sourceSysId) &&
-                        row.get(1).equals(sourceSysInstId) &&
-                        row.get(2).equals(businessDate)){
-                    isPartitionKeyMonthEnd = true;
-                }
-            } else if (pattern == Pattern.SH){
-                String businessDate = partition.getValues().get(0).split("=")[1];
-                // THIS DOESNT WORK AS DOESNT ACCOUNT FOR SRC_SYS_INST_ID
-                if (row.get(1).equals(businessDate)){
-                    isPartitionKeyMonthEnd = true;
-                }
-            }
-        }
-        return isPartitionKeyMonthEnd;
-    }
+//    /**
+//     * Method to verify if partition key is a month end
+//     * @param partition
+//     * @return
+//     */
+//    @Deprecated
+//    private boolean isPartitionKeyMonthEnd(Partition partition) {
+//        boolean isPartitionKeyMonthEnd = false;
+//        for (Row row : partitionMonthEndsList){
+//            if (pattern == Pattern.EAS){
+//                String businessDate = partition.getValues().get(0).split("=")[1];
+//                String sourceSysId = partition.getValues().get(1).split("=")[1];
+//                String sourceSysInstId = partition.getValues().get(2).split("=")[1];
+//                if (    row.get(0).equals(sourceSysId) &&
+//                        row.get(1).equals(sourceSysInstId) &&
+//                        row.get(2).equals(businessDate)){
+//                    isPartitionKeyMonthEnd = true;
+//                }
+//            } else if (pattern == Pattern.SH){
+//                String businessDate = partition.getValues().get(0).split("=")[1];
+//                // THIS DOESNT WORK AS DOESNT ACCOUNT FOR SRC_SYS_INST_ID
+//                if (row.get(1).equals(businessDate)){
+//                    isPartitionKeyMonthEnd = true;
+//                }
+//            }
+//        }
+//        return isPartitionKeyMonthEnd;
+//    }
 
     /**
      * Method to calculate the minimum retention date (purge ceiling)
@@ -112,8 +134,10 @@ class HousekeepingJob extends ClusterManagementJob {
      * @return LocalDate
      */
     private LocalDate calculatePurgeCeiling(int retentionPeriod, LocalDate currentDate) {
+        logger.debug("Retention period : "+ retentionPeriod);
         if (retentionPeriod <= 0) {
             logger.debug("Invalid retention period [ " + retentionPeriod + "]. Returning zero partitions.");
+            return currentDate;
         }
         return currentDate.minusDays(retentionPeriod);
     }
@@ -124,7 +148,12 @@ class HousekeepingJob extends ClusterManagementJob {
      * @throws TException
      */
     private void dropHivePartition(Partition partition) throws TException {
-        hiveMetaStoreClient.dropPartition(partition.getDbName(), partition.getTableName(), partition.getValues());
+        if (isDryRun){
+            logger.info("DRY RUN - Dropped partition : "+partition.toString());
+        } else {
+            hiveMetaStoreClient.dropPartition(partition.getDbName(), partition.getTableName(), partition.getValues());
+            logger.info("Dropped par tition : " + partition.toString());
+        }
     }
 
     /**
@@ -133,7 +162,12 @@ class HousekeepingJob extends ClusterManagementJob {
      * @throws TException
      */
     private void purgeHivePartition(Partition partition) throws TException {
-        hiveMetaStoreClient.dropPartition(partition.getDbName(), partition.getTableName(), partition.getValues(), true);
+        if (isDryRun){
+            logger.info("DRY RUN - Purged partition : "+partition.toString());
+        } else {
+            hiveMetaStoreClient.dropPartition(partition.getDbName(), partition.getTableName(), partition.getValues(), true);
+            logger.info("Purged partition : "+partition.toString());
+        }
     }
 
     /**
@@ -142,28 +176,21 @@ class HousekeepingJob extends ClusterManagementJob {
      * @param purgeDateCeiling
      * @return
      */
-    private List<Partition> getAllPurgeCandidates(List<Partition> partitionList, LocalDate purgeDateCeiling, boolean retainMonthEnd) {
-        List<Partition> eligiblePartitions = partitionList.stream()
-                //filter all partitions that are month end if this is set
-//                .filter(partition -> {
-//                    if (isPartitionKeyMonthEnd(partition) && retainMonthEnd) {
-//                        logger.error("Partition is a month end [ " + partition.getValues().toString() + " ] and month ends are to be retained for this table. ");
-//                        return false;
-//                    } else {
-//                        return true;
-//                    }
-//                })
-                //find partitions older than purgeCeiling
-                .filter(partition -> {
-                    if (metadataHelper.getPartitionDate(partition).before(Date.valueOf(purgeDateCeiling))) {
-                        return true;
-                    } else {
-                        logger.debug(partition.toString() + "is within retention period [ Purge ceiling = " + purgeDateCeiling + " ]");
-                        return false;
+    private List<Partition> getAllPurgeCandidates(List<Partition> partitionList, LocalDate purgeDateCeiling) {
+        ArrayList<Partition> eligiblePartitions = new ArrayList<>();
+        partitionList.forEach(
+                partition -> {
+                    java.util.Date partitionDate = null;
+                    try {
+                        partitionDate = metadataHelper.getPartitionDate(partition, pattern);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
                     }
-                })
-                .collect(Collectors.toList());
-
+                    if (partitionDate.before(Date.valueOf(purgeDateCeiling))){
+                    eligiblePartitions.add(partition);
+                    }
+                }
+            );
         return eligiblePartitions;
     }
 
@@ -187,11 +214,20 @@ class HousekeepingJob extends ClusterManagementJob {
     }
 
     private void trashDataOutwithRetention(List<Partition> purgeCandidates) throws IOException {
-        for (Partition p : purgeCandidates){ ;
+        setTrashBaseLocation();
+        for (Partition p : purgeCandidates){
             String trashTarget = trashBaseLocation+"/"+p.getSd().getLocation();
-            boolean isRenameSuccess = fileSystem.rename(new Path(p.getSd().getLocation()), new Path(trashTarget));
-            if (! isRenameSuccess ){
-                throw new IOException(String.format("Failed to move files from : %s to : %s",p.getSd().getLocation(),trashTarget));
+            logger.debug("Trash location : "+trashTarget);
+            if (isDryRun){
+                logger.info("Dropped location :"+p.getSd().getLocation()+" to Trash");
+            } else {
+                try {
+                boolean isRenameSuccess = fileSystem.rename(new Path(p.getSd().getLocation()), new Path(trashTarget));
+                if (!isRenameSuccess)
+                    throw new IOException(String.format("Failed to move files from : %s to : %s", p.getSd().getLocation(), trashTarget));
+                } catch (Exception e){
+                    logger.error("Unexpected error processing : "+p.getSd().getLocation()+" to Trash");
+                }
             }
         }
     }
@@ -226,7 +262,10 @@ class HousekeepingJob extends ClusterManagementJob {
      * @throws IOException
      */
     private void purgeHDFSPartition(Partition partition) throws IOException {
-        fileSystem.delete(new Path(getPartitionLocation(partition)), true);
+        boolean delete = fileSystem.delete(new Path(getPartitionLocation(partition)), true);
+        if (! delete ){
+            throw new IOException("Unexpected error deleting location: "+getPartitionLocation(partition));
+        }
     }
 
     /**
@@ -261,18 +300,53 @@ class HousekeepingJob extends ClusterManagementJob {
         //todo
     }
 
-    private void getTableType(TableDescriptor tableDescriptor) throws SourceException {
+    private boolean verifyPartitionKey(Table table){
+        //edi_business_day='2020-02-20'
+        boolean validPartitionKey = false;
+        //Test if partition key is "edi_business_day", if so, return true
+        if (table.getPartitionKeys().get(0).getName().equals("edi_business_day")){
+            validPartitionKey = true;
+        }
+        return validPartitionKey;
+    }
+
+    private boolean verifyPartitionKey(String partitionName){
+        //edi_business_day='2020-02-20'
+        boolean partitionKey = false;
+        //Test if partition key is "edi_business_day", if so, return true
+        if (partitionName.startsWith("edi_business_day")){
+            partitionKey = true;
+        }
+        return partitionKey;
+    }
+
+    private String returnPartitionDate(String partitionName){
+        String partitionKey = null;
+        //Test if partition key is "edi_business_day", if so, return date value
+        if (partitionName.startsWith("edi_business_day")){
+            partitionKey = partitionName.split("=")[1];
+        }
+        return partitionKey;
+    }
+
+    private void getTableType(HousekeepingController.TableMetadata tableMetadata) throws SourceException {
+        TableDescriptor tableDescriptor = tableMetadata.tableDescriptor;
+        logger.info("Now processing table "+tableDescriptor.getDatabaseName()+"."+tableDescriptor.getTableName());
         Pattern pattern = null;
         if (tableDescriptor.isPartitioned()){
             Partition p = tableDescriptor.getPartitionList().get(0);
-            if (p.getValues().size() == 3 && p.getValues().get(0).contains("edi_business_day")) {
-                pattern = Pattern.EAS;
-            } else if (p.getValues().size() == 1 && p.getValues().get(0).contains("edi_business_day")){
-                pattern =  Pattern.SH;
+            //Test that partition name starts with "edi_business_day" and value matches
+            if (verifyPartitionKey(tableDescriptor.getTable()) && p.getValues().size() == 3) {
+                    pattern = Pattern.EAS;
+            } else if (verifyPartitionKey(tableDescriptor.getTable()) && p.getValues().size() == 1){
+                    pattern = Pattern.SH;
             } else {
-                logger.error("Partition specification not recognised");
-            }
+                logger.error("Partition specification pattern not recognised");
+                }
+        } else {
+            logger.error("Table "+tableDescriptor.getDatabaseName()+"."+tableDescriptor.getTableName()+" is not partitioned");
         }
+        logger.debug("Pattern confirmed as : "+pattern.toString());
         this.pattern=pattern;
     }
 
@@ -281,9 +355,22 @@ class HousekeepingJob extends ClusterManagementJob {
      * @throws MetaException
      * @throws SourceException
      */
-    void execute(TableDescriptor tableDescriptor){
-
-
+    void execute(HousekeepingController.TableMetadata tableMetadata) throws SourceException, IOException {
+        getTableType(tableMetadata);
+        if (this.pattern != null){
+            LocalDate purgeCeiling = calculatePurgeCeiling(tableMetadata.retentionPeriod, LocalDate.now());
+            logger.debug("Purge ceiling calculated as :"+purgeCeiling.toString());
+            List<Partition> allPurgeCandidates = getAllPurgeCandidates(tableMetadata.tableDescriptor.getPartitionList(), purgeCeiling);
+            logger.debug(allPurgeCandidates.size()+" : partitions returned as eligible for purge");
+            if (tableMetadata.isRetainMonthEnd){
+                getTablePartitionMonthEnds(tableMetadata.database,tableMetadata.tableName);
+                createMonthEndSwingTable(tableMetadata.database,tableMetadata.tableName);
+                trashDataOutwithRetention(allPurgeCandidates);
+                resolveSourceTableWithSwingTable(tableMetadata.database,tableMetadata.tableName);
+            } else {
+                trashDataOutwithRetention(allPurgeCandidates);
+            }
+        }
     }
 
 }

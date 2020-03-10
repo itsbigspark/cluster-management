@@ -1,13 +1,12 @@
 package com.bigspark.cloudera.management.services.housekeeping;
 
-import com.bigspark.cloudera.management.common.utils.PropertyUtils;
+import com.bigspark.cloudera.management.common.enums.Pattern;
 
-import java.io.InputStream;
+import java.io.*;
 import java.util.Properties;
 
 public class HousekeepingJobTestRunner {
     public static void main(String[] args) throws Exception {
-        System.out.println("Test startup");
         InputStream input=HousekeepingJobTestRunner.class.getClassLoader().getResourceAsStream("config.properties");
         Properties prop = new Properties();
         prop.load(input);
@@ -15,4 +14,5 @@ public class HousekeepingJobTestRunner {
         housekeepingJobTest.jobProperties=prop;
         housekeepingJobTest.execute();
     }
+
 }

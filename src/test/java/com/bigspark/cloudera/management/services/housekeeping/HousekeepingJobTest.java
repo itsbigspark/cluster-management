@@ -4,58 +4,28 @@ import com.bigspark.cloudera.management.Common;
 import com.bigspark.cloudera.management.common.enums.Pattern;
 import com.bigspark.cloudera.management.helpers.MetadataHelper;
 import com.bigspark.cloudera.management.services.ClusterManagementJob;
+import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.MetaException;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
-import org.junit.Before;
 import org.junit.jupiter.api.Test;
 
 import javax.naming.ConfigurationException;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.util.Properties;
 import java.util.stream.IntStream;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class HousekeepingJobTest {
-
-//    spark.sql("CREATE TABLE housekeeping_testing.testTableSH (value STRING, source_sys_id STRING, source_sys_inst_id STRING) PARTITIONED BY (edi_business_day timestamp)");
-//    spark.sql("ALTER TABLE housekeeping_testing.testTableSH ADD PARTITION (edi_business_day='2020-01-20')");
-//    spark.sql("INSERT INTO housekeeping_testing.testTableSH PARTITION (edi_business_day='2020-01-20') VALUES ('test1','ADB','UBR')");
-//    spark.sql("INSERT INTO housekeeping_testing.testTableSH PARTITION (edi_business_day='2020-01-22') VALUES ('test1','ADB','UBR')");
-//    spark.sql("INSERT INTO housekeeping_testing.testTableSH PARTITION (edi_business_day='2020-01-23') VALUES ('test1','ADB','UBR')");
-//    spark.sql("INSERT INTO housekeeping_testing.testTableSH PARTITION (edi_business_day='2020-01-24') VALUES ('test1','ADB','UBR')");
-//    spark.sql("INSERT INTO housekeeping_testing.testTableSH PARTITION (edi_business_day='2020-01-20') VALUES ('test1','ADB','UBN')");
-//    spark.sql("INSERT INTO housekeeping_testing.testTableSH PARTITION (edi_business_day='2020-01-22') VALUES ('test1','ADB','UBN')");
-//    spark.sql("INSERT INTO housekeeping_testing.testTableSH PARTITION (edi_business_day='2020-01-23') VALUES ('test1','ADB','UBN')");
-//    spark.sql("INSERT INTO housekeeping_testing.testTableSH PARTITION (edi_business_day='2020-01-26') VALUES ('test1','ADB','UBN')");
-//
-//    spark.sql("CREATE TABLE housekeeping_testing.testTableEAS (value STRING) PARTITIONED BY (edi_business_day timestamp, source_sys_id STRING, source_sys_inst_id STRING)");
-//
-//    spark.sql("ALTER TABLE housekeeping_testing.testTableEAS ADD PARTITION (edi_business_day='"+ generateBusinessDate(0)+"',source_sys_id='ADB',source_sys_inst_id='UBR')");
-//    spark.sql("ALTER TABLE housekeeping_testing.testTableEAS ADD PARTITION (edi_business_day='"+ generateBusinessDate(1)+"',source_sys_id='ADB',source_sys_inst_id='UBR')");
-//    spark.sql("ALTER TABLE housekeeping_testing.testTableEAS ADD PARTITION (edi_business_day='"+ generateBusinessDate(2)+"',source_sys_id='ADB',source_sys_inst_id='UBR')");
-//    spark.sql("ALTER TABLE housekeeping_testing.testTableEAS ADD PARTITION (edi_business_day='"+ generateBusinessDate(3)+"',source_sys_id='ADB',source_sys_inst_id='UBR')");
-//    spark.sql("ALTER TABLE housekeeping_testing.testTableEAS ADD PARTITION (edi_business_day='"+ generateBusinessDate(4)+"',source_sys_id='ADB',source_sys_inst_id='UBR')");
-//    spark.sql("ALTER TABLE housekeeping_testing.testTableEAS ADD PARTITION (edi_business_day='"+ generateBusinessDate(5)+"',source_sys_id='ADB',source_sys_inst_id='UBR')");
-//    spark.sql("ALTER TABLE housekeeping_testing.testTableEAS ADD PARTITION (edi_business_day='"+ generateBusinessDate(6)+"',source_sys_id='ADB',source_sys_inst_id='UBR')");
-//    spark.sql("ALTER TABLE housekeeping_testing.testTableEAS ADD PARTITION (edi_business_day='"+ generateBusinessDate(7)+"',source_sys_id='ADB',source_sys_inst_id='UBR')");
-//    spark.sql("ALTER TABLE housekeeping_testing.testTableEAS ADD PARTITION (edi_business_day='"+ generateBusinessDate(7)+"',source_sys_id='ADB',source_sys_inst_id='UBR')");
-//
-//
-//    spark.sql("INSERT INTO housekeeping_testing.testTableEAS PARTITION (edi_business_day='"+ generateBusinessDate(0)+"',source_sys_id='ADB',source_sys_inst_id='UBR') VALUES ('test1')");
-//    spark.sql("INSERT INTO housekeeping_testing.testTableEAS PARTITION (edi_business_day='"+ generateBusinessDate(1)+"',source_sys_id='ADB',source_sys_inst_id='UBR') VALUES ('test1')");
-//    spark.sql("INSERT INTO housekeeping_testing.testTableEAS PARTITION (edi_business_day='"+ generateBusinessDate(2)+"',source_sys_id='ADB',source_sys_inst_id='UBR') VALUES ('test1')");
-//    spark.sql("INSERT INTO housekeeping_testing.testTableEAS PARTITION (edi_business_day='"+ generateBusinessDate(3)+"',source_sys_id='ADB',source_sys_inst_id='UBR') VALUES ('test1')");
-//    spark.sql("INSERT INTO housekeeping_testing.testTableEAS PARTITION (edi_business_day='"+ generateBusinessDate(4)+"',source_sys_id='ADB',source_sys_inst_id='UBR') VALUES ('test1')");
-//    spark.sql("INSERT INTO housekeeping_testing.testTableEAS PARTITION (edi_business_day='"+ generateBusinessDate(5)+"',source_sys_id='ADB',source_sys_inst_id='UBR') VALUES ('test1')");
-//    spark.sql("INSERT INTO housekeeping_testing.testTableEAS PARTITION (edi_business_day='"+ generateBusinessDate(6)+"',source_sys_id='ADB',source_sys_inst_id='UBR') VALUES ('test1')");
-//    spark.sql("INSERT INTO housekeeping_testing.testTableEAS PARTITION (edi_business_day='"+ generateBusinessDate(7)+"',source_sys_id='ADB',source_sys_inst_id='UBR') VALUES ('test1')");
-//    spark.sql("INSERT INTO housekeeping_testing.testTableEAS PARTITION (edi_business_day='"+ generateBusinessDate(8)+"',source_sys_id='ADB',source_sys_inst_id='UBR') VALUES ('test1')");
+public class HousekeepingJobTest {
 
     public Properties jobProperties;
     public SparkSession spark;
@@ -66,8 +36,8 @@ class HousekeepingJobTest {
     public HousekeepingController housekeepingController;
 
     public HousekeepingJobTest() throws IOException, MetaException, ConfigurationException {
+        ClusterManagementJob clusterManagementJob = ClusterManagementJob.getInstance();
         this.housekeepingController = new HousekeepingController();
-        ClusterManagementJob clusterManagementJob = housekeepingController.getInstance();
         this.spark = clusterManagementJob.spark;
         this.fileSystem = clusterManagementJob.fileSystem;
         this.hadoopConfiguration = clusterManagementJob.hadoopConfiguration;
@@ -75,83 +45,91 @@ class HousekeepingJobTest {
         this.isDryRun = clusterManagementJob.isDryRun;
     }
 
-    void setUp() throws ConfigurationException, IOException, MetaException {
+    void setUp() throws IOException {
+//        FileUtils.deleteDirectory(new File("/opt/spark/2.4.3/metastore_db"));
+        FileUtils.forceDelete(new File("/opt/spark/2.4.3/metastore_db/db.lck"));
+        FileUtils.forceDelete(new File("/opt/spark/2.4.3/metastore_db/dbex.lck"));
+        File testFile = new File("/tmp/testdata.csv");
 
-        spark.sql("CREATE DATABASE housekeeping_testing");
-        spark.sql("DROP TABLE IF EXISTS housekeeping_testing.testTableSH");
-        spark.sql("DROP TABLE IF EXISTS housekeeping_testing.testTableEAS");
-        spark.sql("DROP TABLE IF EXISTS housekeeping_testing.data_retention_configuration");
-        
-        spark.sql("CREATE TABLE housekeeping_testing.data_retention_configuration (database STRING, table STRING, retention_period INT, retain_month_end STRING, group INT)");
-        spark.sql("INSERT INTO housekeeping_testing.data_retention_configuration VALUES ('housekeeping_testing','testTableSH',30,'false',1)");
-        spark.sql("INSERT INTO housekeeping_testing.data_retention_configuration VALUES ('housekeeping_testing','testTableSH2',40,'false',2)");
-        spark.sql("INSERT INTO housekeeping_testing.data_retention_configuration VALUES ('housekeeping_testing','testTableEAS',30,'false',1)");
-        spark.sql("INSERT INTO housekeeping_testing.data_retention_configuration VALUES ('housekeeping_testing','testTableEAS2',40,'false',2)");
+        if (! testFile.exists()) {
+            System.out.println("Now generating test dataset");
 
-        createTable("housekeeping_testing","testTableSH",Pattern.SH);
-        generateTestData("housekeeping_testing","testTableSH","ADB","NWB",100,Pattern.SH);
-        generateTestData("housekeeping_testing","testTableSH","ADB","UBR",90,Pattern.SH);
-        generateTestData("housekeeping_testing","testTableSH","ADB","UBN",80,Pattern.SH);
-        generateTestData("housekeeping_testing","testTableSH","ADB","RBS",70,Pattern.SH);
+            StringBuilder sb = new StringBuilder();
+            sb.append("value,edi_business_day,src_sys_id,src_sys_inst_id\n");
 
-        createTable("housekeeping_testing","testTableSH2",Pattern.SH);
-        generateTestData("housekeeping_testing","testTableSH2","ADB","NWB",100,Pattern.SH);
-        generateTestData("housekeeping_testing","testTableSH2","ADB","UBR",90,Pattern.SH);
-        generateTestData("housekeeping_testing","testTableSH2","ADB","UBN",80,Pattern.SH);
-        generateTestData("housekeeping_testing","testTableSH2","ADB","RBS",70,Pattern.SH);
+            generateTestData("ADB", "NWB", 1000, sb);
+            generateTestData("ADB", "UBR", 900, sb);
+            generateTestData("ADB", "UBN", 800, sb);
+            generateTestData("ADB", "RBS", 700, sb);
 
-        createTable("housekeeping_testing","testTableEAS",Pattern.EAS);
-        generateTestData("housekeeping_testing","testTableEAS","ADB","NWB",100,Pattern.EAS);
-        generateTestData("housekeeping_testing","testTableEAS","ADB","UBR",90,Pattern.EAS);
-        generateTestData("housekeeping_testing","testTableEAS","ADB","UBN",80,Pattern.EAS);
-        generateTestData("housekeeping_testing","testTableEAS","ADB","RBS",70,Pattern.EAS);
+            System.out.println(sb.toString());
 
-        createTable("housekeeping_testing","testTableEAS2",Pattern.EAS);
-        generateTestData("housekeeping_testing","testTableEAS2","ADB","NWB",100,Pattern.EAS);
-        generateTestData("housekeeping_testing","testTableEAS2","ADB","UBR",90,Pattern.EAS);
-        generateTestData("housekeeping_testing","testTableEAS2","ADB","UBN",80,Pattern.EAS);
-        generateTestData("housekeeping_testing","testTableEAS2","ADB","RBS",70,Pattern.EAS);
-
+            BufferedWriter writer = null;
+            try {
+                writer = new BufferedWriter(new FileWriter(testFile));
+                writer.write(sb.toString());
+            } finally {
+                if (writer != null) writer.close();
+            }
+        }
+        createTables();
     }
 
     private String generateBusinessDate(int offset){
-        return "year(now())||'-'||format_string('%02d',month(now()))||'-'||format_string('%02d',day(now())-"+offset+")";
+        return LocalDate.now().minusDays(offset).toString();
     }
 
-    private void createTable(String database, String table, Pattern pattern){
-        if (pattern == Pattern.SH) {
-            spark.sql(String.format("CREATE TABLE %s.%s (value STRING, source_sys_id STRING, source_sys_inst_id STRING) PARTITIONED BY (edi_business_day TIMESTAMP)",database, table));
-        } else if (pattern == Pattern.EAS){
-            spark.sql(String.format("CREATE TABLE %s.%s (value STRING) PARTITIONED BY (edi_business_day TIMESTAMP, source_sys_id STRING, source_sys_inst_id STRING)",database, table));
-        }
+    private StringBuilder addData(String sys, String inst, int offset) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("test_%d,%s,%s,%s\n",offset,generateBusinessDate(offset), sys, inst));
+        return sb;
     }
 
-    private void addPartitionAndData(String database, String table, String sys, String inst, int offset, Pattern pattern) {
-        if (pattern == Pattern.EAS) {
-            spark.sql(String.format("ALTER TABLE %s.%s ADD PARTITION (edi_business_day='" + generateBusinessDate(offset) + "',source_sys_id='%s',source_sys_inst_id='%s')", database, table, sys, inst, offset));
-            spark.sql(String.format("INSERT INTO %s.%s PARTITION (edi_business_day='" + generateBusinessDate(offset) + "',source_sys_id='%s',source_sys_inst_id='%s') VALUES ('test_%d')", database, table, sys, inst, offset));
-        } else if (pattern == Pattern.SH){
-            spark.sql(String.format("ALTER TABLE %s.%s ADD PARTITION (edi_business_day='" + generateBusinessDate(offset)+"')", database, table, offset));
-            spark.sql(String.format("INSERT INTO %s.%s PARTITION (edi_business_day='" + generateBusinessDate(offset) + "',source_sys_id='%s',source_sys_inst_id='%s') VALUES ('test_%d','%s','%s')", database, table, offset, sys, inst));
-        }
-
-    }
-
-    private void generateTestData(String database, String table, String sys, String inst, int numOffsets, Pattern pattern){
+    private StringBuilder generateTestData(String sys, String inst, int numOffsets, StringBuilder sb){
         IntStream.range(0, numOffsets).forEach(i ->
-                addPartitionAndData(database,table,sys,inst,i,pattern)
+                sb.append(addData(sys,inst,i)).toString()
         );
+        return sb;
     }
-
 
     private void checkHousekeepingResult(String database, String table, String sys, String inst, int numOffsets, Pattern pattern, int retentionDays){
         if (pattern == Pattern.EAS) {
-            long count = spark.sql(String.format("SELECT distinct edi_business_day from %s.%s where source_sys_id=%s and source_sys_inst_id=%s", database, table, sys, inst)).count();
+            long count = spark.sql(String.format("SELECT distinct edi_business_day from %s.%s where src_sys_id=%s and src_sys_inst_id='%s'", database, table, sys, inst)).count();
             assertEquals(count,(numOffsets - retentionDays));
         } else if (pattern == Pattern.SH){
-            long count = spark.sql(String.format("SELECT distinct edi_business_day from %s.%s where source_sys_inst_id=%s", database, table, inst)).count();
+            long count = spark.sql(String.format("SELECT distinct edi_business_day from %s.%s where src_sys_inst_id='%s'", database, table, inst)).count();
             assertEquals(count,(numOffsets - retentionDays));
         }
+    }
+
+    private void createTables() {
+        spark.conf().set("spark.sql.legacy.allowCreatingManagedTableUsingNonemptyLocation","true");
+        System.out.println("Check test tables existence...");
+        spark.sql("USE DEFAULT");
+        spark.sql("SHOW TABLES").show();
+        Dataset<Row> csv = spark.read().option("header", "true").csv("/tmp/testdata.csv");
+        csv.explain();
+        csv.cache();
+        if (!spark.catalog().tableExists("default", "test_table_sh")) {
+            csv.write().partitionBy("edi_business_day").mode("overwrite").saveAsTable("default.test_table_sh");
+            spark.sql("USE DEFAULT");
+            spark.sql("SHOW TABLES").show();
+        }
+        if (!spark.catalog().tableExists("default", "test_table_eas")) {
+            csv.write().partitionBy("edi_business_day", "src_sys_id", "src_sys_inst_id").mode("overwrite").saveAsTable("default.test_table_eas");
+            spark.sql("USE DEFAULT");
+            spark.sql("SHOW TABLES").show();
+        }
+
+        if (!spark.catalog().tableExists("default", "data_retention_configuration")) {
+            spark.sql("CREATE TABLE IF NOT EXISTS default.data_retention_configuration (database STRING, table STRING, retention_period INT, retain_month_end STRING, group INT, active STRING)");
+            spark.sql("INSERT INTO default.data_retention_configuration VALUES " +
+                    "('default','test_table_sh',100,'false',1,'true')" +
+                    ",('default','test_table_eas',100,'false',2,'true')");
+            spark.sql("USE DEFAULT");
+            spark.sql("SHOW TABLES").show();
+        }
+
     }
 
     @Test
@@ -159,37 +137,22 @@ class HousekeepingJobTest {
 
         setUp();
 
-        Common.getBannerStart("Execution group 1");
-        
+        System.out.print(Common.getBannerStart("Execution group 1"));
         housekeepingController.executeHousekeepingGroup(1);
-
-        checkHousekeepingResult("housekeeping_testing","testTableSH","ADB","NWB",100,Pattern.SH,30);
-        checkHousekeepingResult("housekeeping_testing","testTableSH","ADB","UBR",90,Pattern.SH,30);
-        checkHousekeepingResult("housekeeping_testing","testTableSH","ADB","UBN",80,Pattern.SH,30);
-        checkHousekeepingResult("housekeeping_testing","testTableSH","ADB","RBS",70,Pattern.SH,30);
-
-        checkHousekeepingResult("housekeeping_testing","testTableEAS","ADB","NWB",100,Pattern.EAS,30);
-        checkHousekeepingResult("housekeeping_testing","testTableEAS","ADB","UBR",90,Pattern.EAS,30);
-        checkHousekeepingResult("housekeeping_testing","testTableEAS","ADB","UBN",80,Pattern.EAS,30);
-        checkHousekeepingResult("housekeeping_testing","testTableEAS","ADB","RBS",70,Pattern.EAS,30);
-        
-        Common.getBannerFinish("Execution group 1");
+        checkHousekeepingResult("default","test_table_sh","ADB","NWB",1000,Pattern.SH,100);
+        checkHousekeepingResult("default","test_table_sh","ADB","UBR",900,Pattern.SH,100);
+        checkHousekeepingResult("default","test_table_sh","ADB","UBN",800,Pattern.SH,100);
+        checkHousekeepingResult("default","test_table_sh","ADB","RBS",700,Pattern.SH,100);
+        System.out.print(Common.getBannerFinish("Execution group 1 - SH"));
 
         Common.getBannerStart("Execution group 2");
         housekeepingController.executeHousekeepingGroup(2);
-        
-        checkHousekeepingResult("housekeeping_testing","testTableSH2","ADB","NWB",100,Pattern.SH,40);
-        checkHousekeepingResult("housekeeping_testing","testTableSH2","ADB","UBR",90,Pattern.SH,40);
-        checkHousekeepingResult("housekeeping_testing","testTableSH2","ADB","UBN",80,Pattern.SH,40);
-        checkHousekeepingResult("housekeeping_testing","testTableSH2","ADB","RBS",70,Pattern.SH,40);
-        
-        checkHousekeepingResult("housekeeping_testing","testTableEAS2","ADB","NWB",100,Pattern.EAS,40);
-        checkHousekeepingResult("housekeeping_testing","testTableEAS2","ADB","UBR",90,Pattern.EAS,40);
-        checkHousekeepingResult("housekeeping_testing","testTableEAS2","ADB","UBN",80,Pattern.EAS,40);
-        checkHousekeepingResult("housekeeping_testing","testTableEAS2","ADB","RBS",70,Pattern.EAS,40);
-        
-        Common.getBannerFinish("Execution group 2");
-        
+        checkHousekeepingResult("default","test_table_eas","ADB","NWB",1000,Pattern.EAS,100);
+        checkHousekeepingResult("default","test_table_eas","ADB","UBR",900,Pattern.EAS,100);
+        checkHousekeepingResult("default","test_table_eas","ADB","UBN",800,Pattern.EAS,100);
+        checkHousekeepingResult("default","test_table_eas","ADB","RBS",700,Pattern.EAS,100);
+        System.out.print(Common.getBannerFinish("Execution group 2 - EAS"));
+
     }
 
 }

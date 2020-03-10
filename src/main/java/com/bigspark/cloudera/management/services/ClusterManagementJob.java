@@ -1,10 +1,8 @@
 package com.bigspark.cloudera.management.services;
 
-import com.bigspark.cloudera.management.common.utils.PropertyUtils;
 import com.bigspark.cloudera.management.helpers.MetadataHelper;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.spark.sql.SparkSession;
@@ -24,25 +22,22 @@ public class ClusterManagementJob {
     public HiveMetaStoreClient hiveMetaStoreClient;
     public MetadataHelper metadataHelper;
     public Boolean isDryRun;
+    public String appPrefix;
 
-    public ClusterManagementJob() throws IOException, MetaException, ConfigurationException {
-        getClusterManagementProperties();
-        String appPrefix = jobProperties.getProperty("com.bigspark.cloudera.management.services.sparkAppNamePrefix");
-        if (this.spark == null)
-            this.spark=SparkSession.builder()
-                    .appName(appPrefix+this.getClass().getName())
-                    .enableHiveSupport()
-                    .getOrCreate();
-        this.hadoopConfiguration =(spark.sparkContext().hadoopConfiguration());
-        this.fileSystem =FileSystem.get(hadoopConfiguration);
-        if (this.hiveMetaStoreClient == null)
-            this.hiveMetaStoreClient = new HiveMetaStoreClient(new HiveConf());
-        this.metadataHelper = new MetadataHelper();
+    private ClusterManagementJob() throws IOException, MetaException, ConfigurationException {
         this.jobProperties = getClusterManagementProperties();
         this.isDryRun = Boolean.valueOf(String.valueOf(
                 jobProperties.getProperty("com.bigspark.cloudera.management.services.isDryRun")
-                )
-        );
+                ));
+        appPrefix = jobProperties.getProperty("com.bigspark.cloudera.management.services.sparkAppNamePrefix");
+        this.spark=SparkSession.builder()
+                .appName(appPrefix+this.getClass().getName())
+                .enableHiveSupport()
+                .getOrCreate();
+        this.hadoopConfiguration =spark.sparkContext().hadoopConfiguration();
+        this.fileSystem =FileSystem.get(hadoopConfiguration);
+        this.metadataHelper = new MetadataHelper();
+        this.hiveMetaStoreClient = metadataHelper.getHiveMetastoreClient();
     }
 
 
@@ -55,15 +50,11 @@ public class ClusterManagementJob {
         return INSTANCE;
     }
 
-    public synchronized Properties getClusterManagementProperties() throws IOException {
-        if(this.jobProperties == null) {
-//            jobProperties = PropertyUtils.getPropertiesFile("/config.properties");
-            InputStream input=ClusterManagementJob.class.getClassLoader().getResourceAsStream("config.properties");
-            Properties prop = new Properties();
-            prop.load(input);
-            jobProperties=prop;
-        }
-        return jobProperties;
+    private synchronized Properties getClusterManagementProperties() throws IOException {
+        InputStream input = ClusterManagementJob.class.getClassLoader().getResourceAsStream("config.properties");
+        Properties prop = new Properties();
+        prop.load(input);
+        return prop;
     }
 
 }

@@ -34,6 +34,6 @@ df=spark.sql("SELECT DISTINCT SOURCE_SYS_ID, SOURCE_SYS_INST_ID, year(EDI_BUSINE
 df.createOrReplaceTempView("monthEnds")
 df2=spark.sql("SELECT DISTINCT t.SOURCE_SYS_ID, t.SOURCE_SYS_INST_ID, t.EDI_BUSINESS_DAY FROM testDB.testTable t JOIN monthEnds t2 on t.EDI_BUSINESS_DAY = t2.YEAR||'-'||t2.MONTH||'-'||t2.DAY ")
 
-spark.sql("CREATE TABLE testDB.data_retention_configuration (DATABASE STRING, TABLE STRING, RETENTION_PERIOD int, RETAIN_MONTH_END STRING)")
-spark.sql("INSERT INTO testDB.data_retention_configuration VALUES ('testDB','testTable',100,'true')")
+spark.sql("CREATE TABLE default.data_retention_configuration (DATABASE STRING, TABLE STRING, RETENTION_PERIOD int, RETAIN_MONTH_END STRING, group INT)")
+spark.sql("INSERT INTO default.data_retention_configuration VALUES ('default','testTableSH',100,'false',1),('default','testTableEAS',100,'false',2)")
 

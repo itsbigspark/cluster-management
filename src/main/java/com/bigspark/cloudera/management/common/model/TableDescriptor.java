@@ -3,6 +3,7 @@ package com.bigspark.cloudera.management.common.model;
 
 import com.bigspark.cloudera.management.common.exceptions.SourceException;
 import org.apache.hadoop.hive.metastore.api.Partition;
+import org.apache.hadoop.hive.metastore.api.Table;
 
 import java.util.List;
 
@@ -10,18 +11,21 @@ import java.util.List;
  * Created by chris on 16/12/2019.
  */
 public class TableDescriptor {
-    String databaseName;
-    String tableName;
-    Boolean isPartitioned;
+    private final Table table;
+    private final String databaseName;
+    private final String tableName;
+    private final Boolean isPartitioned;
     List<Partition> partitionList;
 
-    public TableDescriptor(String databaseName, String tableName, Boolean isPartitioned) {
+    public TableDescriptor(Table table, String databaseName, String tableName, Boolean isPartitioned) {
+        this.table = table;
         this.databaseName = databaseName;
         this.tableName = tableName;
         this.isPartitioned = isPartitioned;
     }
 
-    public TableDescriptor(String databaseName, String tableName, Boolean isPartitioned, List<Partition> partitionList) {
+    public TableDescriptor(Table table, String databaseName, String tableName, Boolean isPartitioned, List<Partition> partitionList) {
+        this.table = table;
         this.databaseName = databaseName;
         this.tableName = tableName;
         this.isPartitioned = isPartitioned;
@@ -38,6 +42,10 @@ public class TableDescriptor {
 
     public Boolean isPartitioned() {
         return isPartitioned;
+    }
+
+    public Table getTable() {
+        return table;
     }
 
     public List<Partition> getPartitionList() throws SourceException {

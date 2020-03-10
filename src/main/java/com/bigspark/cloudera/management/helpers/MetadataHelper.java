@@ -1,6 +1,7 @@
 package com.bigspark.cloudera.management.helpers;
 
 import com.bigspark.cloudera.management.common.configuration.HiveConfiguration;
+import com.bigspark.cloudera.management.common.enums.Pattern;
 import com.bigspark.cloudera.management.common.exceptions.SourceException;
 import com.bigspark.cloudera.management.common.model.TableDescriptor;
 import com.google.common.collect.Lists;
@@ -16,10 +17,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.naming.ConfigurationException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import static com.bigspark.cloudera.management.common.enums.Pattern.EAS;
+import static com.bigspark.cloudera.management.common.enums.Pattern.SH;
 
 /**
  * Created by chris on 12/12/2019.
@@ -31,19 +37,28 @@ public class MetadataHelper {
     private static HiveMetaStoreClient client;
 
     public MetadataHelper() throws MetaException, ConfigurationException {
+        this.client = getHiveMetastoreClient();
     }
 
+    public HiveMetaStoreClient getHiveMetastoreClient() throws MetaException {
+        if (this.client == null){
+            return new HiveMetaStoreClient(new HiveConf());
+        }
+        return client;
+    }
 
     public TableDescriptor getTableDescriptor(Table table) throws SourceException {
         if (table.getPartitionKeys().size() == 0) {
             return new TableDescriptor(
-                    table.getDbName()
+                    table
+                    , table.getDbName()
                     , table.getTableName()
                     , false);
 
         } else {
             return new TableDescriptor(
-                    table.getDbName()
+                    table
+                    , table.getDbName()
                     , table.getTableName()
                     , true
                     , getTablePartitions(table.getDbName(),table.getTableName()));
@@ -64,7 +79,7 @@ public class MetadataHelper {
         try {
             t = client.getTable(database, table);
         } catch (TException e) {
-            throw new SourceException("Table not found", e.getCause());
+            throw new SourceException("Table not found : "+table, e.getCause());
         }
         return t;
     }
@@ -121,28 +136,29 @@ public class MetadataHelper {
          return client.getAllDatabases();
     }
 
-    public String getPartitionDateString(Partition partition) {
+    public String getPartitionDateString(Partition partition, Pattern pattern) {
         //SH - /prod/source-history/ADB/ADB_BRANCH/edi_business_day=2020-01-20/
         //EAS - /prod/enterprise-analytics-store/data/AGREEMENT/edi_business_day=2020-01-20/src_sys_id=ADB/src_sys_inst_id=NWB/
-        for (int i = 0; i <= partition.getValues().size(); i = i + 1) {
-            if (partition.getValues().get(i).contains("edi_business_day")){
-                logger.debug(String.format("Date key found at level %s/%s for table: %s.%s, partition: %s"
-                        ,i,partition.getValues().size(),partition.getDbName(),partition.getTableName(),partition.toString()));
-                return partition.getValues().get(i).split("=")[1];
-            }
+        String partitionLocation = partition.getSd().getLocation();
+        String[] partitionLocationParts = partitionLocation.split("/");
+        String partitionName = null;
+        if (pattern == SH) {
+            partitionName = partitionLocationParts[partitionLocationParts.length - 1];
+        } else if (pattern == EAS){
+            partitionName = partitionLocationParts[partitionLocationParts.length - 3];
         }
-        logger.debug("No date found in partition keys, returning null");
-        return null;
+        return partitionName.split("=")[1];
     }
 
-    public Date getPartitionDate(Partition partition) {
-        String partitionDateString = getPartitionDateString(partition);
+    public Date getPartitionDate(Partition partition, Pattern pattern) throws ParseException {
+        String partitionDateString = getPartitionDateString(partition, pattern);
         return stringToDate(partitionDateString);
     }
 
-    public Date stringToDate (String dateStr){
-        DateWritable writableVal = new DateWritable(java.sql.Date.valueOf(dateStr));
-        return new Date(writableVal.getDays());
+    public Date stringToDate (String dateStr) throws ParseException {
+        String pattern = "yyyy-MM-dd";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+        return simpleDateFormat.parse(dateStr);
     }
 
 

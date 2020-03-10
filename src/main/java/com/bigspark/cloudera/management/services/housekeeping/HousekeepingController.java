@@ -2,10 +2,15 @@ package com.bigspark.cloudera.management.services.housekeeping;
 
 import com.bigspark.cloudera.management.common.exceptions.SourceException;
 import com.bigspark.cloudera.management.common.model.TableDescriptor;
+import com.bigspark.cloudera.management.helpers.MetadataHelper;
 import com.bigspark.cloudera.management.services.ClusterManagementJob;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.spark.sql.Row;
+import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,14 +18,30 @@ import javax.naming.ConfigurationException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
-public class HousekeepingController extends ClusterManagementJob {
+public class HousekeepingController {
 
-    public HousekeepingController() throws IOException, MetaException, ConfigurationException {
-        super();
-    }
+    public Properties jobProperties;
+    public SparkSession spark;
+    public FileSystem fileSystem;
+    public Configuration hadoopConfiguration;
+    public HiveMetaStoreClient hiveMetaStoreClient;
+    public MetadataHelper metadataHelper;
+    public Boolean isDryRun;
 
     Logger logger = LoggerFactory.getLogger(getClass());
+
+    public HousekeepingController() throws IOException, MetaException, ConfigurationException {
+        ClusterManagementJob clusterManagementJob = ClusterManagementJob.getInstance();
+        this.spark = clusterManagementJob.spark;
+        this.fileSystem = clusterManagementJob.fileSystem;
+        this.hadoopConfiguration = clusterManagementJob.hadoopConfiguration;
+        this.metadataHelper = clusterManagementJob.metadataHelper;
+        this.isDryRun = clusterManagementJob.isDryRun;
+        this.jobProperties = clusterManagementJob.jobProperties;
+        this.hiveMetaStoreClient = clusterManagementJob.hiveMetaStoreClient;
+    }
 
     /**
      * Method to fetch metadata table value from properties file
@@ -41,11 +62,12 @@ public class HousekeepingController extends ClusterManagementJob {
     }
 
     /**
-     * Method to pull distinct list of databases for purging scoping
+     * Method to pull distinct list of databases in execution group
      *
      * @return List<Row>
      */
-    private List<Row> getRetentionGroup(int group) {
+    private List<Row> getRetentionGroupDatabases(int group) {
+        logger.info("Now pulling list of databases for group : "+ group);
         return spark.sql("SELECT DISTINCT DATABASE FROM " + getRetentionTable()+ " WHERE GROUP="+group).collectAsList();
     }
 
@@ -56,74 +78,27 @@ public class HousekeepingController extends ClusterManagementJob {
      * @return List<Row>
      */
     private List<Row> getRetentionDataForDatabase(String database) {
-        return spark.sql("SELECT TABLE, RETENTION_PERIOD, RETAIN_MONTH_END FROM " + getRetentionTable() + " WHERE DATABASE = '" + database + "' AND ACTIVE='Y'").collectAsList();
+        logger.info("Now pulling configuration metadata for all tables in database : "+ database);
+        return spark.sql("SELECT TABLE, RETENTION_PERIOD, RETAIN_MONTH_END FROM " + getRetentionTable() + " WHERE DATABASE = '" + database + "' AND ACTIVE='true'").collectAsList();
     }
 
-    /**
-     * Class to store an array of hive metadata for a database
-     */
-    class HiveMetastoreContainer {
-        String databaseName;
-        ArrayList<String> allTables;
-        ArrayList<TableDescriptor> allTableDescriptors;
-    }
 
-    /**
-     * Class to store an array of housekeeping retention metadata
-     */
-    class RetentionMetadataContainer {
-        String databaseName;
-        ArrayList<TableRetentionMetadata> RetentionMetadataContainerArrayList;
-
-    }
-
-    class TableRetentionMetadata {
+    class TableMetadata {
+        String database;
         String tableName;
         Integer retentionPeriod;
         boolean isRetainMonthEnd;
+        TableDescriptor tableDescriptor;
 
-        public TableRetentionMetadata(String tableName, Integer retentionPeriod, boolean isRetainMonthEnd) {
+        public TableMetadata(String database, String tableName, Integer retentionPeriod, boolean isRetainMonthEnd, TableDescriptor tableDescriptor) {
+            this.database = database;
             this.tableName = tableName;
             this.retentionPeriod = retentionPeriod;
             this.isRetainMonthEnd = isRetainMonthEnd;
+            this.tableDescriptor = tableDescriptor;
         }
     }
 
-    /**
-     * Method to collect all Hive metadata for a specific database
-     *
-     * @param database
-     * @return HiveMetastoreContainer
-     * @throws SourceException
-     */
-
-    private HiveMetastoreContainer sourceDatabaseFromHiveMetastore(String database) throws SourceException {
-        ArrayList<Table> allTablesFromDatabase = metadataHelper.getAllTablesFromDatabase(database);
-        ArrayList<TableDescriptor> allTableDescriptors = metadataHelper.getAllTableDescriptors(allTablesFromDatabase);
-        HiveMetastoreContainer hiveMetastoreContainer = new HiveMetastoreContainer();
-        hiveMetastoreContainer.databaseName = database;
-        for (Table table : allTablesFromDatabase)
-            hiveMetastoreContainer.allTables.add(table.getTableName());
-        hiveMetastoreContainer.allTableDescriptors = allTableDescriptors;
-        return hiveMetastoreContainer;
-    }
-
-    /**
-     * Method to iterate over all databases and return a list of HiveMetastoreContainers
-     *
-     * @return List<HiveMetastoreContainer>
-     * @throws SourceException
-     * @throws MetaException
-     */
-    private List<HiveMetastoreContainer> sourceAllDatabasesFromHiveMetastore() throws SourceException, MetaException {
-        List<String> allDatabasesInMetastore = metadataHelper.getAllDatabases();
-        List<HiveMetastoreContainer> allHiveMetastoreItems = null;
-        for (String database : allDatabasesInMetastore) {
-            HiveMetastoreContainer hiveMetastoreContainer = sourceDatabaseFromHiveMetastore(database);
-            allHiveMetastoreItems.add(hiveMetastoreContainer);
-        }
-        return allHiveMetastoreItems;
-    }
 
     /**
      * Method to fetch the housekeeping metadata for a specific database
@@ -131,76 +106,46 @@ public class HousekeepingController extends ClusterManagementJob {
      * @param database
      * @return RetentionMetadataContainer
      */
-    private RetentionMetadataContainer sourceDatabaseFromMetaTable(String database) {
-        RetentionMetadataContainer retentionMetadataContainer = new RetentionMetadataContainer();
-        retentionMetadataContainer.databaseName = database;
-        logger.info("Now collecting purge metadata for database : " + database);
+    private ArrayList<TableMetadata> sourceDatabaseTablesFromMetaTable(String database) throws SourceException {
         List<Row> purgeTables = getRetentionDataForDatabase(database);
+        ArrayList<TableMetadata> tableMetadataList = new ArrayList<>();
         logger.info(purgeTables.size() + " tables returned with a purge configuration");
-        for (Row table : purgeTables)
-            retentionMetadataContainer.RetentionMetadataContainerArrayList.add(
-                    new TableRetentionMetadata(
-                            table.get(0).toString()
-                            ,(Integer) table.get(1)
-                            ,Boolean.parseBoolean(String.valueOf(table.get(2)))
-                    ));
-        return retentionMetadataContainer;
-    }
-
-    /**
-     * Method to retrieve a specified group of databases held in the metadata and return a list of RetentionMetadataContainers
-     * @return List<RetentionMetadataContainer>
-     */
-    private List<RetentionMetadataContainer> sourceGroupDatabasesFromMetaTable(int executionGroup) {
-        List<Row> allDatabasesInMetaTable = getRetentionGroup(executionGroup);
-        List<RetentionMetadataContainer> allPurgeMetadataItems = null;
-        for (Row database : allDatabasesInMetaTable) {
-            RetentionMetadataContainer RetentionMetadataContainer = sourceDatabaseFromMetaTable(database.get(0).toString());
-            allPurgeMetadataItems.add(RetentionMetadataContainer);
-        }
-        return allPurgeMetadataItems;
-    }
-
-
-    /**
-     * Method to iterate over all databases held in the metadata and return a list of RetentionMetadataContainers
-     * @return List<RetentionMetadataContainer>
-     */
-    private List<RetentionMetadataContainer> sourceAllDatabasesFromMetaTable() {
-        List<Row> allDatabasesInMetaTable = getRetentionDatabases();
-        List<RetentionMetadataContainer> allPurgeMetadataItems = null;
-        for (Row database : allDatabasesInMetaTable) {
-            RetentionMetadataContainer RetentionMetadataContainer = sourceDatabaseFromMetaTable(database.get(0).toString());
-            allPurgeMetadataItems.add(RetentionMetadataContainer);
-        }
-        return allPurgeMetadataItems;
-    }
-
-    private void executeHousekeepingGroupForAll() throws ConfigurationException, IOException, MetaException {
-        List<RetentionMetadataContainer> allPurgeMetadata = sourceAllDatabasesFromMetaTable();
-        HousekeepingJob housekeepingJob = new HousekeepingJob();
-        allPurgeMetadata.forEach(database -> {
-            try {
-                HiveMetastoreContainer hiveMetastoreContainer = sourceDatabaseFromHiveMetastore(database.databaseName);
-                hiveMetastoreContainer.allTableDescriptors.forEach(housekeepingJob::execute);
-            } catch (Exception e) {
-                e.printStackTrace();
+        for (Row table : purgeTables){
+            String tableName = table.get(0).toString();
+            Integer retentionPeriod = (Integer) table.get(1);
+            boolean isRetainMonthEnd = Boolean.parseBoolean(String.valueOf(table.get(2)));
+            try{
+                Table tableMeta = metadataHelper.getTable(database,tableName);
+                TableDescriptor tableDescriptor =  metadataHelper.getTableDescriptor(tableMeta);
+                TableMetadata tableMetadata = new TableMetadata(database,tableName,retentionPeriod,isRetainMonthEnd,tableDescriptor);
+                tableMetadataList.add(tableMetadata);
+            } catch (SourceException e){
+                logger.error(tableName+" provided in metadata configuration, but not found in database..");
             }
-        });
+        }
+        return tableMetadataList;
     }
+
 
     public void executeHousekeepingGroup(int executionGroup) throws ConfigurationException, IOException, MetaException{
-        List<RetentionMetadataContainer> allPurgeMetadata = sourceGroupDatabasesFromMetaTable(executionGroup);
         HousekeepingJob housekeepingJob = new HousekeepingJob();
-        allPurgeMetadata.forEach(database -> {
+        List<Row> retentionGroup = getRetentionGroupDatabases(executionGroup);
+        retentionGroup.forEach(retentionRecord -> {
+            String database=retentionRecord.get(0).toString();
+            ArrayList<TableMetadata> tableMetadataList = new ArrayList<>();
             try {
-                HiveMetastoreContainer hiveMetastoreContainer = sourceDatabaseFromHiveMetastore(database.databaseName);
-                hiveMetastoreContainer.allTableDescriptors.forEach(housekeepingJob::execute);
-            } catch (Exception e) {
+                tableMetadataList.addAll(sourceDatabaseTablesFromMetaTable(database));
+            } catch (SourceException e) {
                 e.printStackTrace();
             }
+            tableMetadataList.forEach(table ->{
+                try {
+                    housekeepingJob.execute(table);
+                } catch (SourceException | IOException e) {
+                    e.printStackTrace();
+                }
+            });
         });
-
     }
 }
 

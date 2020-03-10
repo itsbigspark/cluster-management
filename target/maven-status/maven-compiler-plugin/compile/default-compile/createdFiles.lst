@@ -8,7 +8,6 @@ com/bigspark/cloudera/management/services/compaction/CompactionRunner.class
 com/bigspark/cloudera/management/common/model/EDIPublishMessage.class
 com/bigspark/cloudera/management/common/model/TableDescriptor.class
 com/bigspark/cloudera/management/services/housekeeping/HousekeepingJob.class
-com/bigspark/cloudera/management/services/housekeeping/HousekeepingController$HiveMetastoreContainer.class
 com/bigspark/cloudera/management/helpers/SparkHelper$Hdfs.class
 com/bigspark/cloudera/management/common/model/PlatformDescriptor.class
 com/bigspark/cloudera/management/common/utils/ParseUtils.class
@@ -16,10 +15,10 @@ com/bigspark/cloudera/management/common/enums/Pattern.class
 com/bigspark/cloudera/management/helpers/SparkHelperStatic.class
 com/bigspark/cloudera/management/common/configuration/HadoopConfiguration.class
 com/bigspark/cloudera/management/helpers/SparkHelper.class
+com/bigspark/cloudera/management/services/housekeeping/HousekeepingController$TableMetadata.class
 com/bigspark/cloudera/management/helpers/SparkHelperStatic$Hdfs.class
 com/bigspark/cloudera/management/common/model/SourceDescriptor.class
 com/bigspark/cloudera/management/helpers/SparkJobDto.class
-com/bigspark/cloudera/management/services/housekeeping/HousekeepingController$TableRetentionMetadata.class
 com/bigspark/cloudera/management/helpers/SparkHelper$Security.class
 com/bigspark/cloudera/management/helpers/ImpalaHelper.class
 com/bigspark/cloudera/management/helpers/MetadataHelper.class
@@ -35,4 +34,3 @@ com/bigspark/cloudera/management/services/housekeeping/HousekeepingRunner.class
 com/bigspark/cloudera/management/services/ClusterManagementJob.class
 com/bigspark/cloudera/management/services/compaction/CompactionMistRunner.class
 com/bigspark/cloudera/management/helpers/SparkHelperStatic$Security.class
-com/bigspark/cloudera/management/services/housekeeping/HousekeepingController$RetentionMetadataContainer.class

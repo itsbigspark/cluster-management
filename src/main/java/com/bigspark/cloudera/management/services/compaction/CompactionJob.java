@@ -1,13 +1,16 @@
 package com.bigspark.cloudera.management.services.compaction;
 
 import com.bigspark.cloudera.management.helpers.FileSystemHelper;
+import com.bigspark.cloudera.management.helpers.MetadataHelper;
 import com.bigspark.cloudera.management.helpers.SparkHelper;
 import com.bigspark.cloudera.management.services.ClusterManagementJob;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.ContentSummary;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.spark.sql.AnalysisException;
 import org.apache.spark.sql.Dataset;
@@ -24,6 +27,7 @@ import scala.Some;
 
 import javax.naming.ConfigurationException;
 import java.io.IOException;
+import java.util.Properties;
 
 /**
  * Compaction job
@@ -31,13 +35,28 @@ import java.io.IOException;
  * @author Chris Finlayson
  *
  */
-public class CompactionJob extends ClusterManagementJob {
+public class CompactionJob {
+
+
+    public Properties jobProperties;
+    public SparkSession spark;
+    public FileSystem fileSystem;
+    public Configuration hadoopConfiguration;
+    public HiveMetaStoreClient hiveMetaStoreClient;
+    public MetadataHelper metadataHelper;
+    public Boolean isDryRun;
 
     Logger logger = LoggerFactory.getLogger(getClass());
-    SparkSession spark;
-    FileSystem fs;
 
     public CompactionJob() throws IOException, MetaException, ConfigurationException {
+        ClusterManagementJob clusterManagementJob = ClusterManagementJob.getInstance();
+        this.spark = clusterManagementJob.spark;
+        this.fileSystem = clusterManagementJob.fileSystem;
+        this.hadoopConfiguration = clusterManagementJob.hadoopConfiguration;
+        this.metadataHelper = clusterManagementJob.metadataHelper;
+        this.isDryRun = clusterManagementJob.isDryRun;
+        this.jobProperties = clusterManagementJob.jobProperties;
+        this.hiveMetaStoreClient = clusterManagementJob.hiveMetaStoreClient;
     }
 
     /**
@@ -97,7 +116,7 @@ public class CompactionJob extends ClusterManagementJob {
      * @throws IOException
      */
     private Pair<Long, Long> getFileCountTotalSizePair(String location) throws IOException {
-        ContentSummary cs = this.fs.getContentSummary(new Path(location));
+        ContentSummary cs = fileSystem.getContentSummary(new Path(location));
          ImmutablePair<Long, Long> pair = new ImmutablePair<>(cs.getFileCount(),cs.getLength());
          return pair;
     }
@@ -109,7 +128,7 @@ public class CompactionJob extends ClusterManagementJob {
      * @throws IOException
      */
     private long[] getFileCountTotalSize(String location) throws IOException {
-        ContentSummary cs = this.fs.getContentSummary(new Path(location));
+        ContentSummary cs = fileSystem.getContentSummary(new Path(location));
         long returnArray [];
         returnArray = new long[2];
         returnArray[0]=cs.getFileCount();
@@ -224,19 +243,19 @@ public class CompactionJob extends ClusterManagementJob {
      */
     private void resolvePartition(String partitionLocation) throws IOException{
         try {
-            fs.rename(new Path(partitionLocation), new Path(partitionLocation + "_delete"));
+            fileSystem.rename(new Path(partitionLocation), new Path(partitionLocation + "_delete"));
         } catch (Exception  e){
             System.out.println("ERROR: Unable to move uncompacted files from : "+partitionLocation +" to delete location");
             e.printStackTrace();
         }
         try {
-            fs.rename(new Path(partitionLocation+"_tmp"), new Path(partitionLocation));
+            fileSystem.rename(new Path(partitionLocation+"_tmp"), new Path(partitionLocation));
         } catch (Exception  e){
             System.out.println("ERROR: Unable to move files from temp : "+partitionLocation+"_tmp to partition location" );
             e.printStackTrace();
             // If this happens, we need to try and resolve, oherwise the partition is impacted
             try {
-                fs.rename(new Path(partitionLocation+"_delete"),new Path(partitionLocation));
+                fileSystem.rename(new Path(partitionLocation+"_delete"),new Path(partitionLocation));
             } catch (Exception e_){
                 logger.error("FATAL: Error while reinstating partition at "+partitionLocation);
                 logger.error("FATAL: Partition is now inoperable");

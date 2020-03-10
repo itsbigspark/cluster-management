@@ -1,4 +1,5 @@
 /Users/chris/edh-cluster-management/src/test/java/com/bigspark/cloudera/management/common/model/TableDescriptorTest.java
+/Users/chris/edh-cluster-management/src/test/java/com/bigspark/cloudera/management/services/housekeeping/HousekeepingJobTestOld.java
 /Users/chris/edh-cluster-management/src/test/java/com/bigspark/cloudera/management/helpers/YarnHelperTest.java
 /Users/chris/edh-cluster-management/src/test/java/com/bigspark/cloudera/management/Common.java
 /Users/chris/edh-cluster-management/src/test/java/com/bigspark/cloudera/management/services/housekeeping/HousekeepingJobTestRunner.java
