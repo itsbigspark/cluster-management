@@ -22,6 +22,14 @@ public class SourceDescriptor {
         this.database = database;
         this.table = table;
     }
+
+    @Override
+    public String toString() {
+        return "SourceDescriptor{" +
+                "database=" + database +
+                ", table=" + table +
+                '}';
+    }
 }
 
 

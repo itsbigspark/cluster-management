@@ -161,5 +161,30 @@ public class MetadataHelper {
         return simpleDateFormat.parse(dateStr);
     }
 
+    /**
+     * Method to return the location defined on a Hive table partition
+     * @param partition
+     * @return
+     */
+    public String getPartitionLocation(Partition partition) {
+        return partition.getSd().getLocation();
+    }
+
+    /**
+     * Method to return the location defined on a Hive table
+     * @param table
+     * @return
+     */
+    public String getTableLocation(Table table) {
+        return table.getSd().getLocation();
+    }
+
+    /**
+     * Method to delete a S3 location using the AWS API
+     */
+    private void purgeS3Partition() {
+        //todo
+    }
+
 
 }

@@ -2,9 +2,9 @@
 /Users/chris/edh-cluster-management/src/main/java/com/bigspark/cloudera/management/helpers/ImpalaHelper.java
 /Users/chris/edh-cluster-management/src/main/java/com/bigspark/cloudera/management/helpers/SparkHelper.java
 /Users/chris/edh-cluster-management/src/main/java/com/bigspark/cloudera/management/services/compaction/CompactionMistRunner.java
+/Users/chris/edh-cluster-management/src/main/java/com/bigspark/cloudera/management/helpers/AuditHelper.java
 /Users/chris/edh-cluster-management/src/main/java/com/bigspark/cloudera/management/services/housekeeping/HousekeepingController.java
 /Users/chris/edh-cluster-management/src/main/java/com/bigspark/cloudera/management/services/housekeeping/HousekeepingRunner.java
-/Users/chris/edh-cluster-management/src/main/java/com/bigspark/cloudera/management/common/model/HadoopPublishNotification.java
 /Users/chris/edh-cluster-management/src/main/java/com/bigspark/cloudera/management/services/compaction/CompactionRunner.java
 /Users/chris/edh-cluster-management/src/main/java/com/bigspark/cloudera/management/common/configuration/HiveConfiguration.java
 /Users/chris/edh-cluster-management/src/main/java/com/bigspark/cloudera/management/services/ClusterManagementJob.java
@@ -17,7 +17,6 @@
 /Users/chris/edh-cluster-management/src/main/java/com/bigspark/cloudera/management/helpers/FileSystemHelper.java
 /Users/chris/edh-cluster-management/src/main/java/com/bigspark/cloudera/management/common/model/PlatformDescriptor.java
 /Users/chris/edh-cluster-management/src/main/java/com/bigspark/cloudera/management/helpers/HadoopKeyStoreHelper.java
-/Users/chris/edh-cluster-management/src/main/java/com/bigspark/cloudera/management/helpers/SparkHelperStatic.java
 /Users/chris/edh-cluster-management/src/main/java/com/bigspark/cloudera/management/common/exceptions/SourceException.java
 /Users/chris/edh-cluster-management/src/main/java/com/bigspark/cloudera/management/helpers/SourceHelper.java
 /Users/chris/edh-cluster-management/src/main/java/com/bigspark/cloudera/management/helpers/YarnHelper.java

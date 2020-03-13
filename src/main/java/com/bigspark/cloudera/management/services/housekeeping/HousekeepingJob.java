@@ -2,9 +2,12 @@ package com.bigspark.cloudera.management.services.housekeeping;
 
 import com.bigspark.cloudera.management.common.enums.Pattern;
 import com.bigspark.cloudera.management.common.exceptions.SourceException;
+import com.bigspark.cloudera.management.common.model.SourceDescriptor;
 import com.bigspark.cloudera.management.common.model.TableDescriptor;
+import com.bigspark.cloudera.management.helpers.AuditHelper;
 import com.bigspark.cloudera.management.helpers.FileSystemHelper;
 import com.bigspark.cloudera.management.helpers.MetadataHelper;
+import com.bigspark.cloudera.management.helpers.SparkHelper;
 import com.bigspark.cloudera.management.services.ClusterManagementJob;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -15,7 +18,6 @@ import org.apache.hadoop.hive.metastore.api.Partition;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
-import org.apache.spark.sql.SparkSession;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +30,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.stream.Collectors;
 
 
 /**
@@ -40,23 +41,27 @@ import java.util.stream.Collectors;
 class HousekeepingJob {
 
     public Properties jobProperties;
-    public SparkSession spark;
+    public SparkHelper.AuditedSparkSession spark;
     public FileSystem fileSystem;
     public Configuration hadoopConfiguration;
     public HiveMetaStoreClient hiveMetaStoreClient;
     public MetadataHelper metadataHelper;
     public Boolean isDryRun;
+    public ClusterManagementJob clusterManagementJob;
+    public AuditHelper auditHelper;
+    public HousekeepingController.TableMetadata tableMetadata;
+    public SourceDescriptor sourceDescriptor;
 
     String trashBaseLocation;
     Pattern pattern;
     Dataset<Row> partitionMonthEnds;
-//    private List<Row> partitionMonthEndsList;
 
     Logger logger = LoggerFactory.getLogger(getClass());
 
-    HousekeepingJob() throws IOException, MetaException, ConfigurationException {
-        ClusterManagementJob clusterManagementJob = ClusterManagementJob.getInstance();
-        this.spark = clusterManagementJob.spark;
+    HousekeepingJob() throws IOException, MetaException, ConfigurationException, SourceException {
+        this.clusterManagementJob = ClusterManagementJob.getInstance();
+        this.auditHelper = new AuditHelper(clusterManagementJob);
+        this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark,auditHelper);
         this.fileSystem = clusterManagementJob.fileSystem;
         this.hadoopConfiguration = clusterManagementJob.hadoopConfiguration;
         this.metadataHelper = clusterManagementJob.metadataHelper;
@@ -70,28 +75,26 @@ class HousekeepingJob {
         if (pattern == pattern.EAS){
             sb.append(String.format
                     ("SELECT DISTINCT" +
-                    "SOURCE_SYS_ID" +
-                    ", SOURCE_SYS_INST_ID" +
+                    " SRC_SYS_ID" +
+                    ", SRC_SYS_INST_ID" +
                     ", year(EDI_BUSINESS_DAY)" +
                     "||'-'||month(EDI_BUSINESS_DAY)" +
                     "||'-'||max(day(EDI_BUSINESS_DAY)) AS MONTH_END" +
                     " FROM %s.%s " +
-                    "GROUP BY SOURCE_SYS_ID, SOURCE_SYS_INST_ID, year(EDI_BUSINESS_DAY), month(EDI_BUSINESS_DAY)"
+                    "GROUP BY SRC_SYS_ID, SRC_SYS_INST_ID, year(EDI_BUSINESS_DAY), month(EDI_BUSINESS_DAY)"
                     , dbName, tableName));
              partitionMonthEnds = spark.sql(sb.toString());
-//             partitionMonthEndsList = spark.sql(sb.toString()).collectAsList();
         }
         else if (pattern == pattern.SH){
             sb.append(String.format("SELECT DISTINCT" +
-                            ", SOURCE_SYS_INST_ID" +
+                            " SRC_SYS_INST_ID" +
                             ", year(EDI_BUSINESS_DAY)" +
                             "||'-'||month(EDI_BUSINESS_DAY)" +
                             "||'-'||max(day(EDI_BUSINESS_DAY)) AS MONTH_END" +
                             " FROM %s.%s " +
-                            "GROUP BY SOURCE_SYS_INST_ID, year(EDI_BUSINESS_DAY), month(EDI_BUSINESS_DAY)"
+                            "GROUP BY SRC_SYS_INST_ID, year(EDI_BUSINESS_DAY), month(EDI_BUSINESS_DAY)"
                     , dbName,tableName));
             partitionMonthEnds = spark.sql(sb.toString());
-//            partitionMonthEndsList = spark.sql(sb.toString()).collectAsList();
         }
     }
 
@@ -197,9 +200,9 @@ class HousekeepingJob {
     private void createMonthEndSwingTable(String database, String table) {
         partitionMonthEnds.createOrReplaceTempView("partitionMonthEnds");
         if (pattern == Pattern.SH) {
-            spark.sql(String.format("CREATE TABLE %s.%s_hkp AS SELECT * from %s.%s t join partitionMonthEnds me on t.EDI_BUSINESS_DAY = me.MONTH_END and t.SOURCE_SYS_INST_ID = me.SOURCE_SYS_INST_ID",database,table));
+            spark.sql(String.format("CREATE TABLE %s.%s_hkp AS SELECT t.* from %s.%s t join partitionMonthEnds me on t.EDI_BUSINESS_DAY = me.MONTH_END and t.SRC_SYS_INST_ID = me.SRC_SYS_INST_ID",database,table,database,table));
         } else if (pattern == Pattern.EAS) {
-            spark.sql(String.format("CREATE TABLE %s.%s_hkp AS SELECT * from %s.%s t join partitionMonthEnds me on t.EDI_BUSINESS_DAY = me.MONTH_END and t.SOURCE_SYS_ID = me.SOURCE_SYS_ID and t.SOURCE_SYS_INST_ID = me.SOURCE_SYS_INST_ID",database,table));
+            spark.sql(String.format("CREATE TABLE %s.%s_hkp AS SELECT t.* from %s.%s t join partitionMonthEnds me on t.EDI_BUSINESS_DAY = me.MONTH_END and t.SRC_SYS_ID = me.SRC_SYS_ID and t.SRC_SYS_INST_ID = me.SRC_SYS_INST_ID",database,table,database,table));
         }
     }
 
@@ -218,16 +221,19 @@ class HousekeepingJob {
         for (Partition p : purgeCandidates){
             String trashTarget = trashBaseLocation+"/"+p.getSd().getLocation();
             logger.debug("Trash location : "+trashTarget);
-            if (isDryRun){
-                logger.info("Dropped location :"+p.getSd().getLocation()+" to Trash");
-            } else {
+            if (!isDryRun){
                 try {
-                boolean isRenameSuccess = fileSystem.rename(new Path(p.getSd().getLocation()), new Path(trashTarget));
-                if (!isRenameSuccess)
-                    throw new IOException(String.format("Failed to move files from : %s to : %s", p.getSd().getLocation(), trashTarget));
+                    logger.info("Dropped location :"+p.getSd().getLocation()+" to Trash");
+                    boolean isRenameSuccess = fileSystem.rename(new Path(p.getSd().getLocation()), new Path(trashTarget));
+                    if (!isRenameSuccess)
+                        throw new IOException(String.format("Failed to move files from : %s to : %s", p.getSd().getLocation(), trashTarget));
+                    auditHelper.writeAuditLine("Trash",sourceDescriptor.toString(), String.format("Moved files from : %s to : %s", p.getSd().getLocation(), trashTarget),true);
                 } catch (Exception e){
-                    logger.error("Unexpected error processing : "+p.getSd().getLocation()+" to Trash");
+                    auditHelper.writeAuditLine("Trash",sourceDescriptor.toString(), e.getMessage(),false);
+                    throw e;
                 }
+            } else {
+                logger.info("Dropped location :"+p.getSd().getLocation()+" to Trash");
             }
         }
     }
@@ -243,7 +249,7 @@ class HousekeepingJob {
     }
 
     private void resolveSourceTableWithSwingTable(String database, String table){
-        Dataset<Row> swingTable = spark.table(String.format("%s.%s_hkp", database, table));
+        Dataset<Row> swingTable = clusterManagementJob.spark.table(String.format("%s.%s_hkp", database, table));
         if (pattern==Pattern.SH){
 //            swingTable.write().partitionBy("EDI_BUSINESS_DAY").insertInto(String.format("%s.%s", database, table));
             swingTable.write().insertInto(String.format("%s.%s", database, table));
@@ -262,35 +268,10 @@ class HousekeepingJob {
      * @throws IOException
      */
     private void purgeHDFSPartition(Partition partition) throws IOException {
-        boolean delete = fileSystem.delete(new Path(getPartitionLocation(partition)), true);
+        boolean delete = fileSystem.delete(new Path(metadataHelper.getPartitionLocation(partition)), true);
         if (! delete ){
-            throw new IOException("Unexpected error deleting location: "+getPartitionLocation(partition));
+            throw new IOException("Unexpected error deleting location: "+metadataHelper.getPartitionLocation(partition));
         }
-    }
-
-    /**
-     * Method to return the location defined on a Hive table partition
-     * @param partition
-     * @return
-     */
-    private String getPartitionLocation(Partition partition) {
-        return partition.getSd().getLocation();
-    }
-
-    /**
-     * Method to return the location defined on a Hive table
-     * @param table
-     * @return
-     */
-    private String getTableLocation(Table table) {
-        return table.getSd().getLocation();
-    }
-
-    /**
-     * Method to delete a S3 location using the AWS API
-     */
-    private void purgeS3Partition() {
-        //todo
     }
 
     /**
@@ -356,6 +337,8 @@ class HousekeepingJob {
      * @throws SourceException
      */
     void execute(HousekeepingController.TableMetadata tableMetadata) throws SourceException, IOException {
+        this.tableMetadata = tableMetadata;
+        this.sourceDescriptor = new SourceDescriptor(metadataHelper.getDatabase(tableMetadata.database),tableMetadata.tableDescriptor);
         getTableType(tableMetadata);
         if (this.pattern != null){
             LocalDate purgeCeiling = calculatePurgeCeiling(tableMetadata.retentionPeriod, LocalDate.now());
@@ -363,14 +346,19 @@ class HousekeepingJob {
             List<Partition> allPurgeCandidates = getAllPurgeCandidates(tableMetadata.tableDescriptor.getPartitionList(), purgeCeiling);
             logger.debug(allPurgeCandidates.size()+" : partitions returned as eligible for purge");
             if (tableMetadata.isRetainMonthEnd){
+                logger.debug("RetainMonthEnd config passed from metadata table");
                 getTablePartitionMonthEnds(tableMetadata.database,tableMetadata.tableName);
+                    logger.debug("Creating swing table for month end partitions");
                 createMonthEndSwingTable(tableMetadata.database,tableMetadata.tableName);
                 trashDataOutwithRetention(allPurgeCandidates);
+                logger.debug("Resolving source table by reinstating month end partitions");
                 resolveSourceTableWithSwingTable(tableMetadata.database,tableMetadata.tableName);
             } else {
                 trashDataOutwithRetention(allPurgeCandidates);
             }
         }
     }
+
+
 
 }

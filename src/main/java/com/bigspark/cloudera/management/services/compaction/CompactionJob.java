@@ -1,5 +1,9 @@
 package com.bigspark.cloudera.management.services.compaction;
 
+import com.bigspark.cloudera.management.common.exceptions.SourceException;
+import com.bigspark.cloudera.management.common.model.SourceDescriptor;
+import com.bigspark.cloudera.management.common.model.TableDescriptor;
+import com.bigspark.cloudera.management.helpers.AuditHelper;
 import com.bigspark.cloudera.management.helpers.FileSystemHelper;
 import com.bigspark.cloudera.management.helpers.MetadataHelper;
 import com.bigspark.cloudera.management.helpers.SparkHelper;
@@ -12,6 +16,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.MetaException;
+import org.apache.hadoop.hive.metastore.api.Partition;
 import org.apache.spark.sql.AnalysisException;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -27,6 +32,7 @@ import scala.Some;
 
 import javax.naming.ConfigurationException;
 import java.io.IOException;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -37,7 +43,6 @@ import java.util.Properties;
  */
 public class CompactionJob {
 
-
     public Properties jobProperties;
     public SparkSession spark;
     public FileSystem fileSystem;
@@ -45,18 +50,25 @@ public class CompactionJob {
     public HiveMetaStoreClient hiveMetaStoreClient;
     public MetadataHelper metadataHelper;
     public Boolean isDryRun;
+    public String applicationID;
+    public AuditHelper auditHelper;
+    private String trashBaseLocation;
 
     Logger logger = LoggerFactory.getLogger(getClass());
+    private SourceDescriptor sourceDescriptor;
 
-    public CompactionJob() throws IOException, MetaException, ConfigurationException {
+
+    public CompactionJob() throws IOException, MetaException, ConfigurationException, SourceException {
         ClusterManagementJob clusterManagementJob = ClusterManagementJob.getInstance();
-        this.spark = clusterManagementJob.spark;
+        this.auditHelper = new AuditHelper(clusterManagementJob);
+        this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark,auditHelper);
         this.fileSystem = clusterManagementJob.fileSystem;
         this.hadoopConfiguration = clusterManagementJob.hadoopConfiguration;
         this.metadataHelper = clusterManagementJob.metadataHelper;
         this.isDryRun = clusterManagementJob.isDryRun;
         this.jobProperties = clusterManagementJob.jobProperties;
         this.hiveMetaStoreClient = clusterManagementJob.hiveMetaStoreClient;
+        this.applicationID = SparkHelper.getSparkApplicationId();
     }
 
     /**
@@ -181,7 +193,13 @@ public class CompactionJob {
      * @throws NoSuchTableException
      * @throws IOException
      */
-    private void processTable(String dbName, String tableName) throws NoSuchDatabaseException, NoSuchTableException, IOException{
+    private void processTable(String dbName, String tableName) throws NoSuchDatabaseException, NoSuchTableException, IOException, SourceException {
+       setTrashBaseLocation();
+       org.apache.hadoop.hive.metastore.api.Table tableMeta = metadataHelper.getTable(dbName,tableName);
+       TableDescriptor tableDescriptor =  metadataHelper.getTableDescriptor(tableMeta);
+
+       this.sourceDescriptor = new SourceDescriptor(metadataHelper.getDatabase(dbName),tableDescriptor);
+
        String tableLocation = getTableLocation(dbName,tableName);
        Row[] partitions = getTablePartitions(dbName, tableName);
        for (Row row : partitions){
@@ -202,7 +220,7 @@ public class CompactionJob {
             Integer repartitionFactor = getRepartitionFactor(countSize[1]);
             compactLocation(absPartitionLocation,repartitionFactor);
             long[] newCountSize = getFileCountTotalSize(absPartitionLocation+"_tmp");
-//            resolvePartition(absPartitionLocation);
+            resolvePartition(absPartitionLocation);
         }
     }
 
@@ -236,26 +254,60 @@ public class CompactionJob {
         }
     }
 
+    private void setTrashBaseLocation() throws IOException {
+        StringBuilder sb = new StringBuilder();
+        String userHomeArea = FileSystemHelper.getUserHomeArea();
+        sb.append(userHomeArea).append("/.ClusterManagementTrash/compaction");
+        trashBaseLocation = sb.toString();
+        if (! fileSystem.exists(new Path(trashBaseLocation))){
+            fileSystem.mkdirs(new Path(trashBaseLocation));
+        }
+    }
+
+    private String trashOriginalData(String trashBaseLocation, String itemLocation, SourceDescriptor sourceDescriptor) throws IOException {
+        String trashTarget = trashBaseLocation+"/"+itemLocation;
+        logger.debug("Trash location : "+trashTarget);
+        if (!isDryRun){
+            try {
+                logger.info("Dropped location :"+itemLocation+" to Trash");
+                boolean isRenameSuccess = fileSystem.rename(new Path(itemLocation), new Path(trashTarget));
+                if (!isRenameSuccess)
+                    throw new IOException(String.format("Failed to move files from : %s to : %s", itemLocation, trashTarget));
+                auditHelper.writeAuditLine("Trash",sourceDescriptor.toString(), String.format("Moved files from : %s to : %s", itemLocation, trashTarget),true);
+            } catch (Exception e){
+                auditHelper.writeAuditLine("Trash",sourceDescriptor.toString(), e.getMessage(),false);
+                throw e;
+            }
+        } else {
+            logger.info("Dropped location :"+itemLocation+" to Trash");
+        }
+        return trashTarget;
+    }
+
+
     /**
      * Method to complete the HDFS actions required to swap the compacted data with the original
      * @param partitionLocation
      * @throws IOException
      */
     private void resolvePartition(String partitionLocation) throws IOException{
+        String trashLocation = null;
         try {
-            fileSystem.rename(new Path(partitionLocation), new Path(partitionLocation + "_delete"));
+            trashLocation = trashOriginalData(trashBaseLocation,partitionLocation,sourceDescriptor);
+//            fileSystem.rename(new Path(partitionLocation), new Path(partitionLocation + "_delete"));
         } catch (Exception  e){
-            System.out.println("ERROR: Unable to move uncompacted files from : "+partitionLocation +" to delete location");
+            System.out.println("FATAL: Unable to move uncompacted files from : "+partitionLocation +" to Trash location");
             e.printStackTrace();
+            System.exit(1);
         }
         try {
             fileSystem.rename(new Path(partitionLocation+"_tmp"), new Path(partitionLocation));
         } catch (Exception  e){
             System.out.println("ERROR: Unable to move files from temp : "+partitionLocation+"_tmp to partition location" );
             e.printStackTrace();
-            // If this happens, we need to try and resolve, oherwise the partition is impacted
+            // If this happens, we need to try and resolve, otherwise the partition is impacted
             try {
-                fileSystem.rename(new Path(partitionLocation+"_delete"),new Path(partitionLocation));
+                fileSystem.rename(new Path(trashLocation),new Path(partitionLocation));
             } catch (Exception e_){
                 logger.error("FATAL: Error while reinstating partition at "+partitionLocation);
                 logger.error("FATAL: Partition is now inoperable");
@@ -271,8 +323,7 @@ public class CompactionJob {
      * @throws NoSuchTableException
      * @throws NoSuchDatabaseException
      */
-    void executeMist(String database, String table, SparkSession spark) throws IOException, NoSuchTableException,NoSuchDatabaseException{
-        this.spark = SparkHelper.getSparkSession();
+    void executeMist(String database, String table) throws IOException, NoSuchTableException, NoSuchDatabaseException, SourceException {
         processTable(database,table);
     }
     /**
@@ -281,9 +332,8 @@ public class CompactionJob {
      * @throws NoSuchTableException
      * @throws NoSuchDatabaseException
      */
-    void execute() throws IOException, NoSuchTableException,NoSuchDatabaseException{
-        this.spark = SparkHelper.getSparkSession();
-        processTable("bddlsold01p","cf_small_files");
+    void execute(String database, String table) throws IOException, NoSuchTableException, NoSuchDatabaseException, SourceException {
+        processTable(database,table);
     }
 }
 

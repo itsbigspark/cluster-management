@@ -1,7 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="81c03950-0574-43ed-8d8a-e7bc63d8bf3d" name="Default Changelist" comment="" />
+    <list default="true" id="81c03950-0574-43ed-8d8a-e7bc63d8bf3d" name="Default Changelist" comment="BIG-13 Addition of Junit test skeletons">
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__junit_junit_4_13.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_apiguardian_apiguardian_api_1_1_0.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_hamcrest_hamcrest_core_1_3.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_junit_jupiter_junit_jupiter_5_6_0.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_junit_jupiter_junit_jupiter_api_5_6_0.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_junit_jupiter_junit_jupiter_engine_5_6_0.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_junit_jupiter_junit_jupiter_params_5_6_0.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_junit_platform_junit_platform_commons_1_6_0.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_junit_platform_junit_platform_engine_1_6_0.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_opentest4j_opentest4j_1_2_0.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/AuditHelper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/services/compaction/CompactionJobTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/services/compaction/CompactionJobTestRunner.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/assembly/assembly.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/model/HadoopPublishNotification.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/model/SourceDescriptor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/model/SourceDescriptor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/MetadataHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/MetadataHelper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/SparkHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/SparkHelper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/SparkHelperStatic.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/services/ClusterManagementJob.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/services/ClusterManagementJob.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/services/compaction/CompactionJob.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/services/compaction/CompactionJob.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/services/compaction/CompactionMistRunner.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/services/compaction/CompactionMistRunner.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/services/housekeeping/HousekeepingController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/services/housekeeping/HousekeepingController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/services/housekeeping/HousekeepingJob.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/services/housekeeping/HousekeepingJob.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/config.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/config.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/services/housekeeping/HousekeepingJobTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/services/housekeeping/HousekeepingJobTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/services/housekeeping/HousekeepingJobTestOld.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/config.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/config.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/bigspark/cloudera/management/common/model/HadoopPublishNotification.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/bigspark/cloudera/management/common/model/SourceDescriptor.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/bigspark/cloudera/management/common/model/SourceDescriptor.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/bigspark/cloudera/management/helpers/MetadataHelper.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/bigspark/cloudera/management/helpers/MetadataHelper.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/bigspark/cloudera/management/helpers/SparkHelper$Hdfs.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/bigspark/cloudera/management/helpers/SparkHelper$Hdfs.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/bigspark/cloudera/management/helpers/SparkHelper$Security.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/bigspark/cloudera/management/helpers/SparkHelper$Security.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/bigspark/cloudera/management/helpers/SparkHelper.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/bigspark/cloudera/management/helpers/SparkHelper.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/bigspark/cloudera/management/services/compaction/CompactionJob.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/bigspark/cloudera/management/services/compaction/CompactionJob.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/cluster-management-1.0-SNAPSHOT.jar" beforeDir="false" afterPath="$PROJECT_DIR$/target/cluster-management-1.0-SNAPSHOT.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/inputFiles.lst" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -10,27 +55,87 @@
   <component name="CodeStyleSettingsInfer">
     <option name="done" value="true" />
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Enum" />
+        <option value="JUnit5 Test Class" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="UPDATE_TYPE" value="MERGE" />
+  </component>
   <component name="JsFlowSettings">
     <service-enabled>false</service-enabled>
     <exe-path />
     <annotation-enable>false</annotation-enable>
     <other-services-enabled>false</other-services-enabled>
   </component>
+  <component name="MavenImportPreferences">
+    <option name="importingSettings">
+      <MavenImportingSettings>
+        <option name="importAutomatically" value="true" />
+      </MavenImportingSettings>
+    </option>
+  </component>
   <component name="ProjectCodeStyleSettingsMigration">
     <option name="version" value="1" />
   </component>
   <component name="ProjectId" id="1YP6bgkLagXMxIwkvY1CjauSobP" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showExcludedFiles" value="true" />
     <option name="showLibraryContents" value="true" />
+    <option name="showMembers" value="true" />
   </component>
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="settings.editor.selected.configurable" value="project.scopes" />
+    <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary" value="JUnit5" />
+    <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5" value="" />
+    <property name="com.intellij.testIntegration.createTest.CreateTestDialog.includeInheritedMembers" value="true" />
+    <property name="create.test.in.the.same.root" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/test/resources" />
+    <property name="project.structure.last.edited" value="SDKs" />
+    <property name="project.structure.proportion" value="0.15" />
+    <property name="project.structure.side.proportion" value="0.2" />
+    <property name="run.code.analysis.last.selected.profile" value="aDefault" />
+    <property name="settings.editor.selected.configurable" value="Console" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CreateTestDialog.RecentsKey">
+      <recent name="com.bigspark.cloudera.management.services.housekeeping" />
+      <recent name="com.bigspark.cloudera.management.common.model" />
+      <recent name="com.bigspark.cloudera.management.helpers" />
+      <recent name="com.bigspark.cloudera.management.common.configuration" />
+    </key>
+    <key name="CreateTestDialog.Recents.Supers">
+      <recent name="" />
+    </key>
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="com.bigspark.cloudera" />
+      <recent name="com.bigspark.cloudera.management.helpers" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/test/resources" />
+      <recent name="$PROJECT_DIR$/target" />
+      <recent name="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common" />
+      <recent name="$PROJECT_DIR$/test/com/bigspark/cloudera/management" />
+      <recent name="$PROJECT_DIR$/test" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.bigspark.cloudera.management.helpers" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/test/java" />
+      <recent name="$PROJECT_DIR$/src" />
+    </key>
   </component>
   <component name="RunManager">
     <configuration default="true" type="Applet" factoryName="Applet">
@@ -52,6 +157,30 @@
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
+    </configuration>
+    <configuration name="HousekeepingDebug" type="Remote">
+      <module name="cluster-management" />
+      <option name="USE_SOCKET_TRANSPORT" value="true" />
+      <option name="SERVER_MODE" value="false" />
+      <option name="SHMEM_ADDRESS" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="5050" />
+      <option name="AUTO_RESTART" value="false" />
+      <RunnerSettings RunnerId="Debug">
+        <option name="DEBUG_PORT" value="5050" />
+        <option name="LOCAL" value="false" />
+      </RunnerSettings>
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="Remote">
+      <module name="cluster-management" />
+      <option name="USE_SOCKET_TRANSPORT" value="true" />
+      <option name="SERVER_MODE" value="false" />
+      <option name="SHMEM_ADDRESS" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="4000" />
+      <option name="AUTO_RESTART" value="false" />
+      <method v="2" />
     </configuration>
     <configuration default="true" type="TestNG">
       <option name="TEST_OBJECT" value="CLASS" />
@@ -103,16 +232,287 @@
       <option name="presentableId" value="Default" />
       <updated>1582831954601</updated>
       <workItem from="1582831959254" duration="545000" />
+      <workItem from="1582884816202" duration="3990000" />
+      <workItem from="1583223528007" duration="2123000" />
+      <workItem from="1583226819252" duration="78991000" />
+      <workItem from="1583743763580" duration="76356000" />
+      <workItem from="1584003399643" duration="9236000" />
+      <workItem from="1584084745364" duration="240000" />
     </task>
+    <task id="LOCAL-00001" summary="BIG-13 Addition of Junit test skeletons">
+      <created>1583222933153</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1583222933153</updated>
+    </task>
+    <task id="LOCAL-00002" summary="BIG-4 Base of housekeeping class complete">
+      <created>1583338256296</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1583338256296</updated>
+    </task>
+    <task id="LOCAL-00003" summary="BIG-4 Bulk changes to Housekeeping class">
+      <created>1583513968800</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1583513968800</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Commit prior to amending ClusterManagementJob">
+      <created>1583741032814</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1583741032814</updated>
+    </task>
+    <task id="LOCAL-00005" summary="BIG-4 Initial testing of Housekeeping completed">
+      <created>1583855907652</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1583855907652</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
   </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="BIG-13 Addition of Junit test skeletons" />
+    <MESSAGE value="BIG-4 Base of housekeeping class complete" />
+    <MESSAGE value="BIG-4 Bulk changes to Housekeeping class" />
+    <MESSAGE value="Commit prior to amending ClusterManagementJob" />
+    <MESSAGE value="BIG-4 Initial testing of Housekeeping completed" />
+    <option name="LAST_COMMIT_MESSAGE" value="BIG-4 Initial testing of Housekeeping completed" />
+  </component>
   <component name="WindowStateProjectService">
-    <state x="444" y="345" key="com.intellij.ide.util.TipDialog" timestamp="1582884945939">
+    <state x="2385" y="104" key="#All_in_cluster-management" timestamp="1583222240044">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state x="2385" y="104" key="#All_in_cluster-management/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583222240044" />
+    <state x="2380" y="124" key="#Project_Structure" timestamp="1583222303223">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state x="2380" y="124" key="#Project_Structure/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583222303223" />
+    <state x="2545" y="457" key="#com.intellij.debugger.ui.breakpoints.BreakpointsConfigurationDialogFactory.BreakpointsConfigurationDialog.AddFieldBreakpointDialog" timestamp="1583772345743">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state x="2545" y="457" key="#com.intellij.debugger.ui.breakpoints.BreakpointsConfigurationDialogFactory.BreakpointsConfigurationDialog.AddFieldBreakpointDialog/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583772345743" />
+    <state x="2368" y="372" key="#com.intellij.debugger.ui.breakpoints.EditClassFiltersDialog" timestamp="1583772356478">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state x="2368" y="372" key="#com.intellij.debugger.ui.breakpoints.EditClassFiltersDialog/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583772356478" />
+    <state x="2344" y="216" width="1148" height="686" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1583851943900">
+      <screen x="1920" y="23" width="1920" height="1057" />
+    </state>
+    <state x="424" y="219" width="1148" height="686" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1200@0.0.1920.1200" timestamp="1583592315636" />
+    <state x="2344" y="197" key="#com.intellij.execution.impl.EditConfigurationsDialog/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583510617927" />
+    <state x="2344" y="197" key="#com.intellij.execution.impl.EditConfigurationsDialog/1920.0.1920.1080/0.23.1920.1057@1920.0.1920.1080" timestamp="1583770206127" />
+    <state x="2344" y="216" key="#com.intellij.execution.impl.EditConfigurationsDialog/1920.23.1920.1057/0.23.1920.1057@1920.23.1920.1057" timestamp="1583851943900" />
+    <state x="645" y="345" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1583424044287">
       <screen x="0" y="23" width="1920" height="1057" />
     </state>
+    <state x="645" y="345" key="#com.intellij.fileTypes.FileTypeChooser/1920.23.1920.1057/0.23.1920.1057@0.23.1920.1057" timestamp="1583424044287" />
+    <state x="2649" y="210" key="#com.intellij.ide.util.MemberChooser" timestamp="1583937617273">
+      <screen x="1920" y="23" width="1920" height="1057" />
+    </state>
+    <state x="2649" y="191" key="#com.intellij.ide.util.MemberChooser/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583490568429" />
+    <state x="2649" y="210" key="#com.intellij.ide.util.MemberChooser/1920.23.1920.1057/0.23.1920.1057@1920.23.1920.1057" timestamp="1583937617273" />
+    <state x="2615" y="253" key="#com.intellij.ide.util.PackageChooserDialog" timestamp="1583222499469">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state x="2615" y="253" key="#com.intellij.ide.util.PackageChooserDialog/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583222499469" />
+    <state x="2555" y="292" key="#com.intellij.ide.util.TreeClassChooserDialog" timestamp="1583772335315">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state x="2555" y="292" key="#com.intellij.ide.util.TreeClassChooserDialog/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583772335315" />
+    <state x="333" y="511" key="#com.intellij.refactoring.move.MoveHandler.SelectRefactoringDialog" timestamp="1583529337331">
+      <screen x="0" y="0" width="1920" height="1200" />
+    </state>
+    <state x="333" y="511" key="#com.intellij.refactoring.move.MoveHandler.SelectRefactoringDialog/0.0.1920.1200@0.0.1920.1200" timestamp="1583529337331" />
+    <state x="2253" y="460" key="#com.intellij.refactoring.move.MoveHandler.SelectRefactoringDialog/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583227078178" />
+    <state x="681" y="424" width="774" height="365" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes" timestamp="1583522075422">
+      <screen x="0" y="0" width="1920" height="1200" />
+    </state>
+    <state x="681" y="424" width="774" height="365" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes/0.0.1920.1200@0.0.1920.1200" timestamp="1583522075422" />
+    <state x="2601" y="382" width="656" height="328" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583222575302" />
+    <state x="681" y="468" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.packages" timestamp="1583529341974">
+      <screen x="0" y="0" width="1920" height="1200" />
+    </state>
+    <state x="681" y="468" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.packages/0.0.1920.1200@0.0.1920.1200" timestamp="1583529341974" />
+    <state x="2264" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1583760726337">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state x="2264" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/1920.0.1920.1080/0.23.1920.1057@1920.0.1920.1080" timestamp="1583760726337" />
+    <state x="2555" y="255" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1583926050562">
+      <screen x="1920" y="23" width="1920" height="1057" />
+    </state>
+    <state x="635" y="263" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1920.1200@0.0.1920.1200" timestamp="1583532161333" />
+    <state x="2555" y="237" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583222362427" />
+    <state x="2555" y="255" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/1920.23.1920.1057/0.23.1920.1057@1920.23.1920.1057" timestamp="1583926050562" />
+    <state x="2629" y="354" key="#com.intellij.tools.ToolEditorDialog" timestamp="1583851941475">
+      <screen x="1920" y="23" width="1920" height="1057" />
+    </state>
+    <state x="2629" y="354" key="#com.intellij.tools.ToolEditorDialog/1920.23.1920.1057/0.23.1920.1057@1920.23.1920.1057" timestamp="1583851941475" />
+    <state x="2425" y="359" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1" timestamp="1583333591658">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state x="2425" y="359" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583333591658" />
+    <state x="2098" y="95" key="CommitChangelistDialog2" timestamp="1583855907121">
+      <screen x="1920" y="23" width="1920" height="1057" />
+    </state>
+    <state x="2098" y="74" key="CommitChangelistDialog2/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583741032269" />
+    <state x="2098" y="95" key="CommitChangelistDialog2/1920.23.1920.1057/0.23.1920.1057@1920.23.1920.1057" timestamp="1583855907121" />
+    <state width="1868" height="366" key="GridCell.Tab.0.bottom" timestamp="1584022915907">
+      <screen x="1920" y="23" width="1920" height="1057" />
+    </state>
+    <state width="1868" height="397" key="GridCell.Tab.0.bottom/0.0.1920.1200@0.0.1920.1200" timestamp="1583596047120" />
+    <state width="1868" height="366" key="GridCell.Tab.0.bottom/0.23.1920.1177@0.23.1920.1177" timestamp="1583966208950" />
+    <state width="1868" height="336" key="GridCell.Tab.0.bottom/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583773019968" />
+    <state width="1868" height="336" key="GridCell.Tab.0.bottom/1920.0.1920.1080/0.23.1920.1057@1920.0.1920.1080" timestamp="1583772248908" />
+    <state width="1868" height="366" key="GridCell.Tab.0.bottom/1920.23.1920.1057/0.23.1920.1057@1920.23.1920.1057" timestamp="1584022915907" />
+    <state width="1868" height="366" key="GridCell.Tab.0.center" timestamp="1584022915906">
+      <screen x="1920" y="23" width="1920" height="1057" />
+    </state>
+    <state width="1868" height="397" key="GridCell.Tab.0.center/0.0.1920.1200@0.0.1920.1200" timestamp="1583596047118" />
+    <state width="1868" height="366" key="GridCell.Tab.0.center/0.23.1920.1177@0.23.1920.1177" timestamp="1583966208948" />
+    <state width="1868" height="336" key="GridCell.Tab.0.center/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583773019964" />
+    <state width="1868" height="336" key="GridCell.Tab.0.center/1920.0.1920.1080/0.23.1920.1057@1920.0.1920.1080" timestamp="1583772248900" />
+    <state width="1868" height="366" key="GridCell.Tab.0.center/1920.23.1920.1057/0.23.1920.1057@1920.23.1920.1057" timestamp="1584022915906" />
+    <state width="1868" height="366" key="GridCell.Tab.0.left" timestamp="1584022915905">
+      <screen x="1920" y="23" width="1920" height="1057" />
+    </state>
+    <state width="1868" height="397" key="GridCell.Tab.0.left/0.0.1920.1200@0.0.1920.1200" timestamp="1583596047117" />
+    <state width="1868" height="366" key="GridCell.Tab.0.left/0.23.1920.1177@0.23.1920.1177" timestamp="1583966208948" />
+    <state width="1868" height="336" key="GridCell.Tab.0.left/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583773019962" />
+    <state width="1868" height="336" key="GridCell.Tab.0.left/1920.0.1920.1080/0.23.1920.1057@1920.0.1920.1080" timestamp="1583772248898" />
+    <state width="1868" height="366" key="GridCell.Tab.0.left/1920.23.1920.1057/0.23.1920.1057@1920.23.1920.1057" timestamp="1584022915905" />
+    <state width="1868" height="366" key="GridCell.Tab.0.right" timestamp="1584022915906">
+      <screen x="1920" y="23" width="1920" height="1057" />
+    </state>
+    <state width="1868" height="397" key="GridCell.Tab.0.right/0.0.1920.1200@0.0.1920.1200" timestamp="1583596047119" />
+    <state width="1868" height="366" key="GridCell.Tab.0.right/0.23.1920.1177@0.23.1920.1177" timestamp="1583966208950" />
+    <state width="1868" height="336" key="GridCell.Tab.0.right/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583773019966" />
+    <state width="1868" height="336" key="GridCell.Tab.0.right/1920.0.1920.1080/0.23.1920.1057@1920.0.1920.1080" timestamp="1583772248903" />
+    <state width="1868" height="366" key="GridCell.Tab.0.right/1920.23.1920.1057/0.23.1920.1057@1920.23.1920.1057" timestamp="1584022915906" />
+    <state width="1868" height="366" key="GridCell.Tab.1.bottom" timestamp="1584022950533">
+      <screen x="1920" y="23" width="1920" height="1057" />
+    </state>
+    <state width="1868" height="397" key="GridCell.Tab.1.bottom/0.0.1920.1200@0.0.1920.1200" timestamp="1583596047123" />
+    <state width="1868" height="366" key="GridCell.Tab.1.bottom/0.23.1920.1177@0.23.1920.1177" timestamp="1583966245128" />
+    <state width="1868" height="336" key="GridCell.Tab.1.bottom/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583773039344" />
+    <state width="1868" height="336" key="GridCell.Tab.1.bottom/1920.0.1920.1080/0.23.1920.1057@1920.0.1920.1080" timestamp="1583772429181" />
+    <state width="1868" height="366" key="GridCell.Tab.1.bottom/1920.23.1920.1057/0.23.1920.1057@1920.23.1920.1057" timestamp="1584022950533" />
+    <state width="1868" height="366" key="GridCell.Tab.1.center" timestamp="1584022950532">
+      <screen x="1920" y="23" width="1920" height="1057" />
+    </state>
+    <state width="1868" height="397" key="GridCell.Tab.1.center/0.0.1920.1200@0.0.1920.1200" timestamp="1583596047121" />
+    <state width="1868" height="366" key="GridCell.Tab.1.center/0.23.1920.1177@0.23.1920.1177" timestamp="1583966245126" />
+    <state width="1868" height="336" key="GridCell.Tab.1.center/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583773039340" />
+    <state width="1868" height="336" key="GridCell.Tab.1.center/1920.0.1920.1080/0.23.1920.1057@1920.0.1920.1080" timestamp="1583772429177" />
+    <state width="1868" height="366" key="GridCell.Tab.1.center/1920.23.1920.1057/0.23.1920.1057@1920.23.1920.1057" timestamp="1584022950532" />
+    <state width="1868" height="366" key="GridCell.Tab.1.left" timestamp="1584022950531">
+      <screen x="1920" y="23" width="1920" height="1057" />
+    </state>
+    <state width="1868" height="397" key="GridCell.Tab.1.left/0.0.1920.1200@0.0.1920.1200" timestamp="1583596047120" />
+    <state width="1868" height="366" key="GridCell.Tab.1.left/0.23.1920.1177@0.23.1920.1177" timestamp="1583966245126" />
+    <state width="1868" height="336" key="GridCell.Tab.1.left/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583773039337" />
+    <state width="1868" height="336" key="GridCell.Tab.1.left/1920.0.1920.1080/0.23.1920.1057@1920.0.1920.1080" timestamp="1583772429169" />
+    <state width="1868" height="366" key="GridCell.Tab.1.left/1920.23.1920.1057/0.23.1920.1057@1920.23.1920.1057" timestamp="1584022950531" />
+    <state width="1868" height="366" key="GridCell.Tab.1.right" timestamp="1584022950532">
+      <screen x="1920" y="23" width="1920" height="1057" />
+    </state>
+    <state width="1868" height="397" key="GridCell.Tab.1.right/0.0.1920.1200@0.0.1920.1200" timestamp="1583596047122" />
+    <state width="1868" height="366" key="GridCell.Tab.1.right/0.23.1920.1177@0.23.1920.1177" timestamp="1583966245127" />
+    <state width="1868" height="336" key="GridCell.Tab.1.right/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583773039342" />
+    <state width="1868" height="336" key="GridCell.Tab.1.right/1920.0.1920.1080/0.23.1920.1057@1920.0.1920.1080" timestamp="1583772429180" />
+    <state width="1868" height="366" key="GridCell.Tab.1.right/1920.23.1920.1057/0.23.1920.1057@1920.23.1920.1057" timestamp="1584022950532" />
+    <state x="2240" y="19" key="SettingsEditor" timestamp="1583741983610">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state x="2240" y="19" key="SettingsEditor/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583741983610" />
+    <state x="2380" y="235" key="Vcs.Push.Dialog.v2" timestamp="1583855915504">
+      <screen x="1920" y="23" width="1920" height="1057" />
+    </state>
+    <state x="2380" y="217" key="Vcs.Push.Dialog.v2/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583513971246" />
+    <state x="2380" y="235" key="Vcs.Push.Dialog.v2/1920.23.1920.1057/0.23.1920.1057@1920.23.1920.1057" timestamp="1583855915504" />
+    <state width="960" height="485" key="XDebugger.FullValuePopup" timestamp="1583837791115">
+      <screen x="1920" y="23" width="1920" height="1057" />
+    </state>
+    <state width="960" height="540" key="XDebugger.FullValuePopup/0.23.1920.1177@0.23.1920.1177" timestamp="1583782350809" />
+    <state width="960" height="485" key="XDebugger.FullValuePopup/1920.23.1920.1057/0.23.1920.1057@1920.23.1920.1057" timestamp="1583837791115" />
+    <state x="2364" y="345" key="com.intellij.ide.util.TipDialog" timestamp="1584084749810">
+      <screen x="1920" y="23" width="1920" height="1057" />
+    </state>
     <state x="444" y="345" key="com.intellij.ide.util.TipDialog/0.23.1920.1057/1920.23.1920.1057@0.23.1920.1057" timestamp="1582884945939" />
+    <state x="2364" y="345" key="com.intellij.ide.util.TipDialog/1920.23.1920.1057/0.23.1920.1057@1920.23.1920.1057" timestamp="1584084749810" />
+    <state x="2616" y="446" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1583314336421">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state x="2616" y="446" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583314336421" />
+    <state x="601" y="233" key="com.intellij.testIntegration.createTest.CreateTestDialog" timestamp="1583521946074">
+      <screen x="0" y="0" width="1920" height="1200" />
+    </state>
+    <state x="601" y="233" key="com.intellij.testIntegration.createTest.CreateTestDialog/0.0.1920.1200@0.0.1920.1200" timestamp="1583521946074" />
+    <state x="2521" y="210" key="com.intellij.testIntegration.createTest.CreateTestDialog/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583222710902" />
+    <state x="2789" y="235" key="com.intellij.tools.ToolSelectDialog.dimensionServiceKey" timestamp="1583851942350">
+      <screen x="1920" y="23" width="1920" height="1057" />
+    </state>
+    <state x="2789" y="235" key="com.intellij.tools.ToolSelectDialog.dimensionServiceKey/1920.23.1920.1057/0.23.1920.1057@1920.23.1920.1057" timestamp="1583851942350" />
+    <state x="2325" y="242" width="1110" height="721" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2" timestamp="1583854802575">
+      <screen x="1920" y="23" width="1920" height="1057" />
+    </state>
+    <state x="2325" y="224" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583772357872" />
+    <state x="2325" y="224" width="1110" height="721" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2/1920.0.1920.1080/0.23.1920.1057@1920.0.1920.1080" timestamp="1583771764676" />
+    <state x="2325" y="242" width="1110" height="721" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2/1920.23.1920.1057/0.23.1920.1057@1920.23.1920.1057" timestamp="1583854802575" />
+    <state x="2372" y="36" width="1015" height="1031" key="find.popup" timestamp="1584024543304">
+      <screen x="1920" y="23" width="1920" height="1057" />
+    </state>
+    <state x="452" y="37" width="1015" height="1149" key="find.popup/0.23.1920.1177@0.23.1920.1177" timestamp="1583965810140" />
+    <state x="2372" y="13" width="1015" height="1054" key="find.popup/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583740150229" />
+    <state x="2372" y="13" width="1015" height="1053" key="find.popup/1920.0.1920.1080/0.23.1920.1057@1920.0.1920.1080" timestamp="1583322379454" />
+    <state x="2372" y="36" width="1015" height="1031" key="find.popup/1920.23.1920.1057/0.23.1920.1057@1920.23.1920.1057" timestamp="1584024543304" />
+    <state x="2570" y="113" key="refactoring.ChangeSignatureDialog" timestamp="1583850364029">
+      <screen x="1920" y="23" width="1920" height="1057" />
+    </state>
+    <state x="2570" y="92" key="refactoring.ChangeSignatureDialog/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583232494771" />
+    <state x="2570" y="113" key="refactoring.ChangeSignatureDialog/1920.23.1920.1057/0.23.1920.1057@1920.23.1920.1057" timestamp="1583850364029" />
+    <state x="2461" y="70" width="838" height="1011" key="search.everywhere.popup" timestamp="1583934670720">
+      <screen x="1920" y="23" width="1920" height="1057" />
+    </state>
+    <state x="541" y="53" width="838" height="1147" key="search.everywhere.popup/0.0.1920.1200@0.0.1920.1200" timestamp="1583524150254" />
+    <state x="2461" y="48" width="838" height="1032" key="search.everywhere.popup/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583759737273" />
+    <state x="2461" y="48" width="838" height="1032" key="search.everywhere.popup/1920.0.1920.1080/0.23.1920.1057@1920.0.1920.1080" timestamp="1583242136832" />
+    <state x="2461" y="70" width="838" height="1011" key="search.everywhere.popup/1920.23.1920.1057/0.23.1920.1057@1920.23.1920.1057" timestamp="1583934670720" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint type="java-line">
+          <condition expression="partition.getValues().get(0).equals(&quot;2019-12-01&quot;)" language="JAVA" />
+          <url>file://$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/services/housekeeping/HousekeepingJob.java</url>
+          <line>191</line>
+          <option name="timeStamp" value="37" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/services/housekeeping/HousekeepingJob.java</url>
+          <line>351</line>
+          <option name="timeStamp" value="44" />
+        </line-breakpoint>
+      </breakpoints>
+      <default-breakpoints>
+        <breakpoint type="java-exception">
+          <properties>
+            <option name="class-filters-enabled" value="true" />
+            <class-filters>
+              <class-filter pattern="com.bigspark.cloudera.*" />
+            </class-filters>
+          </properties>
+        </breakpoint>
+      </default-breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

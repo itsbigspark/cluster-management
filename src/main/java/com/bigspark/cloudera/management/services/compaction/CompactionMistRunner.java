@@ -2,6 +2,8 @@ package com.bigspark.cloudera.management.services.compaction;
 
 
 import static mist.api.jdsl.Jdsl.*;
+
+import com.bigspark.cloudera.management.common.exceptions.SourceException;
 import mist.api.Handle;
 import mist.api.MistFn;
 import mist.api.jdsl.JEncoders;
@@ -22,11 +24,7 @@ public class CompactionMistRunner extends MistFn {
             CompactionJob compactionJob = null;
             try {
                 compactionJob = new CompactionJob();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (MetaException e) {
-                e.printStackTrace();
-            } catch (ConfigurationException e) {
+            } catch (IOException | ConfigurationException | SourceException | MetaException e) {
                 e.printStackTrace();
             }
             CompactionJob finalCompactionJob = compactionJob;

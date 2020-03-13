@@ -2,7 +2,9 @@ package com.bigspark.cloudera.management.services.housekeeping;
 
 import com.bigspark.cloudera.management.common.exceptions.SourceException;
 import com.bigspark.cloudera.management.common.model.TableDescriptor;
+import com.bigspark.cloudera.management.helpers.AuditHelper;
 import com.bigspark.cloudera.management.helpers.MetadataHelper;
+import com.bigspark.cloudera.management.helpers.SparkHelper;
 import com.bigspark.cloudera.management.services.ClusterManagementJob;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -10,7 +12,6 @@ import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.spark.sql.Row;
-import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,18 +24,20 @@ import java.util.Properties;
 public class HousekeepingController {
 
     public Properties jobProperties;
-    public SparkSession spark;
+    public SparkHelper.AuditedSparkSession spark;
     public FileSystem fileSystem;
     public Configuration hadoopConfiguration;
     public HiveMetaStoreClient hiveMetaStoreClient;
     public MetadataHelper metadataHelper;
+    public AuditHelper auditHelper;
     public Boolean isDryRun;
 
     Logger logger = LoggerFactory.getLogger(getClass());
 
-    public HousekeepingController() throws IOException, MetaException, ConfigurationException {
+    public HousekeepingController() throws IOException, MetaException, ConfigurationException, SourceException {
         ClusterManagementJob clusterManagementJob = ClusterManagementJob.getInstance();
-        this.spark = clusterManagementJob.spark;
+        this.auditHelper = new AuditHelper(clusterManagementJob);
+        this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark,auditHelper);
         this.fileSystem = clusterManagementJob.fileSystem;
         this.hadoopConfiguration = clusterManagementJob.hadoopConfiguration;
         this.metadataHelper = clusterManagementJob.metadataHelper;
@@ -58,7 +61,7 @@ public class HousekeepingController {
      * @return List<Row>
      */
     private List<Row> getRetentionDatabases() {
-        return spark.sql("SELECT DISTINCT DATABASE FROM " + getRetentionTable()).collectAsList();
+        return spark.sql("SELECT DISTINCT DATABASE FROM " + getRetentionTable()+ " WHERE ACTIVE='true'").collectAsList() ;
     }
 
     /**
@@ -68,7 +71,7 @@ public class HousekeepingController {
      */
     private List<Row> getRetentionGroupDatabases(int group) {
         logger.info("Now pulling list of databases for group : "+ group);
-        return spark.sql("SELECT DISTINCT DATABASE FROM " + getRetentionTable()+ " WHERE GROUP="+group).collectAsList();
+        return spark.sql("SELECT DISTINCT DATABASE FROM " + getRetentionTable()+ " WHERE ACTIVE='true' and GROUP="+group).collectAsList();
     }
 
 
@@ -77,9 +80,9 @@ public class HousekeepingController {
      *
      * @return List<Row>
      */
-    private List<Row> getRetentionDataForDatabase(String database) {
+    private List<Row> getRetentionDataForDatabase(String database, int group) {
         logger.info("Now pulling configuration metadata for all tables in database : "+ database);
-        return spark.sql("SELECT TABLE, RETENTION_PERIOD, RETAIN_MONTH_END FROM " + getRetentionTable() + " WHERE DATABASE = '" + database + "' AND ACTIVE='true'").collectAsList();
+        return spark.sql("SELECT TABLE, RETENTION_PERIOD, RETAIN_MONTH_END FROM " + getRetentionTable() + " WHERE DATABASE = '" + database + "' AND ACTIVE='true' AND GROUP ="+group).collectAsList();
     }
 
 
@@ -106,8 +109,8 @@ public class HousekeepingController {
      * @param database
      * @return RetentionMetadataContainer
      */
-    private ArrayList<TableMetadata> sourceDatabaseTablesFromMetaTable(String database) throws SourceException {
-        List<Row> purgeTables = getRetentionDataForDatabase(database);
+    private ArrayList<TableMetadata> sourceDatabaseTablesFromMetaTable(String database, int group) throws SourceException {
+        List<Row> purgeTables = getRetentionDataForDatabase(database, group);
         ArrayList<TableMetadata> tableMetadataList = new ArrayList<>();
         logger.info(purgeTables.size() + " tables returned with a purge configuration");
         for (Row table : purgeTables){
@@ -120,21 +123,22 @@ public class HousekeepingController {
                 TableMetadata tableMetadata = new TableMetadata(database,tableName,retentionPeriod,isRetainMonthEnd,tableDescriptor);
                 tableMetadataList.add(tableMetadata);
             } catch (SourceException e){
-                logger.error(tableName+" provided in metadata configuration, but not found in database..");
+                logger.error(tableName+" : provided in metadata configuration, but not found in database..");
             }
         }
         return tableMetadataList;
     }
 
 
-    public void executeHousekeepingGroup(int executionGroup) throws ConfigurationException, IOException, MetaException{
+    public void executeHousekeepingGroup(int executionGroup) throws ConfigurationException, IOException, MetaException, SourceException {
         HousekeepingJob housekeepingJob = new HousekeepingJob();
+        auditHelper.startup();
         List<Row> retentionGroup = getRetentionGroupDatabases(executionGroup);
         retentionGroup.forEach(retentionRecord -> {
             String database=retentionRecord.get(0).toString();
             ArrayList<TableMetadata> tableMetadataList = new ArrayList<>();
             try {
-                tableMetadataList.addAll(sourceDatabaseTablesFromMetaTable(database));
+                tableMetadataList.addAll(sourceDatabaseTablesFromMetaTable(database, executionGroup));
             } catch (SourceException e) {
                 e.printStackTrace();
             }
@@ -146,6 +150,7 @@ public class HousekeepingController {
                 }
             });
         });
+        auditHelper.completion();
     }
 }
 

@@ -12,11 +12,9 @@ com/bigspark/cloudera/management/helpers/SparkHelper$Hdfs.class
 com/bigspark/cloudera/management/common/model/PlatformDescriptor.class
 com/bigspark/cloudera/management/common/utils/ParseUtils.class
 com/bigspark/cloudera/management/common/enums/Pattern.class
-com/bigspark/cloudera/management/helpers/SparkHelperStatic.class
 com/bigspark/cloudera/management/common/configuration/HadoopConfiguration.class
 com/bigspark/cloudera/management/helpers/SparkHelper.class
 com/bigspark/cloudera/management/services/housekeeping/HousekeepingController$TableMetadata.class
-com/bigspark/cloudera/management/helpers/SparkHelperStatic$Hdfs.class
 com/bigspark/cloudera/management/common/model/SourceDescriptor.class
 com/bigspark/cloudera/management/helpers/SparkJobDto.class
 com/bigspark/cloudera/management/helpers/SparkHelper$Security.class
@@ -26,11 +24,11 @@ com/bigspark/cloudera/management/services/compaction/CompactionJob.class
 com/bigspark/cloudera/management/helpers/YarnHelper.class
 com/bigspark/cloudera/management/common/configuration/HiveConfiguration.class
 com/bigspark/cloudera/management/helpers/FileSystemHelper.class
-com/bigspark/cloudera/management/common/model/HadoopPublishNotification.class
 com/bigspark/cloudera/management/services/housekeeping/HousekeepingController.class
 com/bigspark/cloudera/management/common/utils/FileSystemUtils.class
 com/bigspark/cloudera/management/common/exceptions/SourceException.class
 com/bigspark/cloudera/management/services/housekeeping/HousekeepingRunner.class
 com/bigspark/cloudera/management/services/ClusterManagementJob.class
 com/bigspark/cloudera/management/services/compaction/CompactionMistRunner.class
-com/bigspark/cloudera/management/helpers/SparkHelperStatic$Security.class
+com/bigspark/cloudera/management/helpers/SparkHelper$AuditedSparkSession.class
+com/bigspark/cloudera/management/helpers/AuditHelper.class
