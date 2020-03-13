@@ -62,7 +62,7 @@ class HousekeepingJob {
         this.clusterManagementJob = ClusterManagementJob.getInstance();
         this.auditHelper = new AuditHelper(clusterManagementJob);
         this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark,auditHelper);
-        this.fileSystem = clusterManagementJob.fileSystem;
+        this.fileSystem = clusterManagementJob.fileSystem; // Keep getting filesystem closed errors
         this.hadoopConfiguration = clusterManagementJob.hadoopConfiguration;
         this.metadataHelper = clusterManagementJob.metadataHelper;
         this.isDryRun = clusterManagementJob.isDryRun;
@@ -200,8 +200,10 @@ class HousekeepingJob {
     private void createMonthEndSwingTable(String database, String table) {
         partitionMonthEnds.createOrReplaceTempView("partitionMonthEnds");
         if (pattern == Pattern.SH) {
+            spark.sql(String.format("DROP TABLE IF EXISTS %s.%s_hkp",database,table));
             spark.sql(String.format("CREATE TABLE %s.%s_hkp AS SELECT t.* from %s.%s t join partitionMonthEnds me on t.EDI_BUSINESS_DAY = me.MONTH_END and t.SRC_SYS_INST_ID = me.SRC_SYS_INST_ID",database,table,database,table));
         } else if (pattern == Pattern.EAS) {
+            spark.sql(String.format("DROP TABLE IF EXISTS %s.%s_hkp",database,table));
             spark.sql(String.format("CREATE TABLE %s.%s_hkp AS SELECT t.* from %s.%s t join partitionMonthEnds me on t.EDI_BUSINESS_DAY = me.MONTH_END and t.SRC_SYS_ID = me.SRC_SYS_ID and t.SRC_SYS_INST_ID = me.SRC_SYS_INST_ID",database,table,database,table));
         }
     }
@@ -211,6 +213,7 @@ class HousekeepingJob {
         String userHomeArea = FileSystemHelper.getUserHomeArea();
         sb.append(userHomeArea).append("/.ClusterManagementTrash/housekeeping");
         trashBaseLocation = sb.toString();
+        this.fileSystem = FileSystemHelper.getConnection();
         if (! fileSystem.exists(new Path(trashBaseLocation))){
             fileSystem.mkdirs(new Path(trashBaseLocation));
         }

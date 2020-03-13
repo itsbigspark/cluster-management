@@ -4,12 +4,14 @@ import com.bigspark.cloudera.management.Common;
 import com.bigspark.cloudera.management.common.enums.Pattern;
 import com.bigspark.cloudera.management.common.exceptions.SourceException;
 import com.bigspark.cloudera.management.helpers.AuditHelper;
+import com.bigspark.cloudera.management.helpers.FileSystemHelper;
 import com.bigspark.cloudera.management.helpers.MetadataHelper;
 import com.bigspark.cloudera.management.helpers.SparkHelper;
 import com.bigspark.cloudera.management.services.ClusterManagementJob;
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -38,19 +40,22 @@ public class HousekeepingJobTest {
     public Boolean isDryRun;
     public HousekeepingController housekeepingController;
     public String testingDatabase;
+    public String testFile;
     public AuditHelper auditHelper;
 
     public HousekeepingJobTest() throws IOException, MetaException, ConfigurationException, SourceException {
-        if (spark.sparkContext().isLocal()) {
-            //Required only for derby db weird locking issues
-            FileUtils.forceDelete(new File(spark.sparkContext().getSparkHome()+"/metastore_db/db.lck"));
-            FileUtils.forceDelete(new File(spark.sparkContext().getSparkHome()+"/metastore_db/dbex.lck"));
-        }
 
         ClusterManagementJob clusterManagementJob = ClusterManagementJob.getInstance();
         this.housekeepingController = new HousekeepingController();
         this.auditHelper = new AuditHelper(clusterManagementJob);
         this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark,auditHelper);
+
+        if (spark.sparkContext().master().equals("local")) {
+            //Required only for derby db weird locking issues
+            FileUtils.forceDelete(new File(spark.sparkContext().getSparkHome()+"/metastore_db/db.lck"));
+            FileUtils.forceDelete(new File(spark.sparkContext().getSparkHome()+"/metastore_db/dbex.lck"));
+        }
+
         this.fileSystem = clusterManagementJob.fileSystem;
         this.hadoopConfiguration = clusterManagementJob.hadoopConfiguration;
         this.metadataHelper = clusterManagementJob.metadataHelper;
@@ -59,9 +64,15 @@ public class HousekeepingJobTest {
 
     void setUp() throws IOException {
         this.testingDatabase = jobProperties.getProperty("com.bigspark.cloudera.management.services.housekeeping.testingDatabase");
-        File testFile = new File("/tmp/testdata.csv");
-
-        if (! testFile.exists()) {
+        String userHomeArea;
+        if (spark.sparkContext().master().equals("yarn")) {
+            userHomeArea = FileSystemHelper.getUserHomeArea();
+        } else {
+            userHomeArea = "/tmp";
+        }
+        String fileName = "testdata.csv";
+        this.testFile = userHomeArea+"/"+fileName;
+        if (! FileSystemHelper.getConnection().exists(new Path(this.testFile))) {
             System.out.println("Now generating test dataset");
 
             StringBuilder sb = new StringBuilder();
@@ -74,12 +85,17 @@ public class HousekeepingJobTest {
 
             System.out.println(sb.toString());
 
-            BufferedWriter writer = null;
-            try {
-                writer = new BufferedWriter(new FileWriter(testFile));
-                writer.write(sb.toString());
-            } finally {
-                if (writer != null) writer.close();
+            if (spark.sparkContext().master().equals("local")) {
+                BufferedWriter writer = null;
+                try {
+                    writer = new BufferedWriter(new FileWriter(testFile));
+                    writer.write(sb.toString());
+                } finally {
+                    if (writer != null) writer.close();
+                }
+            }
+            else if (spark.sparkContext().master().equals("yarn")){
+                FileSystemHelper.writeFileContent(userHomeArea, fileName,sb.toString(),true);
             }
         }
         createTables();
@@ -117,7 +133,7 @@ public class HousekeepingJobTest {
         System.out.println("Check test tables exist...");
         spark.sql("USE "+testingDatabase);
         spark.sql("SHOW TABLES").show();
-        Dataset<Row> csv = spark.read().option("header", "true").csv("/tmp/testdata.csv");
+        Dataset<Row> csv = spark.read().option("header", "true").csv(testFile);
         csv.cache();
         if (!spark.catalog().tableExists(testingDatabase, "test_table_sh")) {
             System.out.println("Creating SH test table...");

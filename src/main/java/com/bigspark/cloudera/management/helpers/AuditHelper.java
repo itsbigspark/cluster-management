@@ -5,15 +5,11 @@ import com.bigspark.cloudera.management.services.ClusterManagementJob;
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.Table;
+import org.apache.spark.sql.SparkSession;
 
 import javax.naming.ConfigurationException;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
+
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -32,11 +28,12 @@ public class AuditHelper {
     }
 
     private void intitialiseAuditTable() throws IOException {
-        this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark,this);
         auditTable = clusterManagementJob.jobProperties.getProperty("com.bigspark.cloudera.management.services.auditTable");
         String[] auditTable_ = auditTable.split("\\.");
+        //Cannot do an audited spark session without the audit table!
+        SparkSession spark = SparkHelper.getSparkSession();
         if (! spark.catalog().tableExists(auditTable_[0],auditTable_[1]))
-              spark.sql("CREATE TABLE %s (" +
+              spark.sql(String.format("CREATE TABLE %s.%s (" +
                       "class_name STRING" +
                       ", method_name STRING" +
                       ", application_id STRING" +
@@ -47,7 +44,9 @@ public class AuditHelper {
                       ", log_time TIMESTAMP" +
                       ", status STRING" +
                       ") STORED AS TEXTFILE"
+              ,auditTable_[0],auditTable_[1])
               );
+        this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark,this);
     }
 
     private void setLogfile() throws SourceException {
@@ -71,12 +70,14 @@ public class AuditHelper {
                 , LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
                 , isSuccess
         );
-//        SparkHelper.Hdfs.appendFileContent(logfileLocation,logfileName,payload);
-        //TODO - Reinstate above line, remove below   append() not supported for local filesystem
+
+        SparkHelper.Hdfs.appendFileContent(logfileLocation,logfileName,payload);
+
+//        TODO - Reinstate above line, remove below   append() not supported for local filesystem
 //        Exception in thread "main" java.io.IOException: Not supported
 //        at org.apache.hadoop.fs.ChecksumFileSystem.append(ChecksumFileSystem.java:357)
-        File file = new File(logfileLocation.substring(5)+"/"+logfileName);
-        Files.write(file.toPath(), payload.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+//        File file = new File(logfileLocation.substring(5)+"/"+logfileName);
+//        Files.write(file.toPath(), payload.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
     }
 
     public void startup() throws IOException {

@@ -323,7 +323,7 @@ public class CompactionJob {
      * @throws NoSuchTableException
      * @throws NoSuchDatabaseException
      */
-    void executeMist(String database, String table) throws IOException, NoSuchTableException, NoSuchDatabaseException, SourceException {
+    void executeMist(String database, String table, SparkSession spark) throws IOException, NoSuchTableException, NoSuchDatabaseException, SourceException {
         processTable(database,table);
     }
     /**

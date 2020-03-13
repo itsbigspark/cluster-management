@@ -16,10 +16,9 @@ public class FileSystemHelper {
 	static FileSystem fs;
 
 	public static FileSystem getConnection() throws IOException{
-		if (fs != null)
+		if (fs == null)
+			fs = FileSystem.get(SparkHelper.getSparkSession().sparkContext().hadoopConfiguration());
 			return fs;
-		else
-			return FileSystem.get(SparkHelper.getSparkSession().sparkContext().hadoopConfiguration());
 	}
 
 	public static String getFileContent(String path) throws IllegalArgumentException, IOException, InterruptedException {
