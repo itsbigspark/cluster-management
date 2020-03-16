@@ -24,6 +24,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.naming.ConfigurationException;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.sql.Date;
 import java.text.ParseException;
 import java.time.LocalDate;
@@ -220,15 +222,16 @@ class HousekeepingJob {
         }
     }
 
-    protected void trashDataOutwithRetention(List<Partition> purgeCandidates) throws IOException {
+    protected void trashDataOutwithRetention(List<Partition> purgeCandidates) throws IOException, URISyntaxException {
         setTrashBaseLocation();
         for (Partition p : purgeCandidates){
-            String trashTarget = trashBaseLocation+"/"+p.getSd().getLocation();
+            String locationNoScheme = new URI(p.getSd().getLocation()).getPath();
+            String trashTarget = trashBaseLocation+locationNoScheme;
             logger.debug("Trash location : "+trashTarget);
             if (!isDryRun){
                 try {
-                    logger.info("Dropped location :"+p.getSd().getLocation()+" to Trash");
-                    boolean isRenameSuccess = fileSystem.rename(new Path(p.getSd().getLocation()), new Path(trashTarget));
+                    logger.info("Dropped location :"+locationNoScheme+" to Trash");
+                    boolean isRenameSuccess = fileSystem.rename(new Path(locationNoScheme), new Path(trashTarget));
                     if (!isRenameSuccess)
                         throw new IOException(String.format("Failed to move files from : %s to : %s", p.getSd().getLocation(), trashTarget));
                     auditHelper.writeAuditLine("Trash",sourceDescriptor.toString(), String.format("Moved files from : %s to : %s", p.getSd().getLocation(), trashTarget),true);
@@ -340,7 +343,7 @@ class HousekeepingJob {
      * @throws MetaException
      * @throws SourceException
      */
-    void execute(HousekeepingController.TableMetadata tableMetadata) throws SourceException, IOException {
+    void execute(HousekeepingController.TableMetadata tableMetadata) throws SourceException, IOException, URISyntaxException {
         this.tableMetadata = tableMetadata;
         this.sourceDescriptor = new SourceDescriptor(metadataHelper.getDatabase(tableMetadata.database),tableMetadata.tableDescriptor);
         getTableType(tableMetadata);

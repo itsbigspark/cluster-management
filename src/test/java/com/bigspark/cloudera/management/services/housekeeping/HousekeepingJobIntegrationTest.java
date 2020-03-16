@@ -83,10 +83,10 @@ public class HousekeepingJobIntegrationTest {
             StringBuilder sb = new StringBuilder();
             sb.append("value,edi_business_day,src_sys_id,src_sys_inst_id\n");
 
-            generateTestData("ADB", "NWB", 10000, sb);
-            generateTestData("ADB", "UBR", 9000, sb);
-            generateTestData("ADB", "UBN", 8000, sb);
-            generateTestData("ADB", "RBS", 7000, sb);
+            generateTestData("ADB", "NWB", 1000, sb);
+            generateTestData("ADB", "UBR", 900, sb);
+            generateTestData("ADB", "UBN", 800, sb);
+            generateTestData("ADB", "RBS", 700, sb);
 
             System.out.println(sb.toString());
 
@@ -133,12 +133,12 @@ public class HousekeepingJobIntegrationTest {
 
     private void dropTables() throws IOException {
 
-        spark.sql("DROP TABLE default.test_table_eas");
-        spark.sql("DROP TABLE default.test_table_eas_swing");
-        spark.sql("DROP TABLE default.test_table_sh");
-        spark.sql("DROP TABLE default.test_table_sh_swing");
-        spark.sql("DROP TABLE default.data_retention_configuration");
-        spark.sql("DROP TABLE default.cluster_management_audit");
+        spark.sql("DROP TABLE IF EXISTS default.test_table_eas");
+        spark.sql("DROP TABLE IF EXISTS default.test_table_eas_swing");
+        spark.sql("DROP TABLE IF EXISTS default.test_table_sh");
+        spark.sql("DROP TABLE IF EXISTS default.test_table_sh_swing");
+        spark.sql("DROP TABLE IF EXISTS default.data_retention_configuration");
+        spark.sql("DROP TABLE IF EXISTS default.cluster_management_audit");
 
     }
 
