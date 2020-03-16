@@ -1,30 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="81c03950-0574-43ed-8d8a-e7bc63d8bf3d" name="Default Changelist" comment="BIG-4 More testing and refactoring. Commit prior to testing on HDFS">
-      <change afterPath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/services/compaction/CompactionJobIntegrationTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/services/housekeeping/HousekeepingJobIntegrationTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    <list default="true" id="81c03950-0574-43ed-8d8a-e7bc63d8bf3d" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/AuditHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/AuditHelper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/FileSystemHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/FileSystemHelper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/services/ClusterManagementJob.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/services/ClusterManagementJob.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/services/compaction/CompactionJob.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/services/compaction/CompactionJob.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/services/housekeeping/HousekeepingController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/services/housekeeping/HousekeepingController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/services/housekeeping/HousekeepingJob.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/services/housekeeping/HousekeepingJob.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/helpers/MetadataHelperTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/helpers/MetadataHelperTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/services/compaction/CompactionJobTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/services/compaction/CompactionJobTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/services/compaction/CompactionJobTestRunner.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/services/compaction/CompactionJobTestRunner.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/services/housekeeping/HousekeepingJobTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/services/housekeeping/HousekeepingJobTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/services/housekeeping/HousekeepingJobTestRunner.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/services/housekeeping/HousekeepingJobTestRunner.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/resources/config.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/config.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/bigspark/cloudera/management/helpers/FileSystemHelper.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/bigspark/cloudera/management/helpers/FileSystemHelper.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/bigspark/cloudera/management/services/compaction/CompactionJob.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/bigspark/cloudera/management/services/compaction/CompactionJob.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/cluster-management-1.0-SNAPSHOT.jar" beforeDir="false" afterPath="$PROJECT_DIR$/target/cluster-management-1.0-SNAPSHOT.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-archiver/pom.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/inputFiles.lst" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -205,7 +184,7 @@
       <workItem from="1584003399643" duration="9236000" />
       <workItem from="1584084745364" duration="342000" />
       <workItem from="1584101773868" duration="496000" />
-      <workItem from="1584102426026" duration="29589000" />
+      <workItem from="1584102426026" duration="31285000" />
     </task>
     <task id="LOCAL-00001" summary="BIG-13 Addition of Junit test skeletons">
       <created>1583222933153</created>
@@ -256,7 +235,14 @@
       <option name="project" value="LOCAL" />
       <updated>1584120804214</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="BIG-4 More testing and defect resolution">
+      <created>1584390817707</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1584390817707</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -269,7 +255,8 @@
     <MESSAGE value="Commit prior to amending ClusterManagementJob" />
     <MESSAGE value="BIG-4 Initial testing of Housekeeping completed" />
     <MESSAGE value="BIG-4 More testing and refactoring. Commit prior to testing on HDFS" />
-    <option name="LAST_COMMIT_MESSAGE" value="BIG-4 More testing and refactoring. Commit prior to testing on HDFS" />
+    <MESSAGE value="BIG-4 More testing and defect resolution" />
+    <option name="LAST_COMMIT_MESSAGE" value="BIG-4 More testing and defect resolution" />
   </component>
   <component name="WindowStateProjectService">
     <state x="2385" y="104" key="#All_in_cluster-management" timestamp="1583222240044">
@@ -347,10 +334,10 @@
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
     <state x="2425" y="359" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583333591658" />
-    <state x="178" y="103" key="CommitChangelistDialog2" timestamp="1584390519491">
+    <state x="178" y="103" key="CommitChangelistDialog2" timestamp="1584390817131">
       <screen x="0" y="23" width="1920" height="1177" />
     </state>
-    <state x="178" y="103" key="CommitChangelistDialog2/0.23.1920.1177@0.23.1920.1177" timestamp="1584390519491" />
+    <state x="178" y="103" key="CommitChangelistDialog2/0.23.1920.1177@0.23.1920.1177" timestamp="1584390817131" />
     <state x="2098" y="74" key="CommitChangelistDialog2/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583741032269" />
     <state x="2098" y="95" key="CommitChangelistDialog2/1920.23.1920.1057/0.23.1920.1057@1920.23.1920.1057" timestamp="1584120803884" />
     <state width="1868" height="302" key="GridCell.Tab.0.bottom" timestamp="1584373900950">
@@ -421,10 +408,10 @@
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
     <state x="2240" y="19" key="SettingsEditor/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583741983610" />
-    <state x="2380" y="235" key="Vcs.Push.Dialog.v2" timestamp="1584120814243">
-      <screen x="1920" y="23" width="1920" height="1057" />
+    <state x="460" y="259" key="Vcs.Push.Dialog.v2" timestamp="1584390820531">
+      <screen x="0" y="23" width="1920" height="1177" />
     </state>
-    <state x="460" y="259" key="Vcs.Push.Dialog.v2/0.23.1920.1177@0.23.1920.1177" timestamp="1584094981611" />
+    <state x="460" y="259" key="Vcs.Push.Dialog.v2/0.23.1920.1177@0.23.1920.1177" timestamp="1584390820531" />
     <state x="2380" y="217" key="Vcs.Push.Dialog.v2/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583513971246" />
     <state x="2380" y="235" key="Vcs.Push.Dialog.v2/1920.23.1920.1057/0.23.1920.1057@1920.23.1920.1057" timestamp="1584120814243" />
     <state width="960" height="485" key="XDebugger.FullValuePopup" timestamp="1583837791115">
@@ -469,9 +456,10 @@
     <state x="2372" y="13" width="1015" height="1054" key="find.popup/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583740150229" />
     <state x="2372" y="13" width="1015" height="1053" key="find.popup/1920.0.1920.1080/0.23.1920.1057@1920.0.1920.1080" timestamp="1583322379454" />
     <state x="2372" y="36" width="1015" height="1031" key="find.popup/1920.23.1920.1057/0.23.1920.1057@1920.23.1920.1057" timestamp="1584344045009" />
-    <state x="2570" y="113" key="refactoring.ChangeSignatureDialog" timestamp="1583850364029">
-      <screen x="1920" y="23" width="1920" height="1057" />
+    <state x="650" y="102" key="refactoring.ChangeSignatureDialog" timestamp="1584391618858">
+      <screen x="0" y="0" width="1920" height="1200" />
     </state>
+    <state x="650" y="102" key="refactoring.ChangeSignatureDialog/0.0.1920.1200@0.0.1920.1200" timestamp="1584391618858" />
     <state x="2570" y="92" key="refactoring.ChangeSignatureDialog/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583232494771" />
     <state x="2570" y="113" key="refactoring.ChangeSignatureDialog/1920.23.1920.1057/0.23.1920.1057@1920.23.1920.1057" timestamp="1583850364029" />
     <state x="541" y="70" width="838" height="1011" key="search.everywhere.popup" timestamp="1584376160113">

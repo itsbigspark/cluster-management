@@ -51,6 +51,8 @@ public class CompactionJob {
     public MetadataHelper metadataHelper;
     public Boolean isDryRun;
     public String applicationID;
+    public String table;
+    public String database;
     public AuditHelper auditHelper;
     protected String trashBaseLocation;
 
@@ -195,13 +197,13 @@ public class CompactionJob {
      */
     protected void processTable(String dbName, String tableName) throws NoSuchDatabaseException, NoSuchTableException, IOException, SourceException {
        setTrashBaseLocation();
+       logger.info("Now processing table : "+dbName+"."+tableName);
        org.apache.hadoop.hive.metastore.api.Table tableMeta = metadataHelper.getTable(dbName,tableName);
        TableDescriptor tableDescriptor =  metadataHelper.getTableDescriptor(tableMeta);
-
        this.sourceDescriptor = new SourceDescriptor(metadataHelper.getDatabase(dbName),tableDescriptor);
-
        String tableLocation = getTableLocation(dbName,tableName);
        Row[] partitions = getTablePartitions(dbName, tableName);
+       logger.debug(partitions.length+" : partitions returned for checking");
        for (Row row : partitions){
            processPartition(tableLocation, row.get(0).toString());
        }
@@ -214,13 +216,20 @@ public class CompactionJob {
      * @throws IOException
      */
     protected void processPartition(String tableLocation, String partition) throws IOException{
+        logger.debug("Now processing partition : "+database+"."+table+" [ "+partition+" ]");
         String absPartitionLocation=tableLocation+"/"+partition;
         long[] countSize = getFileCountTotalSize(absPartitionLocation);
+        logger.debug("Original file count : "+countSize[0]);
         if (isCompactionCandidate(countSize[0],countSize[1])){
+            auditHelper.writeAuditLine("Compact",sourceDescriptor.toString(),"Original file count : "+countSize[0],true);
             Integer repartitionFactor = getRepartitionFactor(countSize[1]);
             compactLocation(absPartitionLocation,repartitionFactor);
             long[] newCountSize = getFileCountTotalSize(absPartitionLocation+"_tmp");
+            logger.debug("Resulting file count : "+newCountSize[0]);
+            auditHelper.writeAuditLine("Compact",sourceDescriptor.toString(),"Original file count : "+countSize[0],true);
             resolvePartition(absPartitionLocation);
+        } else {
+            logger.debug("No compaction required for partition : "+database+"."+table+" [ "+partition+" ]");
         }
     }
 
@@ -296,19 +305,28 @@ public class CompactionJob {
             trashLocation = trashOriginalData(trashBaseLocation,partitionLocation,sourceDescriptor);
 //            fileSystem.rename(new Path(partitionLocation), new Path(partitionLocation + "_delete"));
         } catch (Exception  e){
-            System.out.println("FATAL: Unable to move uncompacted files from : "+partitionLocation +" to Trash location");
+            logger.error("FATAL: Unable to move uncompacted files from : "+partitionLocation +" to Trash location");
             e.printStackTrace();
             System.exit(1);
         }
         try {
-            fileSystem.rename(new Path(partitionLocation+"_tmp"), new Path(partitionLocation));
-        } catch (Exception  e){
-            System.out.println("ERROR: Unable to move files from temp : "+partitionLocation+"_tmp to partition location" );
+
+            boolean rename = fileSystem.rename(new Path(partitionLocation + "_tmp"), new Path(partitionLocation));
+            if (rename)
+                auditHelper.writeAuditLine("Move",sourceDescriptor.toString(),String.format("Moving : %s to : %s",partitionLocation+"_tmp",partitionLocation),true);
+            else throw new IOException("Failed to move files");
+        } catch (Exception e){
+            logger.error("ERROR: Unable to move files from temp : "+partitionLocation+"_tmp to partition location" );
+            auditHelper.writeAuditLine("Move",sourceDescriptor.toString(),String.format("Moving : %s to : %s",partitionLocation+"_tmp",partitionLocation),false);
             e.printStackTrace();
             // If this happens, we need to try and resolve, otherwise the partition is impacted
             try {
-                fileSystem.rename(new Path(trashLocation),new Path(partitionLocation));
+                boolean rename = fileSystem.rename(new Path(trashLocation), new Path(partitionLocation));
+                if (rename)
+                    auditHelper.writeAuditLine("Move",sourceDescriptor.toString(),String.format("Moving : %s to : %s",trashLocation,partitionLocation),true);
+                else throw new IOException("Failed to move files");
             } catch (Exception e_){
+                auditHelper.writeAuditLine("Move",sourceDescriptor.toString(),String.format("Moving : %s to : %s",trashLocation,partitionLocation),false);
                 logger.error("FATAL: Error while reinstating partition at "+partitionLocation);
                 logger.error("FATAL: Partition is now inoperable");
                 e_.printStackTrace();
@@ -333,6 +351,8 @@ public class CompactionJob {
      * @throws NoSuchDatabaseException
      */
     void execute(String database, String table) throws IOException, NoSuchTableException, NoSuchDatabaseException, SourceException {
+        this.table = table;
+        this.database = database;
         processTable(database,table);
     }
 }
