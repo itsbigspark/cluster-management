@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-class MetadataHelperTest {
+public class MetadataHelperTest {
 
     Table tableBase;
     Table tableSourceHistory;
@@ -26,7 +26,7 @@ class MetadataHelperTest {
 
 
     @Before
-    void setUp() throws IOException, TException, ConfigurationException {
+    public void setUp() throws IOException, TException, ConfigurationException {
         this.metadataHelper = new MetadataHelper();
         this.hiveMetaStoreClient = new HiveMetaStoreClient(new HiveConf());
         tableBase = new Table();

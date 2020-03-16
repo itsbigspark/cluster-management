@@ -33,7 +33,7 @@ public class AuditHelper {
         //Cannot do an audited spark session without the audit table!
         SparkSession spark = SparkHelper.getSparkSession();
         if (! spark.catalog().tableExists(auditTable_[0],auditTable_[1]))
-              spark.sql(String.format("CREATE TABLE %s.%s (" +
+              spark.sql(String.format("CREATE TABLE IF NOT EXISTS %s.%s (" +
                       "class_name STRING" +
                       ", method_name STRING" +
                       ", application_id STRING" +
@@ -43,7 +43,10 @@ public class AuditHelper {
                       ", message STRING" +
                       ", log_time TIMESTAMP" +
                       ", status STRING" +
-                      ") STORED AS TEXTFILE"
+                      ") " +
+                      " ROW FORMAT DELIMITED" +
+                      " FIELDS TERMINATED BY ','" +
+                      " STORED AS TEXTFILE"
               ,auditTable_[0],auditTable_[1])
               );
         this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark,this);

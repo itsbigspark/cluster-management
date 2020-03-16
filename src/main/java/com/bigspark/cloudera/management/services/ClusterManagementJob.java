@@ -1,6 +1,7 @@
 package com.bigspark.cloudera.management.services;
 
 import com.bigspark.cloudera.management.common.exceptions.SourceException;
+import com.bigspark.cloudera.management.helpers.FileSystemHelper;
 import com.bigspark.cloudera.management.helpers.MetadataHelper;
 import com.bigspark.cloudera.management.helpers.SparkHelper;
 import org.apache.hadoop.conf.Configuration;
@@ -38,12 +39,13 @@ public class ClusterManagementJob {
         appPrefix = jobProperties.getProperty("com.bigspark.cloudera.management.services.sparkAppNamePrefix");
         this.spark = SparkHelper.getSparkSession();
         this.hadoopConfiguration =spark.sparkContext().hadoopConfiguration();
-        this.fileSystem =FileSystem.get(hadoopConfiguration);
+        this.fileSystem = FileSystemHelper.getConnection();
         this.metadataHelper = new MetadataHelper();
         this.hiveMetaStoreClient = metadataHelper.getHiveMetastoreClient();
         this.applicationID = getSparkApplicationId();
         this.trackingURL = getSparkSession().sparkContext().uiWebUrl().get();
-
+        //Spark options set into base SparkSession object
+        spark.conf().set("spark.sql.legacy.allowCreatingManagedTableUsingNonemptyLocation","true");
     }
 
 

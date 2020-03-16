@@ -34,7 +34,7 @@ import java.util.Properties;
 
 /**
  * Housekeeping job
- * Used to purge files from HDFS or S3 depending on table retention parameter
+ * Used to purge files from HDFS based on a provided table retention parameter
  *
  * @author Chris Finlayson
  */
@@ -62,7 +62,7 @@ class HousekeepingJob {
         this.clusterManagementJob = ClusterManagementJob.getInstance();
         this.auditHelper = new AuditHelper(clusterManagementJob);
         this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark,auditHelper);
-        this.fileSystem = clusterManagementJob.fileSystem; // Keep getting filesystem closed errors
+        this.fileSystem = clusterManagementJob.fileSystem;
         this.hadoopConfiguration = clusterManagementJob.hadoopConfiguration;
         this.metadataHelper = clusterManagementJob.metadataHelper;
         this.isDryRun = clusterManagementJob.isDryRun;
@@ -70,32 +70,34 @@ class HousekeepingJob {
         this.hiveMetaStoreClient = clusterManagementJob.hiveMetaStoreClient;
     }
 
-    private void getTablePartitionMonthEnds(String dbName, String tableName){
+    protected void getTablePartitionMonthEnds(String dbName, String tableName){
         StringBuilder sb = new StringBuilder();
         if (pattern == pattern.EAS){
-            sb.append(String.format
-                    ("SELECT DISTINCT" +
-                    " SRC_SYS_ID" +
-                    ", SRC_SYS_INST_ID" +
-                    ", year(EDI_BUSINESS_DAY)" +
-                    "||'-'||month(EDI_BUSINESS_DAY)" +
-                    "||'-'||max(day(EDI_BUSINESS_DAY)) AS MONTH_END" +
-                    " FROM %s.%s " +
-                    "GROUP BY SRC_SYS_ID, SRC_SYS_INST_ID, year(EDI_BUSINESS_DAY), month(EDI_BUSINESS_DAY)"
-                    , dbName, tableName));
+            sb.append(String.format("SELECT" +
+                            " SRC_SYS_ID" +
+                            ", SRC_SYS_INST_ID" +
+                            ", to_date(year(EDI_BUSINESS_DAY)" +
+                            "||'-'||lpad(month(EDI_BUSINESS_DAY),2,'0')" +
+                            "||'-'||lpad(MAX(day(EDI_BUSINESS_DAY)),2,'0')" +
+                            ") AS MONTH_END" +
+                            " FROM %s.%s " +
+                            "GROUP BY SRC_SYS_ID, SRC_SYS_INST_ID, year(EDI_BUSINESS_DAY), month(EDI_BUSINESS_DAY)"
+                    , dbName,tableName));
              partitionMonthEnds = spark.sql(sb.toString());
         }
         else if (pattern == pattern.SH){
-            sb.append(String.format("SELECT DISTINCT" +
+            sb.append(String.format("SELECT" +
                             " SRC_SYS_INST_ID" +
-                            ", year(EDI_BUSINESS_DAY)" +
-                            "||'-'||month(EDI_BUSINESS_DAY)" +
-                            "||'-'||max(day(EDI_BUSINESS_DAY)) AS MONTH_END" +
+                            ", to_date(year(EDI_BUSINESS_DAY)" +
+                            "||'-'||lpad(month(EDI_BUSINESS_DAY),2,'0')" +
+                            "||'-'||lpad(MAX(day(EDI_BUSINESS_DAY)),2,'0')" +
+                            ") AS MONTH_END" +
                             " FROM %s.%s " +
                             "GROUP BY SRC_SYS_INST_ID, year(EDI_BUSINESS_DAY), month(EDI_BUSINESS_DAY)"
                     , dbName,tableName));
             partitionMonthEnds = spark.sql(sb.toString());
         }
+        partitionMonthEnds.show();
     }
 
 
@@ -106,7 +108,7 @@ class HousekeepingJob {
 //     * @return
 //     */
 //    @Deprecated
-//    private boolean isPartitionKeyMonthEnd(Partition partition) {
+//    protected boolean isPartitionKeyMonthEnd(Partition partition) {
 //        boolean isPartitionKeyMonthEnd = false;
 //        for (Row row : partitionMonthEndsList){
 //            if (pattern == Pattern.EAS){
@@ -136,7 +138,7 @@ class HousekeepingJob {
      * @param currentDate
      * @return LocalDate
      */
-    private LocalDate calculatePurgeCeiling(int retentionPeriod, LocalDate currentDate) {
+    protected LocalDate calculatePurgeCeiling(int retentionPeriod, LocalDate currentDate) {
         logger.debug("Retention period : "+ retentionPeriod);
         if (retentionPeriod <= 0) {
             logger.debug("Invalid retention period [ " + retentionPeriod + "]. Returning zero partitions.");
@@ -150,12 +152,12 @@ class HousekeepingJob {
      * @param partition
      * @throws TException
      */
-    private void dropHivePartition(Partition partition) throws TException {
+    protected void dropHivePartition(Partition partition) throws TException {
         if (isDryRun){
             logger.info("DRY RUN - Dropped partition : "+partition.toString());
         } else {
             hiveMetaStoreClient.dropPartition(partition.getDbName(), partition.getTableName(), partition.getValues());
-            logger.info("Dropped par tition : " + partition.toString());
+            logger.info("Dropped partition : " + partition.toString());
         }
     }
 
@@ -164,7 +166,7 @@ class HousekeepingJob {
      * @param partition
      * @throws TException
      */
-    private void purgeHivePartition(Partition partition) throws TException {
+    protected void purgeHivePartition(Partition partition) throws TException {
         if (isDryRun){
             logger.info("DRY RUN - Purged partition : "+partition.toString());
         } else {
@@ -179,7 +181,7 @@ class HousekeepingJob {
      * @param purgeDateCeiling
      * @return
      */
-    private List<Partition> getAllPurgeCandidates(List<Partition> partitionList, LocalDate purgeDateCeiling) {
+    protected List<Partition> getAllPurgeCandidates(List<Partition> partitionList, LocalDate purgeDateCeiling) {
         ArrayList<Partition> eligiblePartitions = new ArrayList<>();
         partitionList.forEach(
                 partition -> {
@@ -197,29 +199,28 @@ class HousekeepingJob {
         return eligiblePartitions;
     }
 
-    private void createMonthEndSwingTable(String database, String table) {
+    protected void createMonthEndSwingTable(String database, String table) {
         partitionMonthEnds.createOrReplaceTempView("partitionMonthEnds");
         if (pattern == Pattern.SH) {
-            spark.sql(String.format("DROP TABLE IF EXISTS %s.%s_hkp",database,table));
-            spark.sql(String.format("CREATE TABLE %s.%s_hkp AS SELECT t.* from %s.%s t join partitionMonthEnds me on t.EDI_BUSINESS_DAY = me.MONTH_END and t.SRC_SYS_INST_ID = me.SRC_SYS_INST_ID",database,table,database,table));
+            spark.sql(String.format("DROP TABLE IF EXISTS %s.%s_swing",database,table));
+            spark.sql(String.format("CREATE TABLE %s.%s_swing AS SELECT t.* from %s.%s t join partitionMonthEnds me on t.EDI_BUSINESS_DAY = me.MONTH_END and t.SRC_SYS_INST_ID = me.SRC_SYS_INST_ID",database,table,database,table));
         } else if (pattern == Pattern.EAS) {
-            spark.sql(String.format("DROP TABLE IF EXISTS %s.%s_hkp",database,table));
-            spark.sql(String.format("CREATE TABLE %s.%s_hkp AS SELECT t.* from %s.%s t join partitionMonthEnds me on t.EDI_BUSINESS_DAY = me.MONTH_END and t.SRC_SYS_ID = me.SRC_SYS_ID and t.SRC_SYS_INST_ID = me.SRC_SYS_INST_ID",database,table,database,table));
+            spark.sql(String.format("DROP TABLE IF EXISTS %s.%s_swing",database,table));
+            spark.sql(String.format("CREATE TABLE %s.%s_swing AS SELECT t.* from %s.%s t join partitionMonthEnds me on t.EDI_BUSINESS_DAY = me.MONTH_END and t.SRC_SYS_ID = me.SRC_SYS_ID and t.SRC_SYS_INST_ID = me.SRC_SYS_INST_ID",database,table,database,table));
         }
     }
 
-    private void setTrashBaseLocation() throws IOException {
+    protected void setTrashBaseLocation() throws IOException {
         StringBuilder sb = new StringBuilder();
         String userHomeArea = FileSystemHelper.getUserHomeArea();
         sb.append(userHomeArea).append("/.ClusterManagementTrash/housekeeping");
         trashBaseLocation = sb.toString();
-        this.fileSystem = FileSystemHelper.getConnection();
         if (! fileSystem.exists(new Path(trashBaseLocation))){
             fileSystem.mkdirs(new Path(trashBaseLocation));
         }
     }
 
-    private void trashDataOutwithRetention(List<Partition> purgeCandidates) throws IOException {
+    protected void trashDataOutwithRetention(List<Partition> purgeCandidates) throws IOException {
         setTrashBaseLocation();
         for (Partition p : purgeCandidates){
             String trashTarget = trashBaseLocation+"/"+p.getSd().getLocation();
@@ -236,12 +237,12 @@ class HousekeepingJob {
                     throw e;
                 }
             } else {
-                logger.info("Dropped location :"+p.getSd().getLocation()+" to Trash");
+                logger.info("DRY RUN - Dropped location :"+p.getSd().getLocation()+" to Trash");
             }
         }
     }
 
-    private void cleanUpPartitions(List<Partition> purgeCandidates){
+    protected void cleanUpPartitions(List<Partition> purgeCandidates){
         purgeCandidates.forEach(p -> {
             try {
                 dropHivePartition(p);
@@ -251,8 +252,8 @@ class HousekeepingJob {
         });
     }
 
-    private void resolveSourceTableWithSwingTable(String database, String table){
-        Dataset<Row> swingTable = clusterManagementJob.spark.table(String.format("%s.%s_hkp", database, table));
+    protected void resolveSourceTableWithSwingTable(String database, String table){
+        Dataset<Row> swingTable = clusterManagementJob.spark.table(String.format("%s.%s_swing", database, table));
         if (pattern==Pattern.SH){
 //            swingTable.write().partitionBy("EDI_BUSINESS_DAY").insertInto(String.format("%s.%s", database, table));
             swingTable.write().insertInto(String.format("%s.%s", database, table));
@@ -270,7 +271,7 @@ class HousekeepingJob {
      * @param partition
      * @throws IOException
      */
-    private void purgeHDFSPartition(Partition partition) throws IOException {
+    protected void purgeHDFSPartition(Partition partition) throws IOException {
         boolean delete = fileSystem.delete(new Path(metadataHelper.getPartitionLocation(partition)), true);
         if (! delete ){
             throw new IOException("Unexpected error deleting location: "+metadataHelper.getPartitionLocation(partition));
@@ -280,11 +281,11 @@ class HousekeepingJob {
     /**
      * Method to execute an Invalidate metadata statement on a table for Impala
      */
-    private void invalidateMetadata() {
+    protected void invalidateMetadata() {
         //todo
     }
 
-    private boolean verifyPartitionKey(Table table){
+    protected boolean verifyPartitionKey(Table table){
         //edi_business_day='2020-02-20'
         boolean validPartitionKey = false;
         //Test if partition key is "edi_business_day", if so, return true
@@ -294,7 +295,7 @@ class HousekeepingJob {
         return validPartitionKey;
     }
 
-    private boolean verifyPartitionKey(String partitionName){
+    protected boolean verifyPartitionKey(String partitionName){
         //edi_business_day='2020-02-20'
         boolean partitionKey = false;
         //Test if partition key is "edi_business_day", if so, return true
@@ -304,7 +305,7 @@ class HousekeepingJob {
         return partitionKey;
     }
 
-    private String returnPartitionDate(String partitionName){
+    protected String returnPartitionDate(String partitionName){
         String partitionKey = null;
         //Test if partition key is "edi_business_day", if so, return date value
         if (partitionName.startsWith("edi_business_day")){
@@ -313,7 +314,7 @@ class HousekeepingJob {
         return partitionKey;
     }
 
-    private void getTableType(HousekeepingController.TableMetadata tableMetadata) throws SourceException {
+    protected void getTableType(HousekeepingController.TableMetadata tableMetadata) throws SourceException {
         TableDescriptor tableDescriptor = tableMetadata.tableDescriptor;
         logger.info("Now processing table "+tableDescriptor.getDatabaseName()+"."+tableDescriptor.getTableName());
         Pattern pattern = null;
@@ -345,9 +346,9 @@ class HousekeepingJob {
         getTableType(tableMetadata);
         if (this.pattern != null){
             LocalDate purgeCeiling = calculatePurgeCeiling(tableMetadata.retentionPeriod, LocalDate.now());
-            logger.debug("Purge ceiling calculated as :"+purgeCeiling.toString());
+            logger.debug("Purge ceiling calculated as : "+purgeCeiling.toString());
             List<Partition> allPurgeCandidates = getAllPurgeCandidates(tableMetadata.tableDescriptor.getPartitionList(), purgeCeiling);
-            logger.debug(allPurgeCandidates.size()+" : partitions returned as eligible for purge");
+            logger.debug("Partitions returned as eligible for purge : "+allPurgeCandidates.size());
             if (tableMetadata.isRetainMonthEnd){
                 logger.debug("RetainMonthEnd config passed from metadata table");
                 getTablePartitionMonthEnds(tableMetadata.database,tableMetadata.tableName);

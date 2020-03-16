@@ -8,6 +8,7 @@ import com.bigspark.cloudera.management.helpers.SparkHelper;
 import com.bigspark.cloudera.management.services.ClusterManagementJob;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.Table;
@@ -39,6 +40,7 @@ public class HousekeepingController {
         this.auditHelper = new AuditHelper(clusterManagementJob);
         this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark,auditHelper);
         this.fileSystem = clusterManagementJob.fileSystem;
+        logger.debug("Filesystem active check: " + fileSystem.exists(new Path("/user/chris/active")));
         this.hadoopConfiguration = clusterManagementJob.hadoopConfiguration;
         this.metadataHelper = clusterManagementJob.metadataHelper;
         this.isDryRun = clusterManagementJob.isDryRun;

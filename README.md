@@ -1,4 +1,4 @@
-# cluster-management
+# EDH - ClusterManagement
 ###Compilation 
 
 `mvn package`

@@ -52,10 +52,10 @@ public class CompactionJob {
     public Boolean isDryRun;
     public String applicationID;
     public AuditHelper auditHelper;
-    private String trashBaseLocation;
+    protected String trashBaseLocation;
 
     Logger logger = LoggerFactory.getLogger(getClass());
-    private SourceDescriptor sourceDescriptor;
+    protected SourceDescriptor sourceDescriptor;
 
 
     public CompactionJob() throws IOException, MetaException, ConfigurationException, SourceException {
@@ -75,7 +75,7 @@ public class CompactionJob {
      * Method to get currently configured blocksize from Hadoop configuration
      * @return
      */
-    private long getBlocksize(){
+    protected long getBlocksize(){
         return Long.parseLong(spark.sparkContext().hadoopConfiguration().get("dfs.blocksize"));
     }
 
@@ -83,7 +83,7 @@ public class CompactionJob {
      * Method to extract database listing from Hive metastore via catalog
      * @return Dataset<Database>
      */
-    private Dataset<Database> getDatabases(){
+    protected Dataset<Database> getDatabases(){
         return spark.catalog().listDatabases();
     }
 
@@ -93,7 +93,7 @@ public class CompactionJob {
      * @return Dataset<Table>
      * @throws AnalysisException
      */
-    private Dataset<Table> getTables(String dbName) throws AnalysisException {
+    protected Dataset<Table> getTables(String dbName) throws AnalysisException {
         return spark.catalog().listTables(dbName);
     }
 
@@ -103,7 +103,7 @@ public class CompactionJob {
      * @param tableName
      * @return Row[]
      */
-    private Row[] getTablePartitions(String dbName, String tableName){
+    protected Row[] getTablePartitions(String dbName, String tableName){
             return (Row[]) spark.sql("SHOW PARTITIONS " + dbName + "." + tableName).collect();
     }
 
@@ -115,7 +115,7 @@ public class CompactionJob {
      * @throws NoSuchDatabaseException
      * @throws NoSuchTableException
      */
-    private String getTableLocation(String dbName, String tableName) throws NoSuchDatabaseException, NoSuchTableException {
+    protected String getTableLocation(String dbName, String tableName) throws NoSuchDatabaseException, NoSuchTableException {
         Some<String> schema = new Some<String>(dbName);
         TableIdentifier tableIdentifier = new TableIdentifier(tableName, schema);
         return spark.sessionState().catalog().getTableMetadata(tableIdentifier).location().getRawPath();
@@ -127,7 +127,7 @@ public class CompactionJob {
      * @return Pair<Long,Long>
      * @throws IOException
      */
-    private Pair<Long, Long> getFileCountTotalSizePair(String location) throws IOException {
+    protected Pair<Long, Long> getFileCountTotalSizePair(String location) throws IOException {
         ContentSummary cs = fileSystem.getContentSummary(new Path(location));
          ImmutablePair<Long, Long> pair = new ImmutablePair<>(cs.getFileCount(),cs.getLength());
          return pair;
@@ -139,7 +139,7 @@ public class CompactionJob {
      * @return long[]
      * @throws IOException
      */
-    private long[] getFileCountTotalSize(String location) throws IOException {
+    protected long[] getFileCountTotalSize(String location) throws IOException {
         ContentSummary cs = fileSystem.getContentSummary(new Path(location));
         long returnArray [];
         returnArray = new long[2];
@@ -157,7 +157,7 @@ public class CompactionJob {
      * @param totalSize
      * @return Boolean
      */
-    private Boolean isCompactionCandidate(Long numFiles, Long totalSize) {
+    protected Boolean isCompactionCandidate(Long numFiles, Long totalSize) {
         if (numFiles <= 1 || totalSize == 0) {
             return false;
         }
@@ -177,7 +177,7 @@ public class CompactionJob {
      * @param totalSize
      * @return Integer
      */
-    private Integer getRepartitionFactor(Long totalSize){
+    protected Integer getRepartitionFactor(Long totalSize){
         Long bs = getBlocksize();
         float num = (float) totalSize/bs;
         Integer factor = (int)Math.ceil(num);
@@ -193,7 +193,7 @@ public class CompactionJob {
      * @throws NoSuchTableException
      * @throws IOException
      */
-    private void processTable(String dbName, String tableName) throws NoSuchDatabaseException, NoSuchTableException, IOException, SourceException {
+    protected void processTable(String dbName, String tableName) throws NoSuchDatabaseException, NoSuchTableException, IOException, SourceException {
        setTrashBaseLocation();
        org.apache.hadoop.hive.metastore.api.Table tableMeta = metadataHelper.getTable(dbName,tableName);
        TableDescriptor tableDescriptor =  metadataHelper.getTableDescriptor(tableMeta);
@@ -213,7 +213,7 @@ public class CompactionJob {
      * @param partition
      * @throws IOException
      */
-    private void processPartition(String tableLocation, String partition) throws IOException{
+    protected void processPartition(String tableLocation, String partition) throws IOException{
         String absPartitionLocation=tableLocation+"/"+partition;
         long[] countSize = getFileCountTotalSize(absPartitionLocation);
         if (isCompactionCandidate(countSize[0],countSize[1])){
@@ -229,7 +229,7 @@ public class CompactionJob {
      * @param location
      * @param repartitionFactor
      */
-    private void compactLocation(String location, Integer repartitionFactor) {
+    protected void compactLocation(String location, Integer repartitionFactor) {
         Dataset src = spark.read().parquet(location);
         src.repartition(repartitionFactor)
                 .write()
@@ -246,7 +246,7 @@ public class CompactionJob {
      * @param src
      * @param tmp
      */
-    private void reconcileOutput(Dataset src, Dataset tmp){
+    protected void reconcileOutput(Dataset src, Dataset tmp){
         if (src.except(tmp).count()>0){
             logger.error("FATAL: Compacted file has not reconciled to source location");
             logger.error("FATAL: Exiting abnormally");
@@ -254,7 +254,7 @@ public class CompactionJob {
         }
     }
 
-    private void setTrashBaseLocation() throws IOException {
+    protected void setTrashBaseLocation() throws IOException {
         StringBuilder sb = new StringBuilder();
         String userHomeArea = FileSystemHelper.getUserHomeArea();
         sb.append(userHomeArea).append("/.ClusterManagementTrash/compaction");
@@ -264,7 +264,7 @@ public class CompactionJob {
         }
     }
 
-    private String trashOriginalData(String trashBaseLocation, String itemLocation, SourceDescriptor sourceDescriptor) throws IOException {
+    protected String trashOriginalData(String trashBaseLocation, String itemLocation, SourceDescriptor sourceDescriptor) throws IOException {
         String trashTarget = trashBaseLocation+"/"+itemLocation;
         logger.debug("Trash location : "+trashTarget);
         if (!isDryRun){
@@ -290,7 +290,7 @@ public class CompactionJob {
      * @param partitionLocation
      * @throws IOException
      */
-    private void resolvePartition(String partitionLocation) throws IOException{
+    protected void resolvePartition(String partitionLocation) throws IOException{
         String trashLocation = null;
         try {
             trashLocation = trashOriginalData(trashBaseLocation,partitionLocation,sourceDescriptor);
