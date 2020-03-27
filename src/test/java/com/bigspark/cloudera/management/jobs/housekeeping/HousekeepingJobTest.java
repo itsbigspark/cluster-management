@@ -1,8 +1,6 @@
-package com.bigspark.cloudera.management.services.housekeeping;
+package com.bigspark.cloudera.management.jobs.housekeeping;
 
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class HousekeepingJobTest {
 

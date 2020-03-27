@@ -1,11 +1,12 @@
-package com.bigspark.cloudera.management.services.housekeeping;
+package com.bigspark.cloudera.management.jobs.housekeeping;
 
 import com.bigspark.cloudera.management.common.exceptions.SourceException;
 import com.bigspark.cloudera.management.common.model.TableDescriptor;
+import com.bigspark.cloudera.management.common.model.TableMetadata;
 import com.bigspark.cloudera.management.helpers.AuditHelper;
 import com.bigspark.cloudera.management.helpers.MetadataHelper;
 import com.bigspark.cloudera.management.helpers.SparkHelper;
-import com.bigspark.cloudera.management.services.ClusterManagementJob;
+import com.bigspark.cloudera.management.jobs.ClusterManagementJob;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -89,21 +90,21 @@ public class HousekeepingController {
     }
 
 
-    class TableMetadata {
-        String database;
-        String tableName;
-        Integer retentionPeriod;
-        boolean isRetainMonthEnd;
-        TableDescriptor tableDescriptor;
-
-        public TableMetadata(String database, String tableName, Integer retentionPeriod, boolean isRetainMonthEnd, TableDescriptor tableDescriptor) {
-            this.database = database;
-            this.tableName = tableName;
-            this.retentionPeriod = retentionPeriod;
-            this.isRetainMonthEnd = isRetainMonthEnd;
-            this.tableDescriptor = tableDescriptor;
-        }
-    }
+//    public class TableMetadata {
+//        String database;
+//        String tableName;
+//        Integer retentionPeriod;
+//        boolean isRetainMonthEnd;
+//        TableDescriptor tableDescriptor;
+//
+//        public TableMetadata(String database, String tableName, Integer retentionPeriod, boolean isRetainMonthEnd, TableDescriptor tableDescriptor) {
+//            this.database = database;
+//            this.tableName = tableName;
+//            this.retentionPeriod = retentionPeriod;
+//            this.isRetainMonthEnd = isRetainMonthEnd;
+//            this.tableDescriptor = tableDescriptor;
+//        }
+//    }
 
 
     /**

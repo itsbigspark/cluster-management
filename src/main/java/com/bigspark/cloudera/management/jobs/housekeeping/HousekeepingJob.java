@@ -1,14 +1,15 @@
-package com.bigspark.cloudera.management.services.housekeeping;
+package com.bigspark.cloudera.management.jobs.housekeeping;
 
 import com.bigspark.cloudera.management.common.enums.Pattern;
 import com.bigspark.cloudera.management.common.exceptions.SourceException;
 import com.bigspark.cloudera.management.common.model.SourceDescriptor;
 import com.bigspark.cloudera.management.common.model.TableDescriptor;
+import com.bigspark.cloudera.management.common.model.TableMetadata;
 import com.bigspark.cloudera.management.helpers.AuditHelper;
 import com.bigspark.cloudera.management.helpers.FileSystemHelper;
 import com.bigspark.cloudera.management.helpers.MetadataHelper;
 import com.bigspark.cloudera.management.helpers.SparkHelper;
-import com.bigspark.cloudera.management.services.ClusterManagementJob;
+import com.bigspark.cloudera.management.jobs.ClusterManagementJob;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -33,6 +34,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import static com.bigspark.cloudera.management.helpers.MetadataHelper.verifyPartitionKey;
+
 
 /**
  * Housekeeping job
@@ -51,7 +54,7 @@ class HousekeepingJob {
     public Boolean isDryRun;
     public ClusterManagementJob clusterManagementJob;
     public AuditHelper auditHelper;
-    public HousekeepingController.TableMetadata tableMetadata;
+    public TableMetadata tableMetadata;
     public SourceDescriptor sourceDescriptor;
 
     String trashBaseLocation;
@@ -288,36 +291,36 @@ class HousekeepingJob {
         //todo
     }
 
-    protected boolean verifyPartitionKey(Table table){
-        //edi_business_day='2020-02-20'
-        boolean validPartitionKey = false;
-        //Test if partition key is "edi_business_day", if so, return true
-        if (table.getPartitionKeys().get(0).getName().equals("edi_business_day")){
-            validPartitionKey = true;
-        }
-        return validPartitionKey;
-    }
+//    protected boolean verifyPartitionKey(Table table){
+//        //edi_business_day='2020-02-20'
+//        boolean validPartitionKey = false;
+//        //Test if partition key is "edi_business_day", if so, return true
+//        if (table.getPartitionKeys().get(0).getName().equals("edi_business_day")){
+//            validPartitionKey = true;
+//        }
+//        return validPartitionKey;
+//    }
+//
+//    protected boolean verifyPartitionKey(String partitionName){
+//        //edi_business_day='2020-02-20'
+//        boolean partitionKey = false;
+//        //Test if partition key is "edi_business_day", if so, return true
+//        if (partitionName.startsWith("edi_business_day")){
+//            partitionKey = true;
+//        }
+//        return partitionKey;
+//    }
+//
+//    protected String returnPartitionDate(String partitionName){
+//        String partitionKey = null;
+//        //Test if partition key is "edi_business_day", if so, return date value
+//        if (partitionName.startsWith("edi_business_day")){
+//            partitionKey = partitionName.split("=")[1];
+//        }
+//        return partitionKey;
+//    }
 
-    protected boolean verifyPartitionKey(String partitionName){
-        //edi_business_day='2020-02-20'
-        boolean partitionKey = false;
-        //Test if partition key is "edi_business_day", if so, return true
-        if (partitionName.startsWith("edi_business_day")){
-            partitionKey = true;
-        }
-        return partitionKey;
-    }
-
-    protected String returnPartitionDate(String partitionName){
-        String partitionKey = null;
-        //Test if partition key is "edi_business_day", if so, return date value
-        if (partitionName.startsWith("edi_business_day")){
-            partitionKey = partitionName.split("=")[1];
-        }
-        return partitionKey;
-    }
-
-    protected void getTableType(HousekeepingController.TableMetadata tableMetadata) throws SourceException {
+    protected void getTableType(TableMetadata tableMetadata) throws SourceException {
         TableDescriptor tableDescriptor = tableMetadata.tableDescriptor;
         logger.info("Now processing table "+tableDescriptor.getDatabaseName()+"."+tableDescriptor.getTableName());
         Pattern pattern = null;
@@ -343,7 +346,7 @@ class HousekeepingJob {
      * @throws MetaException
      * @throws SourceException
      */
-    void execute(HousekeepingController.TableMetadata tableMetadata) throws SourceException, IOException, URISyntaxException {
+    void execute(TableMetadata tableMetadata) throws SourceException, IOException, URISyntaxException {
         this.tableMetadata = tableMetadata;
         this.sourceDescriptor = new SourceDescriptor(metadataHelper.getDatabase(tableMetadata.database),tableMetadata.tableDescriptor);
         getTableType(tableMetadata);

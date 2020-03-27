@@ -1,4 +1,4 @@
-package com.bigspark.cloudera.management.services.compaction;
+package com.bigspark.cloudera.management.jobs.compaction;
 
 
 import static mist.api.jdsl.Jdsl.*;

@@ -1,8 +1,7 @@
 package com.bigspark.cloudera.management.helpers;
 
 import com.bigspark.cloudera.management.common.exceptions.SourceException;
-import com.bigspark.cloudera.management.services.ClusterManagementJob;
-import org.apache.commons.io.FileUtils;
+import com.bigspark.cloudera.management.jobs.ClusterManagementJob;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.spark.sql.SparkSession;

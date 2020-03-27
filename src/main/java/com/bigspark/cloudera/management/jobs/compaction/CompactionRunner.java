@@ -1,4 +1,4 @@
-package com.bigspark.cloudera.management.services.compaction;
+package com.bigspark.cloudera.management.jobs.compaction;
 
 public class CompactionRunner {
     public static void main(String[] args) throws Exception {

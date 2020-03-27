@@ -1,4 +1,4 @@
-package com.bigspark.cloudera.management.services;
+package com.bigspark.cloudera.management.jobs;
 
 import com.bigspark.cloudera.management.common.exceptions.SourceException;
 import com.bigspark.cloudera.management.helpers.FileSystemHelper;

@@ -1,4 +1,4 @@
-package com.bigspark.cloudera.management.services.housekeeping;
+package com.bigspark.cloudera.management.jobs.housekeeping;
 
 import com.bigspark.cloudera.management.Common;
 import com.bigspark.cloudera.management.common.enums.Pattern;
@@ -7,7 +7,7 @@ import com.bigspark.cloudera.management.helpers.AuditHelper;
 import com.bigspark.cloudera.management.helpers.FileSystemHelper;
 import com.bigspark.cloudera.management.helpers.MetadataHelper;
 import com.bigspark.cloudera.management.helpers.SparkHelper;
-import com.bigspark.cloudera.management.services.ClusterManagementJob;
+import com.bigspark.cloudera.management.jobs.ClusterManagementJob;
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;

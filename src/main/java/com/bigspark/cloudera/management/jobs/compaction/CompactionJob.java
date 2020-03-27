@@ -1,4 +1,4 @@
-package com.bigspark.cloudera.management.services.compaction;
+package com.bigspark.cloudera.management.jobs.compaction;
 
 import com.bigspark.cloudera.management.common.exceptions.SourceException;
 import com.bigspark.cloudera.management.common.model.SourceDescriptor;
@@ -7,7 +7,7 @@ import com.bigspark.cloudera.management.helpers.AuditHelper;
 import com.bigspark.cloudera.management.helpers.FileSystemHelper;
 import com.bigspark.cloudera.management.helpers.MetadataHelper;
 import com.bigspark.cloudera.management.helpers.SparkHelper;
-import com.bigspark.cloudera.management.services.ClusterManagementJob;
+import com.bigspark.cloudera.management.jobs.ClusterManagementJob;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.hadoop.conf.Configuration;
@@ -16,7 +16,6 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.MetaException;
-import org.apache.hadoop.hive.metastore.api.Partition;
 import org.apache.spark.sql.AnalysisException;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -32,14 +31,13 @@ import scala.Some;
 
 import javax.naming.ConfigurationException;
 import java.io.IOException;
-import java.util.List;
 import java.util.Properties;
 
 /**
- * Compaction job
- * Used to discover and compact small parquet files within partitioned tables
+ * @name Compaction job
+ * @purpose Used to discover and compact small parquet files within partitioned tables
  * @author Chris Finlayson
- *
+ * @JIRA BIG-4
  */
 public class CompactionJob {
 

@@ -1,12 +1,12 @@
-package com.bigspark.cloudera.management.services.compaction;
+package com.bigspark.cloudera.management.jobs.compaction;
 
 import com.bigspark.cloudera.management.Common;
 import com.bigspark.cloudera.management.common.exceptions.SourceException;
 import com.bigspark.cloudera.management.helpers.AuditHelper;
 import com.bigspark.cloudera.management.helpers.MetadataHelper;
 import com.bigspark.cloudera.management.helpers.SparkHelper;
-import com.bigspark.cloudera.management.services.ClusterManagementJob;
-import com.bigspark.cloudera.management.services.housekeeping.HousekeepingController;
+import com.bigspark.cloudera.management.jobs.ClusterManagementJob;
+import com.bigspark.cloudera.management.jobs.housekeeping.HousekeepingController;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.ContentSummary;
 import org.apache.hadoop.fs.FileSystem;

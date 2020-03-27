@@ -1,4 +1,4 @@
-package com.bigspark.cloudera.management.services.compaction;
+package com.bigspark.cloudera.management.jobs.compaction;
 
 import com.bigspark.cloudera.management.common.exceptions.SourceException;
 import com.bigspark.cloudera.management.helpers.MetadataHelperTest;
@@ -8,8 +8,6 @@ import org.junit.jupiter.api.Test;
 
 import javax.naming.ConfigurationException;
 import java.io.IOException;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class CompactionJobTest {
 

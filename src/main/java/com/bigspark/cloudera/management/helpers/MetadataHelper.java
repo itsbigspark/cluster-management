@@ -4,6 +4,7 @@ import com.bigspark.cloudera.management.common.configuration.HiveConfiguration;
 import com.bigspark.cloudera.management.common.enums.Pattern;
 import com.bigspark.cloudera.management.common.exceptions.SourceException;
 import com.bigspark.cloudera.management.common.model.TableDescriptor;
+import com.bigspark.cloudera.management.common.model.TableMetadata;
 import com.google.common.collect.Lists;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
@@ -33,7 +34,7 @@ import static com.bigspark.cloudera.management.common.enums.Pattern.SH;
 public class MetadataHelper {
 
 
-    Logger logger = LoggerFactory.getLogger(getClass());
+    private static Logger logger = LoggerFactory.getLogger(MetadataHelper.class);
     private static HiveMetaStoreClient client;
 
     public MetadataHelper() throws MetaException, ConfigurationException {
@@ -184,6 +185,57 @@ public class MetadataHelper {
      */
     private void purgeS3Partition() {
         //todo
+    }
+
+    public static boolean verifyPartitionKey(Table table){
+        //edi_business_day='2020-02-20'
+        boolean validPartitionKey = false;
+        //Test if partition key is "edi_business_day", if so, return true
+        if (table.getPartitionKeys().get(0).getName().equals("edi_business_day")){
+            validPartitionKey = true;
+        }
+        return validPartitionKey;
+    }
+
+    public static  boolean verifyPartitionKey(String partitionName){
+        //edi_business_day='2020-02-20'
+        boolean partitionKey = false;
+        //Test if partition key is "edi_business_day", if so, return true
+        if (partitionName.startsWith("edi_business_day")){
+            partitionKey = true;
+        }
+        return partitionKey;
+    }
+
+    public static  String returnPartitionDate(String partitionName){
+        String partitionKey = null;
+        //Test if partition key is "edi_business_day", if so, return date value
+        if (partitionName.startsWith("edi_business_day")){
+            partitionKey = partitionName.split("=")[1];
+        }
+        return partitionKey;
+    }
+
+    public static Pattern getTableType(TableMetadata tableMetadata) throws SourceException {
+        TableDescriptor tableDescriptor = tableMetadata.tableDescriptor;
+        logger.info("Now processing table "+tableDescriptor.getDatabaseName()+"."+tableDescriptor.getTableName());
+        Pattern pattern = null;
+        if (tableDescriptor.isPartitioned()){
+            Partition p = tableDescriptor.getPartitionList().get(0);
+            //Test that partition name starts with "edi_business_day" and value matches
+            if (verifyPartitionKey(tableDescriptor.getTable()) && p.getValues().size() == 3) {
+                pattern = Pattern.EAS;
+            } else if (verifyPartitionKey(tableDescriptor.getTable()) && p.getValues().size() == 1){
+                pattern = Pattern.SH;
+            } else {
+                logger.error("Partition specification pattern not recognised");
+            }
+        } else {
+            logger.error("Table "+tableDescriptor.getDatabaseName()+"."+tableDescriptor.getTableName()+" is not partitioned");
+        }
+        logger.debug("Pattern confirmed as : "+pattern.toString());
+
+        return pattern;
     }
 
 

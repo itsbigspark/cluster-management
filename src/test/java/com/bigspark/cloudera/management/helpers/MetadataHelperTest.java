@@ -4,12 +4,10 @@ import com.bigspark.cloudera.management.common.exceptions.SourceException;
 import com.bigspark.cloudera.management.common.model.TableDescriptor;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
-import org.apache.hadoop.hive.metastore.api.FieldSchema;
-import org.apache.hadoop.hive.metastore.api.SerDeInfo;
-import org.apache.hadoop.hive.metastore.api.StorageDescriptor;
-import org.apache.hadoop.hive.metastore.api.Table;
+import org.apache.hadoop.hive.metastore.api.*;
 import org.apache.thrift.TException;
 import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import javax.naming.ConfigurationException;
 import java.io.IOException;
@@ -25,10 +23,12 @@ public class MetadataHelperTest {
     MetadataHelper metadataHelper;
 
 
-    @Before
+    @BeforeEach
     public void setUp() throws IOException, TException, ConfigurationException {
         this.metadataHelper = new MetadataHelper();
         this.hiveMetaStoreClient = new HiveMetaStoreClient(new HiveConf());
+        if (hiveMetaStoreClient.getDatabase("testDB").equals(null))
+            hiveMetaStoreClient.createDatabase(new Database("testDB",null,"/tmp/testDB",null));
         tableBase = new Table();
         tableBase.setDbName("testDB");
         tableBase.setTableName("testTable");

@@ -1,6 +1,4 @@
-package com.bigspark.cloudera.management.services.housekeeping;
-
-import com.bigspark.cloudera.management.services.compaction.CompactionJob;
+package com.bigspark.cloudera.management.jobs.housekeeping;
 
 public class HousekeepingRunner {
     public static void main(String[] args) throws Exception {

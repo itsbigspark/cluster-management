@@ -1,4 +1,4 @@
-package com.bigspark.cloudera.management.services.housekeeping;
+package com.bigspark.cloudera.management.jobs.housekeeping;
 
 import java.io.*;
 import java.util.Properties;
