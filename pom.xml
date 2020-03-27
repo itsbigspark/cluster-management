@@ -8,6 +8,22 @@
     <artifactId>cluster-management</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
+
+    <properties>
+        <java.source.version>1.8</java.source.version>
+        <java.target.version>1.8</java.target.version>
+
+
+        <hadoop.version>2.6.0-cdh5.12.1</hadoop.version>
+        <hive-jdbc.version>1.1.0-cdh5.12.1</hive-jdbc.version>
+
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <spark.version>2.4.3</spark.version>
+
+
+    </properties>
+
     <build>
         <plugins>
             <plugin>
@@ -27,55 +43,55 @@
                         <goals>
                             <goal>test-jar</goal>
                         </goals>
-                    <phase>test-compile</phase>
+                        <phase>test-compile</phase>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
     </build>
     <dependencies>
-<!--        <dependency>-->
-<!--            <groupId>com.bigspark.cloudera</groupId>-->
-<!--            <artifactId>cluster-management</artifactId>-->
-<!--            <version>1.0-SNAPSHOT</version>-->
-<!--            <classifier>tests</classifier>-->
-<!--            <type>test-jar</type>-->
-<!--            <scope>test</scope>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>com.bigspark.cloudera</groupId>-->
+        <!--            <artifactId>cluster-management</artifactId>-->
+        <!--            <version>1.0-SNAPSHOT</version>-->
+        <!--            <classifier>tests</classifier>-->
+        <!--            <type>test-jar</type>-->
+        <!--            <scope>test</scope>-->
+        <!--        </dependency>-->
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-sql_2.11</artifactId>
-            <version>2.4.3</version>
+            <version>${spark.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-hive_2.11</artifactId>
-            <version>2.4.3</version>
+            <version>${spark.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-yarn_2.11</artifactId>
-            <version>2.4.3</version>
+            <version>${spark.version}</version>
         </dependency>
-    <dependency>
-        <groupId>org.apache.spark</groupId>
-        <artifactId>spark-core_2.11</artifactId>
-        <version>2.4.3</version>
-        <exclusions>
-            <exclusion>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-log4j12</artifactId>
-            </exclusion>
-            <exclusion>
-                <groupId>log4j</groupId>
-                <artifactId>log4j</artifactId>
-            </exclusion>
-        </exclusions>
-    </dependency>
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-core_2.11</artifactId>
+            <version>${spark.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>log4j</groupId>
+                    <artifactId>log4j</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-client</artifactId>
-            <version>2.6.0</version>
+            <version>${hadoop.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>com.amazonaws</groupId>
@@ -86,23 +102,23 @@
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-aws</artifactId>
-            <version>2.6.0</version>
+            <version>${hadoop.version}</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.apache.hive</groupId>-->
-<!--            <artifactId>hive-metastore</artifactId>-->
-<!--            <version>1.1.1</version>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.apache.hive</groupId>-->
+        <!--            <artifactId>hive-metastore</artifactId>-->
+        <!--            <version>1.1.1</version>-->
+        <!--        </dependency>-->
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-distcp</artifactId>
-            <version>2.6.0</version>
+            <version>${hadoop.version}</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.apache.hadoop</groupId>-->
-<!--            <artifactId>hadoop-tools</artifactId>-->
-<!--            <version>1.2.1</version>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.apache.hadoop</groupId>-->
+        <!--            <artifactId>hadoop-tools</artifactId>-->
+        <!--            <version>1.2.1</version>-->
+        <!--        </dependency>-->
         <dependency>
             <groupId>io.hydrosphere</groupId>
             <artifactId>mist-lib_2.11</artifactId>
@@ -126,11 +142,11 @@
             <version>1.6.0</version>
             <scope>test</scope>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.apache.hadoop</groupId>-->
-<!--            <artifactId>hadoop-minicluster</artifactId>-->
-<!--            <version>2.6.0</version>-->
-<!--            <scope>test</scope>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.apache.hadoop</groupId>-->
+        <!--            <artifactId>hadoop-minicluster</artifactId>-->
+        <!--            <version>2.6.0</version>-->
+        <!--            <scope>test</scope>-->
+        <!--        </dependency>-->
     </dependencies>
 </project>
