@@ -5,7 +5,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+//import org.apache.hadoop.hdfs.MiniDFSCluster;
 import org.junit.Before;
 import org.junit.jupiter.api.Test;
 
@@ -17,13 +17,14 @@ class FileSystemHelperTest {
 
     DistributedFileSystem fileSystem;
     Configuration conf;
-    MiniDFSCluster.Builder builder;
-    MiniDFSCluster hdfsCluster;
+   // MiniDFSCluster.Builder builder;
+   // MiniDFSCluster hdfsCluster;
     String hdfsURI;
     String testFileContent;
     FileSystemHelper fileSystemHelper;
 
     @Before
+    /*
     void setUp() throws IOException {
         conf = new Configuration();
         conf.set(MiniDFSCluster.HDFS_MINIDFS_BASEDIR, "/tmp");
@@ -39,7 +40,7 @@ class FileSystemHelperTest {
         outputStream.close();
         fileSystemHelper = new FileSystemHelper();
         fileSystemHelper.fs = this.fileSystem;
-    }
+    }*/
 
     @Test
     void getConnection() throws IOException {

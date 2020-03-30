@@ -38,7 +38,7 @@ public class OffloadJob {
     public SourceDescriptor sourceDescriptor;
 
     Pattern pattern;
-    private Logger logger = LoggerFactory.getLogger(getClass());
+        private Logger logger = LoggerFactory.getLogger(getClass());
 
     public OffloadJob() throws MetaException, SourceException, ConfigurationException, IOException {
         this.clusterManagementJob = ClusterManagementJob.getInstance();
