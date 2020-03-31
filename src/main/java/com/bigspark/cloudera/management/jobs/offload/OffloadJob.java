@@ -40,6 +40,37 @@ public class OffloadJob {
     Pattern pattern;
         private Logger logger = LoggerFactory.getLogger(getClass());
 
+    public OffloadJob(Properties properties) throws Exception {
+        this.clusterManagementJob = ClusterManagementJob.getInstance();
+        this.auditHelper = new AuditHelper(clusterManagementJob);
+        this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark,auditHelper);
+        this.fileSystem = clusterManagementJob.fileSystem;
+        this.hadoopConfiguration = clusterManagementJob.hadoopConfiguration;
+        this.metadataHelper = clusterManagementJob.metadataHelper;
+        this.isDryRun = clusterManagementJob.isDryRun;
+        this.jobProperties = clusterManagementJob.jobProperties;
+        this.hiveMetaStoreClient = clusterManagementJob.hiveMetaStoreClient;
+
+        if(properties.contains("fs.s3a.access.key")) {
+            this.hadoopConfiguration.set("fs.s3a.access.key", properties.getProperty("fs.s3a.access.key"));
+        }
+
+        if(properties.contains("fs.s3a.secret.key")) {
+            this.hadoopConfiguration.set("fs.s3a.secret.key", properties.getProperty("fs.s3a.secret.key"));
+        }
+
+
+        if(properties.contains("src") && properties.contains("tgt")) {
+            Path src = new Path(properties.getProperty("src"));
+            Path tgt = new Path(properties.getProperty("tgt"));
+            int retVal = this.distCP(src, tgt);
+        } else {
+            logger.error("No src or tgt agrs passed");
+        }
+
+
+    }
+
     public OffloadJob() throws MetaException, SourceException, ConfigurationException, IOException {
         this.clusterManagementJob = ClusterManagementJob.getInstance();
         this.auditHelper = new AuditHelper(clusterManagementJob);
@@ -56,10 +87,11 @@ public class OffloadJob {
 
         DistCpOptions options = new DistCpOptions(src,tgt);
         options.setOverwrite(true);
+        options.setBlocking(true);
+
         DistCp distCp = new DistCp(hadoopConfiguration, options);
         try {
-            return ToolRunner.run(
-                    distCp,new String[]{src.toString(),tgt.toString()});
+            return distCp.run(new String[]{src.toString(), tgt.toString()});
         }
         catch(Exception e){
                 logger.error("distCp : Exception occurred ", e);
