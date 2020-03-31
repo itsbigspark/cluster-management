@@ -4,6 +4,7 @@ import com.bigspark.cloudera.management.common.enums.Pattern;
 import com.bigspark.cloudera.management.common.exceptions.SourceException;
 import com.bigspark.cloudera.management.common.model.SourceDescriptor;
 import com.bigspark.cloudera.management.common.model.TableMetadata;
+import com.bigspark.cloudera.management.common.utils.PropertyUtils;
 import com.bigspark.cloudera.management.helpers.AuditHelper;
 import com.bigspark.cloudera.management.helpers.MetadataHelper;
 import com.bigspark.cloudera.management.helpers.SparkHelper;
@@ -51,22 +52,29 @@ public class OffloadJob {
         this.jobProperties = clusterManagementJob.jobProperties;
         this.hiveMetaStoreClient = clusterManagementJob.hiveMetaStoreClient;
 
-        if(properties.contains("fs.s3a.access.key")) {
+        logger.info(PropertyUtils.dumpProperties(properties));
+
+        if(properties.containsKey("fs.s3a.access.key")) {
+            logger.info("Setting Configuration 'fs.s3a.access.key' with passed program argument");
             this.hadoopConfiguration.set("fs.s3a.access.key", properties.getProperty("fs.s3a.access.key"));
         }
 
-        if(properties.contains("fs.s3a.secret.key")) {
+        if(properties.containsKey("fs.s3a.secret.key")) {
+            logger.warn("Setting Configuration 'fs.s3a.secret.key' with passed program argument.  This method is not recommended");
             this.hadoopConfiguration.set("fs.s3a.secret.key", properties.getProperty("fs.s3a.secret.key"));
         }
 
 
-        if(properties.contains("src") && properties.contains("tgt")) {
+        if(properties.containsKey("src") && properties.containsKey("tgt")) {
+            logger.info("Setting src and tgt from passed program arguments");
             Path src = new Path(properties.getProperty("src"));
             Path tgt = new Path(properties.getProperty("tgt"));
             int retVal = this.distCP(src, tgt);
         } else {
             logger.error("No src or tgt agrs passed");
         }
+
+        logger.info("Finished distpCp");
 
 
     }
@@ -85,18 +93,20 @@ public class OffloadJob {
 
     int distCP(Path src, Path tgt) throws Exception {
 
+        logger.info(String.format("Copying '%s' to '%s'", src.toString(), tgt.toString()));
         DistCpOptions options = new DistCpOptions(src,tgt);
         options.setOverwrite(true);
         options.setBlocking(true);
 
         DistCp distCp = new DistCp(hadoopConfiguration, options);
         try {
+            logger.info("Starting distCp");
             return distCp.run(new String[]{src.toString(), tgt.toString()});
         }
         catch(Exception e){
                 logger.error("distCp : Exception occurred ", e);
+                throw e;
             }
-        return 0;
     }
 
 
