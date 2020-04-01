@@ -4,10 +4,13 @@
 /Users/chris/edh-cluster-management/src/test/java/com/bigspark/cloudera/management/common/configuration/HadoopConfigurationTest.java
 /Users/chris/edh-cluster-management/src/test/java/com/bigspark/cloudera/management/jobs/compaction/CompactionJobIntegrationTest.java
 /Users/chris/edh-cluster-management/src/test/java/com/bigspark/cloudera/management/helpers/ImpalaHelperTest.java
+/Users/chris/edh-cluster-management/src/test/java/com/bigspark/cloudera/management/jobs/offload/OffloadJobIntegrationTest.java
 /Users/chris/edh-cluster-management/src/test/java/com/bigspark/cloudera/management/jobs/offload/OffloadJobTest.java
 /Users/chris/edh-cluster-management/src/test/java/com/bigspark/cloudera/management/helpers/FileSystemHelperTest.java
 /Users/chris/edh-cluster-management/src/test/java/com/bigspark/cloudera/management/common/model/TableDescriptorTest.java
 /Users/chris/edh-cluster-management/src/test/java/com/bigspark/cloudera/management/Common.java
+/Users/chris/edh-cluster-management/src/test/java/com/bigspark/cloudera/management/jobs/TestDataSetup.java
+/Users/chris/edh-cluster-management/src/test/java/com/bigspark/cloudera/management/jobs/offload/OffloadJobTestRunner.java
 /Users/chris/edh-cluster-management/src/test/java/com/bigspark/cloudera/management/helpers/SparkHelperTest.java
 /Users/chris/edh-cluster-management/src/test/java/com/bigspark/cloudera/management/helpers/MetadataHelperTest.java
 /Users/chris/edh-cluster-management/src/test/java/com/bigspark/cloudera/management/jobs/compaction/CompactionJobTestRunner.java

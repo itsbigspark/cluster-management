@@ -5,7 +5,7 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
-import org.apache.hadoop.hdfs.MiniDFSCluster;
+//import org.apache.hadoop.hdfs.MiniDFSCluster;
 import org.junit.Before;
 import org.junit.jupiter.api.Test;
 
@@ -17,8 +17,8 @@ class FileSystemHelperTest {
 
     DistributedFileSystem fileSystem;
     Configuration conf;
-    MiniDFSCluster.Builder builder;
-    MiniDFSCluster hdfsCluster;
+//    MiniDFSCluster.Builder builder;
+//    MiniDFSCluster hdfsCluster;
     String hdfsURI;
     String testFileContent;
     FileSystemHelper fileSystemHelper;
@@ -26,11 +26,11 @@ class FileSystemHelperTest {
     @Before
     void setUp() throws IOException {
         conf = new Configuration();
-        conf.set(MiniDFSCluster.HDFS_MINIDFS_BASEDIR, "/tmp");
-        builder = new MiniDFSCluster.Builder(conf);
-        hdfsCluster = builder.build();
-        hdfsURI = "hdfs://localhost:"+ hdfsCluster.getNameNodePort() + "/";
-        fileSystem = hdfsCluster.getFileSystem();
+//        conf.set(MiniDFSCluster.HDFS_MINIDFS_BASEDIR, "/tmp");
+//        builder = new MiniDFSCluster.Builder(conf);
+//        hdfsCluster = builder.build();
+//        hdfsURI = "hdfs://localhost:"+ hdfsCluster.getNameNodePort() + "/";
+//        fileSystem = hdfsCluster.getFileSystem();
         //Create a path
         Path hdfswritepath = new Path("/testFile");
         testFileContent = "CLUSTER MANAGEMENT TEST";

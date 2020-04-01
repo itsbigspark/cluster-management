@@ -1,30 +1,31 @@
-package com.bigspark.cloudera.management.jobs.housekeeping;
+package com.bigspark.cloudera.management.jobs.compaction;
 
 import com.bigspark.cloudera.management.common.exceptions.SourceException;
+import com.bigspark.cloudera.management.common.metadata.CompactionMetadata;
 import com.bigspark.cloudera.management.common.model.TableDescriptor;
-import com.bigspark.cloudera.management.common.metadata.HousekeepingMetadata;
 import com.bigspark.cloudera.management.helpers.AuditHelper;
 import com.bigspark.cloudera.management.helpers.MetadataHelper;
 import com.bigspark.cloudera.management.helpers.SparkHelper;
 import com.bigspark.cloudera.management.jobs.ClusterManagementJob;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.spark.sql.Row;
+import org.apache.spark.sql.catalyst.analysis.NoSuchDatabaseException;
+import org.apache.spark.sql.catalyst.analysis.NoSuchTableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.naming.ConfigurationException;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-public class HousekeepingController {
+public class CompactionController {
 
     public Properties jobProperties;
     public SparkHelper.AuditedSparkSession spark;
@@ -37,12 +38,11 @@ public class HousekeepingController {
 
     Logger logger = LoggerFactory.getLogger(getClass());
 
-    public HousekeepingController() throws IOException, MetaException, ConfigurationException, SourceException {
+    public CompactionController() throws IOException, MetaException, ConfigurationException, SourceException {
         ClusterManagementJob clusterManagementJob = ClusterManagementJob.getInstance();
-        this.auditHelper = new AuditHelper(clusterManagementJob, "EDH Cluster housekeeping");
+        this.auditHelper = new AuditHelper(clusterManagementJob, "Small file compaction");
         this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark,auditHelper);
         this.fileSystem = clusterManagementJob.fileSystem;
-        logger.debug("Filesystem active check: " + fileSystem.exists(new Path("/user/chris/active")));
         this.hadoopConfiguration = clusterManagementJob.hadoopConfiguration;
         this.metadataHelper = clusterManagementJob.metadataHelper;
         this.isDryRun = clusterManagementJob.isDryRun;
@@ -55,8 +55,8 @@ public class HousekeepingController {
      *
      * @return String
      */
-    private String getRetentionTable() {
-        return jobProperties.getProperty("com.bigspark.cloudera.management.services.housekeeping.metatable");
+    private String getCompactionTable() {
+        return jobProperties.getProperty("com.bigspark.cloudera.management.services.Compaction.metatable");
     }
 
     /**
@@ -65,7 +65,7 @@ public class HousekeepingController {
      * @return List<Row>
      */
     private List<Row> getRetentionDatabases() {
-        return spark.sql("SELECT DISTINCT DATABASE FROM " + getRetentionTable()+ " WHERE ACTIVE='true'").collectAsList() ;
+        return spark.sql("SELECT DISTINCT DATABASE FROM " + getCompactionTable()+ " WHERE ACTIVE='true'").collectAsList() ;
     }
 
     /**
@@ -73,20 +73,19 @@ public class HousekeepingController {
      *
      * @return List<Row>
      */
-    private List<Row> getRetentionGroupDatabases(int group) {
+    private List<Row> getCompactionGroupDatabases(int group) {
         logger.info("Now pulling list of databases for group : "+ group);
-        return spark.sql("SELECT DISTINCT DATABASE FROM " + getRetentionTable()+ " WHERE ACTIVE='true' and GROUP="+group).collectAsList();
+        return spark.sql("SELECT DISTINCT DATABASE FROM " + getCompactionTable()+ " WHERE ACTIVE='true' and GROUP="+group).collectAsList();
     }
-
 
     /**
      * Method to pull list of tables in a specific database for purging
      *
      * @return List<Row>
      */
-    private List<Row> getRetentionDataForDatabase(String database, int group) {
+    private List<Row> getCompactionDataForDatabase(String database, int group) {
         logger.info("Now pulling configuration metadata for all tables in database : "+ database);
-        return spark.sql("SELECT TABLE, RETENTION_PERIOD, RETAIN_MONTH_END FROM " + getRetentionTable() + " WHERE DATABASE = '" + database + "' AND ACTIVE='true' AND GROUP ="+group).collectAsList();
+        return spark.sql("SELECT TABLE, RETENTION_PERIOD, RETAIN_MONTH_END FROM " + getCompactionTable() + " WHERE DATABASE = '" + database + "' AND ACTIVE='true' AND GROUP ="+group).collectAsList();
     }
 
 
@@ -96,43 +95,46 @@ public class HousekeepingController {
      * @param database
      * @return RetentionMetadataContainer
      */
-    private ArrayList<HousekeepingMetadata> sourceDatabaseTablesFromMetaTable(String database, int group) throws SourceException {
-        List<Row> purgeTables = getRetentionDataForDatabase(database, group);
-        ArrayList<HousekeepingMetadata> housekeepingMetadataList = new ArrayList<>();
-        logger.info(purgeTables.size() + " tables returned with a purge configuration");
-        for (Row table : purgeTables){
+    private ArrayList<CompactionMetadata> sourceDatabaseTablesFromMetaTable(String database, int group) throws SourceException {
+        List<Row> compactionTables = getCompactionDataForDatabase(database, group);
+        ArrayList<CompactionMetadata> compactionMetadataList = new ArrayList<>();
+        logger.info(compactionTables.size() + " tables returned with a Compaction configuration");
+        for (Row table : compactionTables){
             String tableName = table.get(0).toString();
-            Integer retentionPeriod = (Integer) table.get(1);
-            boolean isRetainMonthEnd = Boolean.parseBoolean(String.valueOf(table.get(2)));
             try{
                 Table tableMeta = metadataHelper.getTable(database,tableName);
                 TableDescriptor tableDescriptor =  metadataHelper.getTableDescriptor(tableMeta);
-                HousekeepingMetadata housekeepingMetadata = new HousekeepingMetadata(database,tableName,retentionPeriod,isRetainMonthEnd,tableDescriptor);
-                housekeepingMetadataList.add(housekeepingMetadata);
+                CompactionMetadata compactionMetadata = new CompactionMetadata(tableDescriptor);
+                compactionMetadataList.add(compactionMetadata);
             } catch (SourceException e){
                 logger.error(tableName+" : provided in metadata configuration, but not found in database..");
             }
         }
-        return housekeepingMetadataList;
+        return compactionMetadataList;
     }
 
+    public void executeCompactionForDatabase(){}
 
-    public void executeHousekeepingGroup(int executionGroup) throws ConfigurationException, IOException, MetaException, SourceException {
-        HousekeepingJob housekeepingJob = new HousekeepingJob();
+    public void executeCompactionForTable(){}
+
+    public void executeCompactionForLocation(){}
+
+    public void executeCompactionGroup(int executionGroup) throws ConfigurationException, IOException, MetaException, SourceException {
+        CompactionJob CompactionJob = new CompactionJob();
         auditHelper.startup();
-        List<Row> retentionGroup = getRetentionGroupDatabases(executionGroup);
+        List<Row> retentionGroup = getCompactionGroupDatabases(executionGroup);
         retentionGroup.forEach(retentionRecord -> {
             String database=retentionRecord.get(0).toString();
-            ArrayList<HousekeepingMetadata> housekeepingMetadataList = new ArrayList<>();
+            ArrayList<CompactionMetadata> compactionMetadataList = new ArrayList<>();
             try {
-                housekeepingMetadataList.addAll(sourceDatabaseTablesFromMetaTable(database, executionGroup));
+                compactionMetadataList.addAll(sourceDatabaseTablesFromMetaTable(database, executionGroup));
             } catch (SourceException e) {
                 e.printStackTrace();
             }
-            housekeepingMetadataList.forEach(table ->{
+            compactionMetadataList.forEach(table ->{
                 try {
-                    housekeepingJob.execute(table);
-                } catch (SourceException | IOException | URISyntaxException e) {
+                    CompactionJob.execute(table);
+                } catch (SourceException | NoSuchDatabaseException | IOException | NoSuchTableException e) {
                     e.printStackTrace();
                 }
             });

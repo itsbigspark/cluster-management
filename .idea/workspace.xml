@@ -2,12 +2,80 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="81c03950-0574-43ed-8d8a-e7bc63d8bf3d" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/metadata/HousekeepingMetadata.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/metadata/OffloadMetadata.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/compaction/CompactionController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/offload/OffloadController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/jobs/TestDataSetup.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/jobs/offload/OffloadJobIntegrationTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/jobs/offload/OffloadJobTestRunner.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__asm_asm_3_1.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__com_fasterxml_jackson_core_jackson_annotations_2_6_0.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__com_fasterxml_jackson_core_jackson_core_2_6_7.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__com_google_guava_guava_14_0_1.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__com_sun_jersey_contribs_jersey_guice_1_9.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__com_sun_jersey_jersey_client_1_9.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__com_sun_jersey_jersey_core_1_9.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__com_sun_jersey_jersey_json_1_9.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__com_sun_jersey_jersey_server_1_9.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__com_sun_xml_bind_jaxb_impl_2_2_3_1.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_ant_ant_1_9_1.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_ant_ant_launcher_1_9_1.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_curator_curator_client_2_6_0.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_hadoop_hadoop_annotations_2_6_5.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_hadoop_hadoop_auth_2_6_5.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_hadoop_hadoop_client_2_6_5.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_hadoop_hadoop_common_2_6_5.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_hadoop_hadoop_distcp_2_6_5.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_hadoop_hadoop_hdfs_2_6_5.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_hadoop_hadoop_mapreduce_client_app_2_6_5.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_hadoop_hadoop_mapreduce_client_common_2_6_5.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_hadoop_hadoop_mapreduce_client_core_2_6_5.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_hadoop_hadoop_mapreduce_client_jobclient_2_6_5.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_hadoop_hadoop_mapreduce_client_shuffle_2_6_5.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_hadoop_hadoop_yarn_server_applicationhistoryservice_2_6_0.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_hadoop_hadoop_yarn_server_resourcemanager_2_6_0.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_hive_hive_common_1_1_1.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_hive_hive_metastore_1_1_1.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_hive_hive_serde_1_1_1.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_hive_hive_shims_1_1_1.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_hive_shims_hive_shims_0_20S_1_1_1.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_hive_shims_hive_shims_0_23_1_1_1.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_hive_shims_hive_shims_common_1_1_1.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_hive_shims_hive_shims_scheduler_1_1_1.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_codehaus_jettison_jettison_1_1.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_htrace_htrace_core_3_0_4.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_junit_jupiter_junit_jupiter_5_6_0.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_junit_jupiter_junit_jupiter_api_5_6_0.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_junit_jupiter_junit_jupiter_engine_5_6_0.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_junit_jupiter_junit_jupiter_params_5_6_0.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_junit_platform_junit_platform_engine_1_6_0.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/services/housekeeping/HousekeepingController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/services/housekeeping/HousekeepingController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/services/housekeeping/HousekeepingJob.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/services/housekeeping/HousekeepingJob.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/services/housekeeping/HousekeepingJobIntegrationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/services/housekeeping/HousekeepingJobIntegrationTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/bigspark/cloudera/management/services/compaction/CompactionJob.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/bigspark/cloudera/management/services/compaction/CompactionJob.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cluster-management.iml" beforeDir="false" afterPath="$PROJECT_DIR$/cluster-management.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/model/TableMetadata.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/metadata/CompactionMetadata.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/AuditHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/AuditHelper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/FileSystemHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/FileSystemHelper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/MetadataHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/MetadataHelper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/compaction/CompactionJob.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/compaction/CompactionJob.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/compaction/CompactionRunner.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/compaction/CompactionRunner.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/housekeeping/HousekeepingController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/housekeeping/HousekeepingController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/housekeeping/HousekeepingJob.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/housekeeping/HousekeepingJob.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/offload/OffloadJob.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/offload/OffloadJob.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/offload/OffloadRunner.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/offload/OffloadRunner.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/Common.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/Common.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/helpers/FileSystemHelperTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/helpers/FileSystemHelperTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/jobs/compaction/CompactionJobIntegrationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/jobs/compaction/CompactionJobIntegrationTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/jobs/compaction/CompactionJobTestRunner.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/jobs/compaction/CompactionJobTestRunner.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/jobs/housekeeping/HousekeepingJobIntegrationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/jobs/housekeeping/HousekeepingJobIntegrationTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/config.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/config.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/bigspark/cloudera/management/helpers/FileSystemHelper.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/bigspark/cloudera/management/helpers/FileSystemHelper.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/bigspark/cloudera/management/helpers/MetadataHelper.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/bigspark/cloudera/management/helpers/MetadataHelper.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/cluster-management-1.0-SNAPSHOT.jar" beforeDir="false" afterPath="$PROJECT_DIR$/target/cluster-management-1.0-SNAPSHOT.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven-archiver/pom.properties" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-archiver/pom.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/inputFiles.lst" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -21,8 +89,8 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Enum" />
-        <option value="Class" />
         <option value="JUnit5 Test Class" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -81,15 +149,9 @@
     <key name="CreateTestDialog.Recents.Supers">
       <recent name="" />
     </key>
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/src/test/java" />
-      <recent name="$PROJECT_DIR$/src" />
-    </key>
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="com.bigspark.cloudera.management.common.configuration" />
       <recent name="com.bigspark.cloudera" />
-      <recent name="com.bigspark.cloudera.management.helpers" />
-    </key>
-    <key name="CopyClassDialog.RECENTS_KEY">
       <recent name="com.bigspark.cloudera.management.helpers" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
@@ -98,6 +160,17 @@
       <recent name="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common" />
       <recent name="$PROJECT_DIR$/test/com/bigspark/cloudera/management" />
       <recent name="$PROJECT_DIR$/test" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.bigspark.cloudera.management.jobs.offload" />
+      <recent name="com.bigspark.cloudera.management.common.metadata" />
+      <recent name="com.bigspark.cloudera.management.common.model" />
+      <recent name="com.bigspark.cloudera.management.jobs.compaction" />
+      <recent name="com.bigspark.cloudera.management.helpers" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/test/java" />
+      <recent name="$PROJECT_DIR$/src" />
     </key>
   </component>
   <component name="RunManager">
@@ -287,9 +360,10 @@
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
     <state x="2368" y="372" key="#com.intellij.debugger.ui.breakpoints.EditClassFiltersDialog/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583772356478" />
-    <state x="424" y="238" width="1148" height="686" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1584390401746">
-      <screen x="0" y="23" width="1920" height="1177" />
+    <state x="424" y="197" width="1148" height="637" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1585668948203">
+      <screen x="0" y="0" width="1920" height="1080" />
     </state>
+    <state x="424" y="197" width="1148" height="637" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1080@0.0.1920.1080" timestamp="1585668948203" />
     <state x="424" y="219" width="1148" height="686" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1200@0.0.1920.1200" timestamp="1583592315636" />
     <state x="424" y="238" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.23.1920.1177@0.23.1920.1177" timestamp="1584390401746" />
     <state x="2344" y="197" key="#com.intellij.execution.impl.EditConfigurationsDialog/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583510617927" />
@@ -318,18 +392,20 @@
     <state x="333" y="511" key="#com.intellij.refactoring.move.MoveHandler.SelectRefactoringDialog/0.0.1920.1200@0.0.1920.1200" timestamp="1583529337331" />
     <state x="2253" y="460" key="#com.intellij.refactoring.move.MoveHandler.SelectRefactoringDialog/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583227078178" />
     <state x="2253" y="473" key="#com.intellij.refactoring.move.MoveHandler.SelectRefactoringDialog/1920.23.1920.1057/0.23.1920.1057@1920.23.1920.1057" timestamp="1584365012417" />
-    <state x="681" y="424" width="774" height="365" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes" timestamp="1583522075422">
-      <screen x="0" y="0" width="1920" height="1200" />
+    <state x="681" y="382" width="849" height="329" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes" timestamp="1585664564100">
+      <screen x="0" y="0" width="1920" height="1080" />
     </state>
+    <state x="681" y="382" width="849" height="329" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes/0.0.1920.1080@0.0.1920.1080" timestamp="1585664564100" />
     <state x="681" y="424" width="774" height="365" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes/0.0.1920.1200@0.0.1920.1200" timestamp="1583522075422" />
     <state x="2601" y="382" width="656" height="328" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583222575302" />
     <state x="681" y="468" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.packages" timestamp="1583529341974">
       <screen x="0" y="0" width="1920" height="1200" />
     </state>
     <state x="681" y="468" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.packages/0.0.1920.1200@0.0.1920.1200" timestamp="1583529341974" />
-    <state x="2264" y="23" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1584365123687">
-      <screen x="1920" y="23" width="1920" height="1057" />
+    <state x="344" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1585663610042">
+      <screen x="0" y="0" width="1920" height="1080" />
     </state>
+    <state x="344" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1920.1080@0.0.1920.1080" timestamp="1585663610042" />
     <state x="2264" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/1920.0.1920.1080/0.23.1920.1057@1920.0.1920.1080" timestamp="1583760726337" />
     <state x="2264" y="23" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/1920.23.1920.1057/0.23.1920.1057@1920.23.1920.1057" timestamp="1584365123687" />
     <state x="2555" y="255" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1583926050562">
@@ -353,67 +429,75 @@
     <state x="178" y="103" key="CommitChangelistDialog2/0.23.1920.1177@0.23.1920.1177" timestamp="1584390817131" />
     <state x="2098" y="74" key="CommitChangelistDialog2/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583741032269" />
     <state x="2098" y="95" key="CommitChangelistDialog2/1920.23.1920.1057/0.23.1920.1057@1920.23.1920.1057" timestamp="1584120803884" />
-    <state width="1868" height="302" key="GridCell.Tab.0.bottom" timestamp="1584395822918">
+    <state width="1868" height="301" key="GridCell.Tab.0.bottom" timestamp="1585765559549">
       <screen x="0" y="0" width="1920" height="1200" />
     </state>
-    <state width="1868" height="302" key="GridCell.Tab.0.bottom/0.0.1920.1200@0.0.1920.1200" timestamp="1584395822918" />
+    <state width="1868" height="264" key="GridCell.Tab.0.bottom/0.0.1920.1080@0.0.1920.1080" timestamp="1585669432477" />
+    <state width="1868" height="301" key="GridCell.Tab.0.bottom/0.0.1920.1200@0.0.1920.1200" timestamp="1585765559549" />
     <state width="1628" height="391" key="GridCell.Tab.0.bottom/0.23.1920.1177@0.23.1920.1177" timestamp="1584197030973" />
     <state width="1868" height="336" key="GridCell.Tab.0.bottom/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583773019968" />
     <state width="1868" height="336" key="GridCell.Tab.0.bottom/1920.0.1920.1080/0.23.1920.1057@1920.0.1920.1080" timestamp="1583772248908" />
     <state width="1868" height="302" key="GridCell.Tab.0.bottom/1920.23.1920.1057/0.23.1920.1057@1920.23.1920.1057" timestamp="1584373900950" />
-    <state width="1868" height="302" key="GridCell.Tab.0.center" timestamp="1584395822916">
+    <state width="1868" height="301" key="GridCell.Tab.0.center" timestamp="1585765559547">
       <screen x="0" y="0" width="1920" height="1200" />
     </state>
-    <state width="1868" height="302" key="GridCell.Tab.0.center/0.0.1920.1200@0.0.1920.1200" timestamp="1584395822916" />
+    <state width="1868" height="264" key="GridCell.Tab.0.center/0.0.1920.1080@0.0.1920.1080" timestamp="1585669432475" />
+    <state width="1868" height="301" key="GridCell.Tab.0.center/0.0.1920.1200@0.0.1920.1200" timestamp="1585765559547" />
     <state width="1628" height="391" key="GridCell.Tab.0.center/0.23.1920.1177@0.23.1920.1177" timestamp="1584197030941" />
     <state width="1868" height="336" key="GridCell.Tab.0.center/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583773019964" />
     <state width="1868" height="336" key="GridCell.Tab.0.center/1920.0.1920.1080/0.23.1920.1057@1920.0.1920.1080" timestamp="1583772248900" />
     <state width="1868" height="302" key="GridCell.Tab.0.center/1920.23.1920.1057/0.23.1920.1057@1920.23.1920.1057" timestamp="1584373900948" />
-    <state width="1868" height="302" key="GridCell.Tab.0.left" timestamp="1584395822915">
+    <state width="1868" height="301" key="GridCell.Tab.0.left" timestamp="1585765559547">
       <screen x="0" y="0" width="1920" height="1200" />
     </state>
-    <state width="1868" height="302" key="GridCell.Tab.0.left/0.0.1920.1200@0.0.1920.1200" timestamp="1584395822915" />
+    <state width="1868" height="264" key="GridCell.Tab.0.left/0.0.1920.1080@0.0.1920.1080" timestamp="1585669432475" />
+    <state width="1868" height="301" key="GridCell.Tab.0.left/0.0.1920.1200@0.0.1920.1200" timestamp="1585765559547" />
     <state width="1628" height="391" key="GridCell.Tab.0.left/0.23.1920.1177@0.23.1920.1177" timestamp="1584197030941" />
     <state width="1868" height="336" key="GridCell.Tab.0.left/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583773019962" />
     <state width="1868" height="336" key="GridCell.Tab.0.left/1920.0.1920.1080/0.23.1920.1057@1920.0.1920.1080" timestamp="1583772248898" />
     <state width="1868" height="302" key="GridCell.Tab.0.left/1920.23.1920.1057/0.23.1920.1057@1920.23.1920.1057" timestamp="1584373900946" />
-    <state width="1868" height="302" key="GridCell.Tab.0.right" timestamp="1584395822917">
+    <state width="1868" height="301" key="GridCell.Tab.0.right" timestamp="1585765559548">
       <screen x="0" y="0" width="1920" height="1200" />
     </state>
-    <state width="1868" height="302" key="GridCell.Tab.0.right/0.0.1920.1200@0.0.1920.1200" timestamp="1584395822917" />
+    <state width="1868" height="264" key="GridCell.Tab.0.right/0.0.1920.1080@0.0.1920.1080" timestamp="1585669432476" />
+    <state width="1868" height="301" key="GridCell.Tab.0.right/0.0.1920.1200@0.0.1920.1200" timestamp="1585765559548" />
     <state width="1628" height="391" key="GridCell.Tab.0.right/0.23.1920.1177@0.23.1920.1177" timestamp="1584197030942" />
     <state width="1868" height="336" key="GridCell.Tab.0.right/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583773019966" />
     <state width="1868" height="336" key="GridCell.Tab.0.right/1920.0.1920.1080/0.23.1920.1057@1920.0.1920.1080" timestamp="1583772248903" />
     <state width="1868" height="302" key="GridCell.Tab.0.right/1920.23.1920.1057/0.23.1920.1057@1920.23.1920.1057" timestamp="1584373900949" />
-    <state width="1868" height="302" key="GridCell.Tab.1.bottom" timestamp="1584395822920">
+    <state width="1868" height="301" key="GridCell.Tab.1.bottom" timestamp="1585765559552">
       <screen x="0" y="0" width="1920" height="1200" />
     </state>
-    <state width="1868" height="302" key="GridCell.Tab.1.bottom/0.0.1920.1200@0.0.1920.1200" timestamp="1584395822920" />
-    <state width="1628" height="391" key="GridCell.Tab.1.bottom/0.23.1920.1177@0.23.1920.1177" timestamp="1584197030813" />
+    <state width="1868" height="264" key="GridCell.Tab.1.bottom/0.0.1920.1080@0.0.1920.1080" timestamp="1585669432480" />
+    <state width="1868" height="301" key="GridCell.Tab.1.bottom/0.0.1920.1200@0.0.1920.1200" timestamp="1585765559552" />
+    <state width="1868" height="301" key="GridCell.Tab.1.bottom/0.23.1920.1177@0.23.1920.1177" timestamp="1585687876760" />
     <state width="1868" height="336" key="GridCell.Tab.1.bottom/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583773039344" />
     <state width="1868" height="336" key="GridCell.Tab.1.bottom/1920.0.1920.1080/0.23.1920.1057@1920.0.1920.1080" timestamp="1583772429181" />
     <state width="1868" height="302" key="GridCell.Tab.1.bottom/1920.23.1920.1057/0.23.1920.1057@1920.23.1920.1057" timestamp="1584373900789" />
-    <state width="1868" height="302" key="GridCell.Tab.1.center" timestamp="1584395822919">
+    <state width="1868" height="301" key="GridCell.Tab.1.center" timestamp="1585765559550">
       <screen x="0" y="0" width="1920" height="1200" />
     </state>
-    <state width="1868" height="302" key="GridCell.Tab.1.center/0.0.1920.1200@0.0.1920.1200" timestamp="1584395822919" />
-    <state width="1628" height="391" key="GridCell.Tab.1.center/0.23.1920.1177@0.23.1920.1177" timestamp="1584197030812" />
+    <state width="1868" height="264" key="GridCell.Tab.1.center/0.0.1920.1080@0.0.1920.1080" timestamp="1585669432478" />
+    <state width="1868" height="301" key="GridCell.Tab.1.center/0.0.1920.1200@0.0.1920.1200" timestamp="1585765559550" />
+    <state width="1868" height="301" key="GridCell.Tab.1.center/0.23.1920.1177@0.23.1920.1177" timestamp="1585687876758" />
     <state width="1868" height="336" key="GridCell.Tab.1.center/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583773039340" />
     <state width="1868" height="336" key="GridCell.Tab.1.center/1920.0.1920.1080/0.23.1920.1057@1920.0.1920.1080" timestamp="1583772429177" />
     <state width="1868" height="302" key="GridCell.Tab.1.center/1920.23.1920.1057/0.23.1920.1057@1920.23.1920.1057" timestamp="1584373900786" />
-    <state width="1868" height="302" key="GridCell.Tab.1.left" timestamp="1584395822919">
+    <state width="1868" height="301" key="GridCell.Tab.1.left" timestamp="1585765559550">
       <screen x="0" y="0" width="1920" height="1200" />
     </state>
-    <state width="1868" height="302" key="GridCell.Tab.1.left/0.0.1920.1200@0.0.1920.1200" timestamp="1584395822919" />
-    <state width="1628" height="391" key="GridCell.Tab.1.left/0.23.1920.1177@0.23.1920.1177" timestamp="1584197030812" />
+    <state width="1868" height="264" key="GridCell.Tab.1.left/0.0.1920.1080@0.0.1920.1080" timestamp="1585669432478" />
+    <state width="1868" height="301" key="GridCell.Tab.1.left/0.0.1920.1200@0.0.1920.1200" timestamp="1585765559550" />
+    <state width="1868" height="301" key="GridCell.Tab.1.left/0.23.1920.1177@0.23.1920.1177" timestamp="1585687876758" />
     <state width="1868" height="336" key="GridCell.Tab.1.left/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583773039337" />
     <state width="1868" height="336" key="GridCell.Tab.1.left/1920.0.1920.1080/0.23.1920.1057@1920.0.1920.1080" timestamp="1583772429169" />
     <state width="1868" height="302" key="GridCell.Tab.1.left/1920.23.1920.1057/0.23.1920.1057@1920.23.1920.1057" timestamp="1584373900785" />
-    <state width="1868" height="302" key="GridCell.Tab.1.right" timestamp="1584395822920">
+    <state width="1868" height="301" key="GridCell.Tab.1.right" timestamp="1585765559551">
       <screen x="0" y="0" width="1920" height="1200" />
     </state>
-    <state width="1868" height="302" key="GridCell.Tab.1.right/0.0.1920.1200@0.0.1920.1200" timestamp="1584395822920" />
-    <state width="1628" height="391" key="GridCell.Tab.1.right/0.23.1920.1177@0.23.1920.1177" timestamp="1584197030813" />
+    <state width="1868" height="264" key="GridCell.Tab.1.right/0.0.1920.1080@0.0.1920.1080" timestamp="1585669432479" />
+    <state width="1868" height="301" key="GridCell.Tab.1.right/0.0.1920.1200@0.0.1920.1200" timestamp="1585765559551" />
+    <state width="1868" height="301" key="GridCell.Tab.1.right/0.23.1920.1177@0.23.1920.1177" timestamp="1585687876759" />
     <state width="1868" height="336" key="GridCell.Tab.1.right/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583773039342" />
     <state width="1868" height="336" key="GridCell.Tab.1.right/1920.0.1920.1080/0.23.1920.1057@1920.0.1920.1080" timestamp="1583772429180" />
     <state width="1868" height="302" key="GridCell.Tab.1.right/1920.23.1920.1057/0.23.1920.1057@1920.23.1920.1057" timestamp="1584373900787" />
@@ -421,6 +505,14 @@
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
     <state x="2240" y="19" key="SettingsEditor/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583741983610" />
+    <state width="625" height="500" key="SwitcherDM" timestamp="1585666764847">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state width="625" height="500" key="SwitcherDM/0.0.1920.1080@0.0.1920.1080" timestamp="1585666764847" />
+    <state x="536" y="185" key="VCS.ChangeListViewerDialog" timestamp="1585657220819">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state x="536" y="185" key="VCS.ChangeListViewerDialog/0.0.1920.1080@0.0.1920.1080" timestamp="1585657220819" />
     <state x="460" y="241" key="Vcs.Push.Dialog.v2" timestamp="1584392573704">
       <screen x="0" y="0" width="1920" height="1200" />
     </state>
@@ -434,11 +526,19 @@
     <state width="960" height="551" key="XDebugger.FullValuePopup/0.0.1920.1200@0.0.1920.1200" timestamp="1584395758519" />
     <state width="960" height="540" key="XDebugger.FullValuePopup/0.23.1920.1177@0.23.1920.1177" timestamp="1583782350809" />
     <state width="960" height="485" key="XDebugger.FullValuePopup/1920.23.1920.1057/0.23.1920.1057@1920.23.1920.1057" timestamp="1583837791115" />
+    <state x="100" y="100" width="1720" height="1000" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1585765597338">
+      <screen x="0" y="0" width="1920" height="1200" />
+    </state>
+    <state x="100" y="100" width="1720" height="1000" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.0.1920.1200@0.0.1920.1200" timestamp="1585765597338" />
     <state x="2364" y="345" key="com.intellij.ide.util.TipDialog" timestamp="1584102870696">
       <screen x="1920" y="23" width="1920" height="1057" />
     </state>
     <state x="444" y="345" key="com.intellij.ide.util.TipDialog/0.23.1920.1057/1920.23.1920.1057@0.23.1920.1057" timestamp="1582884945939" />
     <state x="2364" y="345" key="com.intellij.ide.util.TipDialog/1920.23.1920.1057/0.23.1920.1057@1920.23.1920.1057" timestamp="1584102870696" />
+    <state x="476" y="73" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1585659512863">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state x="476" y="73" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/0.0.1920.1080@0.0.1920.1080" timestamp="1585659512863" />
     <state x="2616" y="446" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1583314336421">
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
@@ -471,16 +571,20 @@
     <state x="2372" y="13" width="1015" height="1054" key="find.popup/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583740150229" />
     <state x="2372" y="13" width="1015" height="1053" key="find.popup/1920.0.1920.1080/0.23.1920.1057@1920.0.1920.1080" timestamp="1583322379454" />
     <state x="2372" y="36" width="1015" height="1031" key="find.popup/1920.23.1920.1057/0.23.1920.1057@1920.23.1920.1057" timestamp="1584344045009" />
+    <state x="497" y="365" key="git4idea.ui.GitUnstashDialog" timestamp="1585657222122">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state x="497" y="365" key="git4idea.ui.GitUnstashDialog/0.0.1920.1080@0.0.1920.1080" timestamp="1585657222122" />
     <state x="650" y="102" key="refactoring.ChangeSignatureDialog" timestamp="1584391618858">
       <screen x="0" y="0" width="1920" height="1200" />
     </state>
     <state x="650" y="102" key="refactoring.ChangeSignatureDialog/0.0.1920.1200@0.0.1920.1200" timestamp="1584391618858" />
     <state x="2570" y="92" key="refactoring.ChangeSignatureDialog/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583232494771" />
     <state x="2570" y="113" key="refactoring.ChangeSignatureDialog/1920.23.1920.1057/0.23.1920.1057@1920.23.1920.1057" timestamp="1583850364029" />
-    <state x="541" y="70" width="838" height="1011" key="search.everywhere.popup" timestamp="1584376160113">
-      <screen x="0" y="23" width="1920" height="1057" />
+    <state x="541" y="53" width="838" height="1147" key="search.everywhere.popup" timestamp="1585690033223">
+      <screen x="0" y="0" width="1920" height="1200" />
     </state>
-    <state x="541" y="53" width="838" height="1147" key="search.everywhere.popup/0.0.1920.1200@0.0.1920.1200" timestamp="1583524150254" />
+    <state x="541" y="53" width="838" height="1147" key="search.everywhere.popup/0.0.1920.1200@0.0.1920.1200" timestamp="1585690033223" />
     <state x="2461" y="48" width="838" height="1032" key="search.everywhere.popup/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583759737273" />
     <state x="2461" y="48" width="838" height="1032" key="search.everywhere.popup/1920.0.1920.1080/0.23.1920.1057@1920.0.1920.1080" timestamp="1583242136832" />
     <state x="541" y="70" width="838" height="1011" key="search.everywhere.popup/1920.23.1920.1057/0.23.1920.1057@0.23.1920.1057" timestamp="1584376160113" />

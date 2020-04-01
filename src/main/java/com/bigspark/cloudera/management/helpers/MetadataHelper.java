@@ -1,10 +1,9 @@
 package com.bigspark.cloudera.management.helpers;
 
-import com.bigspark.cloudera.management.common.configuration.HiveConfiguration;
 import com.bigspark.cloudera.management.common.enums.Pattern;
 import com.bigspark.cloudera.management.common.exceptions.SourceException;
 import com.bigspark.cloudera.management.common.model.TableDescriptor;
-import com.bigspark.cloudera.management.common.model.TableMetadata;
+import com.bigspark.cloudera.management.common.metadata.HousekeepingMetadata;
 import com.google.common.collect.Lists;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
@@ -12,7 +11,6 @@ import org.apache.hadoop.hive.metastore.api.Database;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.Partition;
 import org.apache.hadoop.hive.metastore.api.Table;
-import org.apache.hadoop.hive.serde2.io.DateWritable;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import javax.naming.ConfigurationException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -64,6 +61,11 @@ public class MetadataHelper {
                     , true
                     , getTablePartitions(table.getDbName(),table.getTableName()));
         }
+    }
+
+    public TableDescriptor getTableDescriptor(String database, String table) throws SourceException {
+        Table tbl = getTable(database, table);
+        return getTableDescriptor(tbl);
     }
 
 
@@ -216,8 +218,8 @@ public class MetadataHelper {
         return partitionKey;
     }
 
-    public static Pattern getTableType(TableMetadata tableMetadata) throws SourceException {
-        TableDescriptor tableDescriptor = tableMetadata.tableDescriptor;
+    public static Pattern getTableType(HousekeepingMetadata housekeepingMetadata) throws SourceException {
+        TableDescriptor tableDescriptor = housekeepingMetadata.tableDescriptor;
         logger.info("Now processing table "+tableDescriptor.getDatabaseName()+"."+tableDescriptor.getTableName());
         Pattern pattern = null;
         if (tableDescriptor.isPartitioned()){

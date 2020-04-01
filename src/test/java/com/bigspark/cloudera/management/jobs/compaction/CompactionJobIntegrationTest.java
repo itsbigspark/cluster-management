@@ -2,23 +2,24 @@ package com.bigspark.cloudera.management.jobs.compaction;
 
 import com.bigspark.cloudera.management.Common;
 import com.bigspark.cloudera.management.common.exceptions.SourceException;
+import com.bigspark.cloudera.management.common.metadata.CompactionMetadata;
 import com.bigspark.cloudera.management.helpers.AuditHelper;
 import com.bigspark.cloudera.management.helpers.MetadataHelper;
 import com.bigspark.cloudera.management.helpers.SparkHelper;
 import com.bigspark.cloudera.management.jobs.ClusterManagementJob;
-import com.bigspark.cloudera.management.jobs.housekeeping.HousekeepingController;
+import com.bigspark.cloudera.management.jobs.TestDataSetup;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.ContentSummary;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.Table;
-import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.catalyst.analysis.NoSuchDatabaseException;
 import org.apache.spark.sql.catalyst.analysis.NoSuchTableException;
+import org.apache.spark.sql.functions;
 import org.junit.Before;
 import org.junit.jupiter.api.Test;
 
@@ -36,23 +37,18 @@ public class CompactionJobIntegrationTest {
     public Configuration hadoopConfiguration;
     public MetadataHelper metadataHelper;
     public Boolean isDryRun;
-    public HousekeepingController housekeepingController;
+    public CompactionController compactionController;
     public String testingDatabase;
     public String testingTable;
+    private String metatable;
     public AuditHelper auditHelper;
     public ClusterManagementJob clusterManagementJob;
 
 
     public CompactionJobIntegrationTest() throws IOException, MetaException, ConfigurationException, SourceException {
-//        if (spark.sparkContext().isLocal()) {
-//            //Required only for derby db weird locking issues
-//            FileUtils.forceDelete(new File(spark.sparkContext().getSparkHome() + "/metastore_db/db.lck"));
-//            FileUtils.forceDelete(new File(spark.sparkContext().getSparkHome() + "/metastore_db/dbex.lck"));
-//        }
-
         this.clusterManagementJob = ClusterManagementJob.getInstance();
-        this.housekeepingController = new HousekeepingController();
-        this.auditHelper = new AuditHelper(clusterManagementJob);
+        this.compactionController = new CompactionController();
+        this.auditHelper = new AuditHelper(clusterManagementJob, "Small file compaction test");
         this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark, auditHelper);
         this.fileSystem = clusterManagementJob.fileSystem;
         this.hadoopConfiguration = clusterManagementJob.hadoopConfiguration;
@@ -62,17 +58,23 @@ public class CompactionJobIntegrationTest {
 
     @Before
     void setUp() throws IOException {
-        this.testingDatabase = jobProperties.getProperty("com.bigspark.cloudera.management.services.housekeeping.testingDatabase");
+        this.testingDatabase = jobProperties.getProperty("com.bigspark.cloudera.management.services.compaction.testingDatabase");
+        this.metatable = jobProperties.getProperty("com.bigspark.cloudera.management.services.compaction.metatable");
         this.testingTable = "test_table_compaction";
         if (spark.catalog().tableExists(testingDatabase,testingTable))
             spark.sql(String.format("DROP TABLE %s.%s",testingDatabase,testingTable));
         Dataset<Long> df = this.spark.range(100000).cache();
-        Dataset<Row> df2 = df.withColumn("partitionCol", new Column("p1"));
+        Dataset<Row> df2 = df.withColumn("partitionCol", functions.lit("p1"));
         df2.repartition(200).write().partitionBy("partitionCol").saveAsTable(testingDatabase+"."+testingTable);
     }
 
     @Test
     void execute() throws ConfigurationException, IOException, MetaException, SourceException, NoSuchTableException, NoSuchDatabaseException, ParseException {
+
+        this.testingDatabase = jobProperties.getProperty("com.bigspark.cloudera.management.services.compaction.testingDatabase");
+        this.metatable = jobProperties.getProperty("com.bigspark.cloudera.management.services.compaction.metatable");
+//        TestDataSetup testDataSetup = new TestDataSetup();
+//        testDataSetup.setUp(testingDatabase, metatable);
         setUp();
         InputStream input = CompactionJobIntegrationTest.class.getClassLoader().getResourceAsStream("config.properties");
         Properties prop = new Properties();
@@ -80,7 +82,7 @@ public class CompactionJobIntegrationTest {
         CompactionJob compactionJob = new CompactionJob();
         compactionJob.jobProperties = prop;
         System.out.print(Common.getBannerStart("Compaction testing"));
-        compactionJob.execute(testingDatabase,"small_files_test");
+        compactionJob.execute(new CompactionMetadata(metadataHelper.getTableDescriptor(testingDatabase,testingTable)));
         confirmResult();
         System.out.print(Common.getBannerFinish("Compaction testing complete"));
     }

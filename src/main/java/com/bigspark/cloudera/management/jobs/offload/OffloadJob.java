@@ -3,7 +3,7 @@ package com.bigspark.cloudera.management.jobs.offload;
 import com.bigspark.cloudera.management.common.enums.Pattern;
 import com.bigspark.cloudera.management.common.exceptions.SourceException;
 import com.bigspark.cloudera.management.common.model.SourceDescriptor;
-import com.bigspark.cloudera.management.common.model.TableMetadata;
+import com.bigspark.cloudera.management.common.metadata.HousekeepingMetadata;
 import com.bigspark.cloudera.management.helpers.AuditHelper;
 import com.bigspark.cloudera.management.helpers.MetadataHelper;
 import com.bigspark.cloudera.management.helpers.SparkHelper;
@@ -15,7 +15,6 @@ import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.tools.DistCp;
 import org.apache.hadoop.tools.DistCpOptions;
-import org.apache.hadoop.util.ToolRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +33,7 @@ public class OffloadJob {
     public Boolean isDryRun;
     public ClusterManagementJob clusterManagementJob;
     public AuditHelper auditHelper;
-    public TableMetadata tableMetadata;
+    public HousekeepingMetadata housekeepingMetadata;
     public SourceDescriptor sourceDescriptor;
 
     Pattern pattern;
@@ -42,7 +41,7 @@ public class OffloadJob {
 
     public OffloadJob() throws MetaException, SourceException, ConfigurationException, IOException {
         this.clusterManagementJob = ClusterManagementJob.getInstance();
-        this.auditHelper = new AuditHelper(clusterManagementJob);
+        this.auditHelper = new AuditHelper(clusterManagementJob,"Storage offload job");
         this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark,auditHelper);
         this.fileSystem = clusterManagementJob.fileSystem;
         this.hadoopConfiguration = clusterManagementJob.hadoopConfiguration;
@@ -56,15 +55,11 @@ public class OffloadJob {
 
         DistCpOptions options = new DistCpOptions(src,tgt);
         options.setOverwrite(true);
+        hadoopConfiguration.set("fs.s3a.endpoint","object.ecstestdrive.com");
+        hadoopConfiguration.set("fs.s3a.awsAccessKeyId","131855586862166345@ecstestdrive.emc.com");
+        hadoopConfiguration.set("fs.s3a.awsSecretAccessKey","Q+f/ypU/Ii6s2tWLmpxyaIVgxT4+rBLWroAO4ufS");
         DistCp distCp = new DistCp(hadoopConfiguration, options);
-        try {
-            return ToolRunner.run(
-                    distCp,new String[]{src.toString(),tgt.toString()});
-        }
-        catch(Exception e){
-                logger.error("distCp : Exception occurred ", e);
-            }
-        return 0;
+        return distCp.run(new String[]{src.toString(), tgt.toString()});
     }
 
 
@@ -73,16 +68,16 @@ public class OffloadJob {
      * @throws MetaException
      * @throws SourceException
      */
-    void execute(TableMetadata tableMetadata) throws SourceException{
-        this.tableMetadata = tableMetadata;
-        this.sourceDescriptor = new SourceDescriptor(metadataHelper.getDatabase(tableMetadata.database),tableMetadata.tableDescriptor);
-        this.pattern = MetadataHelper.getTableType(tableMetadata);
+    void execute(HousekeepingMetadata housekeepingMetadata) throws SourceException{
+        this.housekeepingMetadata = housekeepingMetadata;
+        this.sourceDescriptor = new SourceDescriptor(metadataHelper.getDatabase(housekeepingMetadata.database), housekeepingMetadata.tableDescriptor);
+        this.pattern = MetadataHelper.getTableType(housekeepingMetadata);
         if (this.pattern != null){
 
         }
     }
 
     void executeTest() throws Exception {
-        distCP(new Path("/user/chris/jars/*"),new Path("s3a://s3tab/jars"));
+        distCP(new Path("/user/bigspark/*"),new Path("s3a://s3tab/bigspark"));
     }
 }

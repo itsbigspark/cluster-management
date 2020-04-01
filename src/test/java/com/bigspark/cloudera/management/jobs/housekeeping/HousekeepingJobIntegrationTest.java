@@ -8,6 +8,7 @@ import com.bigspark.cloudera.management.helpers.FileSystemHelper;
 import com.bigspark.cloudera.management.helpers.MetadataHelper;
 import com.bigspark.cloudera.management.helpers.SparkHelper;
 import com.bigspark.cloudera.management.jobs.ClusterManagementJob;
+import com.bigspark.cloudera.management.jobs.TestDataSetup;
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -44,82 +45,22 @@ public class HousekeepingJobIntegrationTest {
     public HousekeepingController housekeepingController;
     public String testingDatabase;
     public String testFile;
+    private String metatable;
     public AuditHelper auditHelper;
-
     Logger logger = LoggerFactory.getLogger(getClass());
 
     public HousekeepingJobIntegrationTest() throws IOException, MetaException, ConfigurationException, SourceException {
 
         ClusterManagementJob clusterManagementJob = ClusterManagementJob.getInstance();
         this.housekeepingController = new HousekeepingController();
-        this.auditHelper = new AuditHelper(clusterManagementJob);
+        this.auditHelper = new AuditHelper(clusterManagementJob, "EDH Cluster housekeeping test");
         this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark,auditHelper);
-
-        if (spark.sparkContext().master().equals("local") && spark.sparkContext().hadoopConfiguration().size() == 0) {
-            //Required only for derby db weird locking issues
-            FileUtils.forceDelete(new File(spark.sparkContext().getSparkHome()+"/metastore_db/db.lck"));
-            FileUtils.forceDelete(new File(spark.sparkContext().getSparkHome()+"/metastore_db/dbex.lck"));
-        }
-
         this.fileSystem = clusterManagementJob.fileSystem;
         this.hadoopConfiguration = clusterManagementJob.hadoopConfiguration;
         this.metadataHelper = clusterManagementJob.metadataHelper;
         this.isDryRun = clusterManagementJob.isDryRun;
     }
 
-    void setUp() throws IOException {
-        this.testingDatabase = jobProperties.getProperty("com.bigspark.cloudera.management.services.housekeeping.testingDatabase");
-        String userHomeArea;
-        String fileName = "testdata.csv";
-        if (spark.sparkContext().hadoopConfiguration().size() > 0) {
-            userHomeArea = FileSystemHelper.getUserHomeArea();
-        } else {
-            userHomeArea = "/tmp";
-        }
-        this.testFile = userHomeArea+"/"+fileName;
-        if ( ! fileSystem.exists(new Path(this.testFile))) {
-            logger.info("Now generating test dataset");
-
-            StringBuilder sb = new StringBuilder();
-            sb.append("value,edi_business_day,src_sys_id,src_sys_inst_id\n");
-
-            generateTestData("ADB", "NWB", 1000, sb);
-            generateTestData("ADB", "UBR", 900, sb);
-            generateTestData("ADB", "UBN", 800, sb);
-            generateTestData("ADB", "RBS", 700, sb);
-
-            System.out.println(sb.toString());
-
-            if (spark.sparkContext().master().equals("local") && spark.sparkContext().hadoopConfiguration().size() == 0) {
-                try (BufferedWriter writer = new BufferedWriter(new FileWriter(testFile))) {
-                    writer.write(sb.toString());
-                }
-            }
-            else if (spark.sparkContext().hadoopConfiguration().size() > 0){
-                FileSystemHelper.writeFileContent(userHomeArea, fileName,sb.toString(),true);
-            }
-            dropTables();
-        }
-
-        createTables();
-    }
-
-    private String generateBusinessDate(int offset){
-        return LocalDate.now().minusDays(offset).toString();
-    }
-
-    private StringBuilder addData(String sys, String inst, int offset) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(String.format("test_%d,%s,%s,%s\n",offset,generateBusinessDate(offset), sys, inst));
-        return sb;
-    }
-
-    private StringBuilder generateTestData(String sys, String inst, int numOffsets, StringBuilder sb){
-        IntStream.range(0, numOffsets).forEach(i ->
-                sb.append(addData(sys,inst,i)).toString()
-        );
-        return sb;
-    }
 
     private void checkHousekeepingResult(String database, String table, String sys, String inst, int numOffsets, Pattern pattern, int retentionDays){
         if (pattern == Pattern.EAS) {
@@ -131,41 +72,11 @@ public class HousekeepingJobIntegrationTest {
         }
     }
 
-    private void dropTables() throws IOException {
-
-        spark.sql("DROP TABLE IF EXISTS default.test_table_eas");
-        spark.sql("DROP TABLE IF EXISTS default.test_table_eas_swing");
-        spark.sql("DROP TABLE IF EXISTS default.test_table_sh");
-        spark.sql("DROP TABLE IF EXISTS default.test_table_sh_swing");
-        spark.sql("DROP TABLE IF EXISTS default.data_retention_configuration");
-        spark.sql("DROP TABLE IF EXISTS default.cluster_management_audit");
-
-    }
-
-
-
-    private void createTables() throws IOException {
-        System.out.println("Check test tables exist...");
-        spark.sql("USE "+testingDatabase);
-        spark.sql("SHOW TABLES").show();
-        spark.conf().set("spark.sql.legacy.allowCreatingManagedTableUsingNonemptyLocation","true");
-        Dataset<Row> csv = spark.read().option("header", "true").csv(testFile);
-        csv.cache();
-        if (!spark.catalog().tableExists(testingDatabase, "test_table_sh")) {
-            System.out.println("Creating SH test table...");
-            csv.write().partitionBy("edi_business_day").mode("overwrite").saveAsTable("default.test_table_sh");
-            spark.sql("SHOW TABLES").show();
-        }
-        if (!spark.catalog().tableExists(testingDatabase, "test_table_eas")) {
-            System.out.println("Creating EAS test table...");
-            csv.write().partitionBy("edi_business_day", "src_sys_id", "src_sys_inst_id").mode("overwrite").saveAsTable("default.test_table_eas");
-            spark.sql("SHOW TABLES").show();
-        }
-
-        if (!spark.catalog().tableExists(testingDatabase, "data_retention_configuration")) {
+    public void createMetadataTable(){
+        if (!spark.catalog().tableExists(testingDatabase, metatable.split("\\.")[0])) {
             System.out.println("Creating test metadata table...");
-            spark.sql("CREATE TABLE IF NOT EXISTS "+testingDatabase+".data_retention_configuration (database STRING, table STRING, retention_period INT, retain_month_end STRING, group INT, active STRING)");
-            spark.sql("INSERT INTO "+testingDatabase+".data_retention_configuration VALUES " +
+            spark.sql("CREATE TABLE IF NOT EXISTS "+metatable+" (database STRING, table STRING, retention_period INT, retain_month_end STRING, group INT, active STRING)");
+            spark.sql("INSERT INTO "+metatable+" VALUES " +
                     "('"+testingDatabase+"','test_table_sh',100,'true',1,'true')," +
                     "('"+testingDatabase+"','test_table_eas',100,'true',2,'true')");
             spark.sql("SHOW TABLES").show();
@@ -175,7 +86,11 @@ public class HousekeepingJobIntegrationTest {
     @Test
     void execute() throws ConfigurationException, IOException, MetaException, ParseException, SourceException {
 
-        setUp();
+        this.testingDatabase = jobProperties.getProperty("com.bigspark.cloudera.management.services.housekeeping.testingDatabase");
+        this.metatable = jobProperties.getProperty("com.bigspark.cloudera.management.services.housekeeping.metatable");
+        TestDataSetup testDataSetup = new TestDataSetup();
+        testDataSetup.setUp(testingDatabase, metatable);
+        createMetadataTable();
 
         System.out.print(Common.getBannerStart("Execution group 1 - SH"));
         housekeepingController.executeHousekeepingGroup(1);

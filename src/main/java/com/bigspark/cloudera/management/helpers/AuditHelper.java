@@ -19,8 +19,9 @@ public class AuditHelper {
     public String logfileLocation;
     public String logfileName;
     public String auditTable;
+    public String jobType;
 
-    public AuditHelper(ClusterManagementJob clusterManagementJob) throws ConfigurationException, IOException, MetaException, SourceException {
+    public AuditHelper(ClusterManagementJob clusterManagementJob, String jobType) throws ConfigurationException, IOException, MetaException, SourceException {
         this.clusterManagementJob = clusterManagementJob;
         intitialiseAuditTable();
         setLogfile();
@@ -44,7 +45,7 @@ public class AuditHelper {
                       ", status STRING" +
                       ") " +
                       " ROW FORMAT DELIMITED" +
-                      " FIELDS TERMINATED BY ','" +
+                      " FIELDS TERMINATED BY '~'" +
                       " STORED AS TEXTFILE"
               ,auditTable_[0],auditTable_[1])
               );
@@ -61,7 +62,7 @@ public class AuditHelper {
     public void writeAuditLine(String action, String descriptor, String message, boolean isSuccess) throws IOException {
         String className = Thread.currentThread().getStackTrace()[2].getClassName();
         String methodName = Thread.currentThread().getStackTrace()[2].getMethodName();
-        String payload = String.format("%s,%s,%s,%s,%s,%s,\"%s\",%s,%s\n"
+        String payload = String.format("%s~%s~%s~%s~%s~%s~\"%s\"~%s~%s\n"
                 , className
                 , methodName
                 , clusterManagementJob.applicationID
@@ -83,11 +84,11 @@ public class AuditHelper {
     }
 
     public void startup() throws IOException {
-        writeAuditLine("Init","","Process start",true);
+        writeAuditLine(jobType+" - Launch","","Process start",true);
     }
 
     public void completion() throws IOException {
-        writeAuditLine("End","","Process end",true);
+        writeAuditLine(jobType+" - Complete","","Process end",true);
     }
 
 }
