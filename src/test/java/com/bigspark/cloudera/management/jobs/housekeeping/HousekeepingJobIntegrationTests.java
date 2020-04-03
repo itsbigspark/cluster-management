@@ -82,7 +82,7 @@ public class HousekeepingJobIntegrationTests {
         createMetadataTable();
 
         System.out.print(Common.getBannerStart("Execution group 1 - SH"));
-        housekeepingController.executeHousekeepingGroup(1);
+        housekeepingController.execute(1);
         checkHousekeepingResult(testingDatabase,"test_table_sh","ADB","NWB",100,Pattern.SH,100);
         checkHousekeepingResult(testingDatabase,"test_table_sh","ADB","UBR",90,Pattern.SH,100);
         checkHousekeepingResult(testingDatabase,"test_table_sh","ADB","UBN",80,Pattern.SH,100);
@@ -90,7 +90,7 @@ public class HousekeepingJobIntegrationTests {
         System.out.print(Common.getBannerFinish("Execution group 1 - SH"));
 
         Common.getBannerStart("Execution group 2 - EAS");
-        housekeepingController.executeHousekeepingGroup(2);
+        housekeepingController.execute(2);
         checkHousekeepingResult(testingDatabase,"test_table_eas","ADB","NWB",100,Pattern.EAS,100);
         checkHousekeepingResult(testingDatabase,"test_table_eas","ADB","UBR",90,Pattern.EAS,100);
         checkHousekeepingResult(testingDatabase,"test_table_eas","ADB","UBN",80,Pattern.EAS,100);

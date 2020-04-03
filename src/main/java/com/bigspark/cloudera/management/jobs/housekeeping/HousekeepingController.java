@@ -86,7 +86,11 @@ public class HousekeepingController {
      */
     private List<Row> getRetentionDataForDatabase(String database, int group) {
         logger.info("Now pulling configuration metadata for all tables in database : "+ database);
-        return spark.sql("SELECT TABLE, RETENTION_PERIOD, RETAIN_MONTH_END FROM " + getRetentionTable() + " WHERE DATABASE = '" + database + "' AND ACTIVE='true' AND GROUP ="+group).collectAsList();
+        String sql  = "SELECT DISTINCT TABLE, RETENTION_PERIOD, RETAIN_MONTH_END FROM " + getRetentionTable() + " WHERE DATABASE = '" + database + "' AND ACTIVE='true'";
+        if(group >=0 ) {
+            sql += " AND GROUP =" + group ;
+        }
+        return spark.sql(sql).collectAsList();
     }
 
 
@@ -118,10 +122,20 @@ public class HousekeepingController {
     }
 
 
-    public void executeHousekeepingGroup(int executionGroup) throws ConfigurationException, IOException, MetaException, SourceException {
+    public void execute() throws ConfigurationException, IOException, MetaException, SourceException {
+        List<Row> retentionGroup = getRetentionDatabases();
+        this.execute(retentionGroup, -1);
+    }
+
+    public void execute(int executionGroup) throws ConfigurationException, IOException, MetaException, SourceException {
+        List<Row> retentionGroup = getRetentionGroupDatabases(executionGroup);
+        this.execute(retentionGroup, executionGroup);
+    }
+
+    public void execute(List<Row> retentionGroup, int executionGroup) throws ConfigurationException, IOException, MetaException, SourceException {
         HousekeepingJob housekeepingJob = new HousekeepingJob();
         auditHelper.startup();
-        List<Row> retentionGroup = getRetentionGroupDatabases(executionGroup);
+
         retentionGroup.forEach(retentionRecord -> {
             String database=retentionRecord.get(0).toString();
             ArrayList<HousekeepingMetadata> housekeepingMetadataList = new ArrayList<>();
