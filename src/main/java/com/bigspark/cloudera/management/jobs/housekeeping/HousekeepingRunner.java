@@ -12,6 +12,6 @@ public class HousekeepingRunner {
         if(argsp.containsKey("housekeepingGroup")) {
             houseKeepingGroup = PropertyUtils.getOptionalProperty(argsp, "housekeepingGroup", -1);
         }
-        housekeepingController.execute(1);
+        housekeepingController.execute(houseKeepingGroup);
     }
 }
