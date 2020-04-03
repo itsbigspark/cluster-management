@@ -42,7 +42,6 @@ public class HousekeepingController {
         this.auditHelper = new AuditHelper(clusterManagementJob, "EDH Cluster housekeeping");
         this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark,auditHelper);
         this.fileSystem = clusterManagementJob.fileSystem;
-        logger.debug("Filesystem active check: " + fileSystem.exists(new Path("/user/chris/active")));
         this.hadoopConfiguration = clusterManagementJob.hadoopConfiguration;
         this.metadataHelper = clusterManagementJob.metadataHelper;
         this.isDryRun = clusterManagementJob.isDryRun;
@@ -75,7 +74,11 @@ public class HousekeepingController {
      */
     private List<Row> getRetentionGroupDatabases(int group) {
         logger.info("Now pulling list of databases for group : "+ group);
-        return spark.sql("SELECT DISTINCT DATABASE FROM " + getRetentionTable()+ " WHERE ACTIVE='true' and GROUP="+group).collectAsList();
+        String sql = "SELECT DISTINCT DATABASE FROM " + getRetentionTable()+ " WHERE ACTIVE='true'";
+        if(group > 0) {
+            sql += " and GROUP="+group;
+        }
+        return spark.sql(sql).collectAsList();
     }
 
 
