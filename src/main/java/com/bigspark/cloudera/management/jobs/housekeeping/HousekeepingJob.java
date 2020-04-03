@@ -222,6 +222,7 @@ class HousekeepingJob {
             URI partitionLocation = new URI(p.getSd().getLocation());
             FileSystemHelper.moveDataToUserTrashLocation(partitionLocation.getPath(),trashBaseLocation, isDryRun,fileSystem);
         }
+        this.cleanUpPartitions(purgeCandidates);
     }
 
     protected void cleanUpPartitions(List<Partition> purgeCandidates){
@@ -306,7 +307,7 @@ class HousekeepingJob {
             if (housekeepingMetadata.isRetainMonthEnd){
                 logger.debug("RetainMonthEnd config passed from metadata table");
                 getTablePartitionMonthEnds(housekeepingMetadata.database, housekeepingMetadata.tableName);
-                    logger.debug("Creating swing table for month end partitions");
+                logger.debug("Creating swing table for month end partitions");
                 createMonthEndSwingTable(housekeepingMetadata.database, housekeepingMetadata.tableName);
                 trashDataOutwithRetention(allPurgeCandidates);
                 logger.debug("Resolving source table by reinstating month end partitions");

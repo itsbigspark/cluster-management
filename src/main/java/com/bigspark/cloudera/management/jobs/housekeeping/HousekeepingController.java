@@ -105,12 +105,13 @@ public class HousekeepingController {
             Integer retentionPeriod = (Integer) table.get(1);
             boolean isRetainMonthEnd = Boolean.parseBoolean(String.valueOf(table.get(2)));
             try{
+                logger.debug(String.format("Going to get table %s.%s", database, tableName));
                 Table tableMeta = metadataHelper.getTable(database,tableName);
                 TableDescriptor tableDescriptor =  metadataHelper.getTableDescriptor(tableMeta);
                 HousekeepingMetadata housekeepingMetadata = new HousekeepingMetadata(database,tableName,retentionPeriod,isRetainMonthEnd,tableDescriptor);
                 housekeepingMetadataList.add(housekeepingMetadata);
             } catch (SourceException e){
-                logger.error(tableName+" : provided in metadata configuration, but not found in database..");
+                logger.error(tableName+" : provided in metadata configuration, but not found in database..", e);
             }
         }
         return housekeepingMetadataList;

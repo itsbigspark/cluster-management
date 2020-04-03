@@ -1,6 +1,7 @@
 package com.bigspark.cloudera.management.jobs;
 
 import com.bigspark.cloudera.management.common.exceptions.SourceException;
+import com.bigspark.cloudera.management.common.utils.PropertyUtils;
 import com.bigspark.cloudera.management.helpers.FileSystemHelper;
 import com.bigspark.cloudera.management.helpers.MetadataHelper;
 import com.bigspark.cloudera.management.helpers.SparkHelper;
@@ -9,6 +10,8 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.spark.sql.SparkSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.naming.ConfigurationException;
 import java.io.IOException;
@@ -18,7 +21,7 @@ import java.util.Properties;
 import static com.bigspark.cloudera.management.helpers.SparkHelper.*;
 
 public class ClusterManagementJob {
-
+    Logger logger = LoggerFactory.getLogger(getClass());
     private static ClusterManagementJob INSTANCE;
     public Properties jobProperties;
     public SparkSession spark;
@@ -33,6 +36,7 @@ public class ClusterManagementJob {
     public String trackingURL;
 
     private ClusterManagementJob() throws IOException, MetaException, ConfigurationException, SourceException {
+        logger.debug("Constructed instance");
         this.jobProperties = getClusterManagementProperties();
         this.isDryRun = Boolean.valueOf(String.valueOf(
                 jobProperties.getProperty("com.bigspark.cloudera.management.services.isDryRun")));

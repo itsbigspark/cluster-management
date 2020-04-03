@@ -226,6 +226,8 @@ public class SparkHelper {
 			sparkSession = SparkSession.builder()
 					.enableHiveSupport()
 					.getOrCreate();
+
+			sparkSession.sql("set hive.exec.dynamic.partition.mode = nonstrict");
 		}
 		return sparkSession;
 	}
