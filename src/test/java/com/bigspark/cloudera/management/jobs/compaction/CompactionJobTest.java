@@ -2,22 +2,29 @@ package com.bigspark.cloudera.management.jobs.compaction;
 
 import com.bigspark.cloudera.management.common.exceptions.SourceException;
 import com.bigspark.cloudera.management.helpers.MetadataHelperTest;
+import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.thrift.TException;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import javax.naming.ConfigurationException;
 import java.io.IOException;
 
+import static javolution.testing.TestContext.assertEquals;
+
 class CompactionJobTest {
 
     CompactionJob compactionJob;
 
-    @Before
+    public CompactionJobTest(CompactionJob compactionJob) throws MetaException, SourceException, ConfigurationException, IOException {
+        this.compactionJob = compactionJob;
+    }
+
+    @BeforeEach
     void setup() throws TException, ConfigurationException, IOException, SourceException {
-        compactionJob = new CompactionJob();
-        MetadataHelperTest metadataHelperTest = new MetadataHelperTest();
-        metadataHelperTest.setUp();
+//        compactionJob = new CompactionJob();
+//        MetadataHelperTest metadataHelperTest = new MetadataHelperTest();
+//        metadataHelperTest.setUp();
     }
 
     @Test
@@ -56,7 +63,7 @@ class CompactionJobTest {
     @Test
     void getRepartitionFactor() {
         //Assumes standard block size of 128MB
-        assert compactionJob.getRepartitionFactor((long) 217894092) == 2;
+        assertEquals(java.util.Optional.ofNullable(compactionJob.getRepartitionFactor((long) 217894092)), 2);
     }
 
     @Test

@@ -6,7 +6,7 @@ import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 //import org.apache.hadoop.hdfs.MiniDFSCluster;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -23,7 +23,7 @@ class FileSystemHelperTest {
     String testFileContent;
     FileSystemHelper fileSystemHelper;
 
-    @Before
+    @BeforeEach
     void setUp() throws IOException {
         conf = new Configuration();
 //        conf.set(MiniDFSCluster.HDFS_MINIDFS_BASEDIR, "/tmp");

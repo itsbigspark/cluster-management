@@ -220,7 +220,7 @@ class HousekeepingJob {
     protected void trashDataOutwithRetention(List<Partition> purgeCandidates) throws IOException, URISyntaxException {
         for (Partition p : purgeCandidates){
             URI partitionLocation = new URI(p.getSd().getLocation());
-            FileSystemHelper.moveDataToUserTrashLocation(partitionLocation.getPath(),trashBaseLocation, isDryRun,fileSystem,sourceDescriptor, auditHelper, logger);
+            FileSystemHelper.moveDataToUserTrashLocation(partitionLocation.getPath(),trashBaseLocation, isDryRun,fileSystem);
         }
     }
 
@@ -316,7 +316,4 @@ class HousekeepingJob {
             }
         }
     }
-
-
-
 }

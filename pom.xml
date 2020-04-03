@@ -15,6 +15,7 @@
     <packaging>jar</packaging>
 
     <properties>
+        <junit.jupiter.version>5.6.1</junit.jupiter.version>
         <hadoop.version>2.6.0-cdh5.12.1</hadoop.version>
         <hive-jdbc.version>1.1.0-cdh5.12.1</hive-jdbc.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -49,14 +50,6 @@
         </plugins>
     </build>
     <dependencies>
-        <!--        <dependency>-->
-        <!--            <groupId>com.bigspark.cloudera</groupId>-->
-        <!--            <artifactId>cluster-management</artifactId>-->
-        <!--            <version>1.0-SNAPSHOT</version>-->
-        <!--            <classifier>tests</classifier>-->
-        <!--            <type>test-jar</type>-->
-        <!--            <scope>test</scope>-->
-        <!--        </dependency>-->
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-sql_2.11</artifactId>
@@ -124,21 +117,9 @@
             <version>1.1.1</version>
         </dependency>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>RELEASE</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>RELEASE</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.platform</groupId>
-            <artifactId>junit-platform-commons</artifactId>
-            <version>1.6.0</version>
+            <version>${junit.jupiter.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

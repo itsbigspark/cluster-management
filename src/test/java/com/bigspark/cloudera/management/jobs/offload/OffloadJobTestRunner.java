@@ -8,7 +8,7 @@ public class OffloadJobTestRunner {
         InputStream input= OffloadJobTestRunner.class.getClassLoader().getResourceAsStream("config.properties");
         Properties prop = new Properties();
         prop.load(input);
-        OffloadJobIntegrationTest offloadJobTest = new OffloadJobIntegrationTest();
+        OffloadJobIntegrationTests offloadJobTest = new OffloadJobIntegrationTests();
         offloadJobTest.jobProperties=prop;
         offloadJobTest.execute();
     }

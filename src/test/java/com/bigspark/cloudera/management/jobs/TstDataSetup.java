@@ -24,7 +24,7 @@ import java.time.LocalDate;
 import java.util.Properties;
 import java.util.stream.IntStream;
 
-public class TestDataSetup {
+public class TstDataSetup {
 
     public Properties jobProperties;
     public SparkSession spark;
@@ -39,7 +39,7 @@ public class TestDataSetup {
 
     Logger logger = LoggerFactory.getLogger(getClass());
 
-    public TestDataSetup() throws IOException, MetaException, ConfigurationException, SourceException {
+    public TstDataSetup() throws IOException, MetaException, ConfigurationException, SourceException {
         ClusterManagementJob clusterManagementJob = ClusterManagementJob.getInstance();
         this.auditHelper = new AuditHelper(clusterManagementJob,"Test data setup");
         this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark,auditHelper);
@@ -62,30 +62,28 @@ public class TestDataSetup {
             userHomeArea = "/tmp";
         }
         this.testFile = userHomeArea+"/"+fileName;
-        if ( ! fileSystem.exists(new Path(this.testFile))) {
-            logger.info("Now generating test dataset");
 
-            StringBuilder sb = new StringBuilder();
-            sb.append("value,edi_business_day,src_sys_id,src_sys_inst_id\n");
+        logger.info("Cleaning up last run");
+        dropTables();
 
-            generateTestData("ADB", "NWB", 1000, sb);
-            generateTestData("ADB", "UBR", 900, sb);
-            generateTestData("ADB", "UBN", 800, sb);
-            generateTestData("ADB", "RBS", 700, sb);
+        logger.info("Now generating test dataset");
+        StringBuilder sb = new StringBuilder();
+        sb.append("value,edi_business_day,src_sys_id,src_sys_inst_id\n");
 
-            System.out.println(sb.toString());
+        generateTestData("ADB", "NWB", 100, sb);
+        generateTestData("ADB", "UBR", 90, sb);
+        generateTestData("ADB", "UBN", 80, sb);
+        generateTestData("ADB", "RBS", 70, sb);
+        System.out.println(sb.toString());
 
-            if (spark.sparkContext().master().equals("local") && spark.sparkContext().hadoopConfiguration().size() == 0) {
-                try (BufferedWriter writer = new BufferedWriter(new FileWriter(testFile))) {
-                    writer.write(sb.toString());
-                }
+        if (spark.sparkContext().master().equals("local") && spark.sparkContext().hadoopConfiguration().size() == 0) {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(testFile))) {
+                writer.write(sb.toString());
             }
-            else if (spark.sparkContext().hadoopConfiguration().size() > 0){
-                FileSystemHelper.writeFileContent(userHomeArea, fileName,sb.toString(),true);
-            }
-            dropTables();
         }
-
+        else if (spark.sparkContext().hadoopConfiguration().size() > 0){
+            FileSystemHelper.writeFileContent(userHomeArea, fileName,sb.toString(),true);
+        }
         createTestTables();
     }
 

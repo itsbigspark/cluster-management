@@ -7,7 +7,6 @@ import com.bigspark.cloudera.management.helpers.AuditHelper;
 import com.bigspark.cloudera.management.helpers.MetadataHelper;
 import com.bigspark.cloudera.management.helpers.SparkHelper;
 import com.bigspark.cloudera.management.jobs.ClusterManagementJob;
-import com.bigspark.cloudera.management.jobs.TestDataSetup;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.ContentSummary;
 import org.apache.hadoop.fs.FileSystem;
@@ -20,8 +19,6 @@ import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.catalyst.analysis.NoSuchDatabaseException;
 import org.apache.spark.sql.catalyst.analysis.NoSuchTableException;
 import org.apache.spark.sql.functions;
-import org.junit.Before;
-import org.junit.jupiter.api.Test;
 
 import javax.naming.ConfigurationException;
 import java.io.IOException;
@@ -29,7 +26,7 @@ import java.io.InputStream;
 import java.text.ParseException;
 import java.util.Properties;
 
-public class CompactionJobIntegrationTest {
+public class CompactionJobIntegrationTests {
 
     public Properties jobProperties;
     public SparkSession spark;
@@ -45,7 +42,7 @@ public class CompactionJobIntegrationTest {
     public ClusterManagementJob clusterManagementJob;
 
 
-    public CompactionJobIntegrationTest() throws IOException, MetaException, ConfigurationException, SourceException {
+    public CompactionJobIntegrationTests() throws IOException, MetaException, ConfigurationException, SourceException {
         this.clusterManagementJob = ClusterManagementJob.getInstance();
         this.compactionController = new CompactionController();
         this.auditHelper = new AuditHelper(clusterManagementJob, "Small file compaction test");
@@ -56,7 +53,6 @@ public class CompactionJobIntegrationTest {
         this.isDryRun = clusterManagementJob.isDryRun;
     }
 
-    @Before
     void setUp() throws IOException {
         this.testingDatabase = jobProperties.getProperty("com.bigspark.cloudera.management.services.compaction.testingDatabase");
         this.metatable = jobProperties.getProperty("com.bigspark.cloudera.management.services.compaction.metatable");
@@ -68,7 +64,6 @@ public class CompactionJobIntegrationTest {
         df2.repartition(200).write().partitionBy("partitionCol").saveAsTable(testingDatabase+"."+testingTable);
     }
 
-    @Test
     void execute() throws ConfigurationException, IOException, MetaException, SourceException, NoSuchTableException, NoSuchDatabaseException, ParseException {
 
         this.testingDatabase = jobProperties.getProperty("com.bigspark.cloudera.management.services.compaction.testingDatabase");
@@ -76,7 +71,7 @@ public class CompactionJobIntegrationTest {
 //        TestDataSetup testDataSetup = new TestDataSetup();
 //        testDataSetup.setUp(testingDatabase, metatable);
         setUp();
-        InputStream input = CompactionJobIntegrationTest.class.getClassLoader().getResourceAsStream("config.properties");
+        InputStream input = CompactionJobIntegrationTests.class.getClassLoader().getResourceAsStream("config.properties");
         Properties prop = new Properties();
         prop.load(input);
         CompactionJob compactionJob = new CompactionJob();

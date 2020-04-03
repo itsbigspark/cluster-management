@@ -8,7 +8,7 @@ public class HousekeepingJobTestRunner {
         InputStream input=HousekeepingJobTestRunner.class.getClassLoader().getResourceAsStream("config.properties");
         Properties prop = new Properties();
         prop.load(input);
-        HousekeepingJobIntegrationTest housekeepingJobTest = new HousekeepingJobIntegrationTest();
+        HousekeepingJobIntegrationTests housekeepingJobTest = new HousekeepingJobIntegrationTests();
         housekeepingJobTest.jobProperties=prop;
         housekeepingJobTest.execute();
     }

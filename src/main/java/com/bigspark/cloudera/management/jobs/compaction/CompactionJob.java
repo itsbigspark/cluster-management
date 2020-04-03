@@ -275,7 +275,7 @@ public class CompactionJob {
     }
 
     protected void moveDataToTrash(String trashBaseLocation, String itemLocation, SourceDescriptor sourceDescriptor) throws IOException, URISyntaxException {
-        FileSystemHelper.moveDataToUserTrashLocation(itemLocation,trashBaseLocation, isDryRun,fileSystem,sourceDescriptor, auditHelper, logger);
+        FileSystemHelper.moveDataToUserTrashLocation(itemLocation,trashBaseLocation, isDryRun,fileSystem);
     }
 
 
@@ -288,6 +288,7 @@ public class CompactionJob {
         String trashLocation = null;
         try {
             moveDataToTrash(trashBaseLocation,partitionLocation,sourceDescriptor);
+            auditHelper.writeAuditLine("Trash",sourceDescriptor.toString(), String.format("Moved files from : %s to : %s", partitionLocation, trashBaseLocation),true);
         } catch (Exception  e){
             logger.error("FATAL: Unable to move uncompacted files from : "+partitionLocation +" to Trash location");
             e.printStackTrace();
@@ -296,21 +297,21 @@ public class CompactionJob {
         try {
             boolean rename = fileSystem.rename(new Path(partitionLocation + "_tmp"), new Path(partitionLocation));
             if (rename)
-                auditHelper.writeAuditLine("Move",sourceDescriptor.toString(),String.format("Moving : %s to : %s",partitionLocation+"_tmp",partitionLocation),true);
+                auditHelper.writeAuditLine("Move",sourceDescriptor.toString(),String.format("Moving : %s ==> %s",partitionLocation+"_tmp",partitionLocation),true);
             else throw new IOException("Failed to move files");
         } catch (Exception e){
             logger.error("ERROR: Unable to move files from temp : "+partitionLocation+"_tmp to partition location" );
-            auditHelper.writeAuditLine("Move",sourceDescriptor.toString(),String.format("Moving : %s to : %s",partitionLocation+"_tmp",partitionLocation),false);
+            auditHelper.writeAuditLine("Move",sourceDescriptor.toString(),String.format("Moving : %s ==> %s",partitionLocation+"_tmp",partitionLocation),false);
             e.printStackTrace();
             // If this happens, we need to try and resolve, otherwise the partition is impacted
             try {
                 trashLocation = trashBaseLocation+partitionLocation;
                 boolean rename = fileSystem.rename(new Path(trashLocation), new Path(partitionLocation));
                 if (rename)
-                    auditHelper.writeAuditLine("Move",sourceDescriptor.toString(),String.format("Moving : %s to : %s",trashLocation,partitionLocation),true);
+                    auditHelper.writeAuditLine("Move",sourceDescriptor.toString(),String.format("Moving : %s ==> %s",trashLocation,partitionLocation),true);
                 else throw new IOException("Failed to move files");
             } catch (Exception e_){
-                auditHelper.writeAuditLine("Move",sourceDescriptor.toString(),String.format("Moving : %s to : %s",trashLocation,partitionLocation),false);
+                auditHelper.writeAuditLine("Move",sourceDescriptor.toString(),String.format("Moving : %s ==> %s",trashLocation,partitionLocation),false);
                 logger.error("FATAL: Error while reinstating partition at "+partitionLocation);
                 logger.error("FATAL: !!!  Partition is now impacted, resolution required  !!!!");
                 e_.printStackTrace();

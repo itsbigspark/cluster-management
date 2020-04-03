@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.UUID;
 
 import com.bigspark.cloudera.management.common.model.SourceDescriptor;
 import org.slf4j.Logger;
@@ -15,10 +16,12 @@ import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.slf4j.LoggerFactory;
 
 public class FileSystemHelper {
 
 	static FileSystem fs;
+	static Logger logger = LoggerFactory.getLogger(FileSystemHelper.class);
 
 	public static FileSystem getConnection() throws IOException{
 		if (fs == null)
@@ -101,14 +104,15 @@ public class FileSystemHelper {
 		FileSystem fileSystem = FileSystemHelper.getConnection();
 		StringBuilder sb = new StringBuilder();
 		String userHomeArea = FileSystemHelper.getUserHomeArea();
-		sb.append(userHomeArea).append("/.ClusterManagementTrash/"+jobType);
+		long seconds = System.currentTimeMillis() / 1000l;
+		sb.append(userHomeArea).append("/.ClusterManagementTrash/"+jobType+"/"+seconds);
 		if (! fileSystem.exists(new Path(sb.toString()))){
 			fileSystem.mkdirs(new Path(sb.toString()));
 		}
 		return sb.toString();
 	}
 
-	public static Boolean moveDataToUserTrashLocation(String sourceLocation, String trashBaseLocation, Boolean isDryRun, FileSystem fileSystem, SourceDescriptor sourceDescriptor, AuditHelper auditHelper, Logger logger) throws URISyntaxException, IOException {
+	public static Boolean moveDataToUserTrashLocation(String sourceLocation, String trashBaseLocation, Boolean isDryRun, FileSystem fileSystem) throws URISyntaxException, IOException {
 		String trashTarget = trashBaseLocation+sourceLocation;
 		URI trashTargetURI = new URI(trashTarget);
 		String trashTargetParent =  trashTargetURI.getPath().endsWith("/") ? trashTargetURI.resolve("..").toString() : trashTargetURI.resolve(".").toString();
@@ -118,14 +122,12 @@ public class FileSystemHelper {
 		logger.debug("Trash location : "+trashTarget);
 		if (!isDryRun){
 			try {
-				logger.info("Dropped location :"+sourceLocation+" to Trash");
+				logger.debug("Dropped location :"+sourceLocation+" to Trash");
 				boolean isRenameSuccess = fileSystem.rename(new Path(sourceLocation), new Path(trashTarget));
 				if (!isRenameSuccess)
-					throw new IOException(String.format("Failed to move files from : %s to : %s", sourceLocation, trashTarget));
-				auditHelper.writeAuditLine("Trash",sourceDescriptor.toString(), String.format("Moved files from : %s to : %s", sourceLocation, trashTarget),true);
+					throw new IOException(String.format("Failed to move files from : %s ==> %s", sourceLocation, trashTarget));
 				return true;
 			} catch (Exception e){
-				auditHelper.writeAuditLine("Trash",sourceDescriptor.toString(), e.getMessage(),false);
 				throw e;
 			}
 		} else {
