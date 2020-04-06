@@ -5,10 +5,7 @@ import com.bigspark.cloudera.management.common.exceptions.SourceException;
 import com.bigspark.cloudera.management.common.model.SourceDescriptor;
 import com.bigspark.cloudera.management.common.model.TableDescriptor;
 import com.bigspark.cloudera.management.common.metadata.HousekeepingMetadata;
-import com.bigspark.cloudera.management.helpers.AuditHelper;
-import com.bigspark.cloudera.management.helpers.FileSystemHelper;
-import com.bigspark.cloudera.management.helpers.MetadataHelper;
-import com.bigspark.cloudera.management.helpers.SparkHelper;
+import com.bigspark.cloudera.management.helpers.*;
 import com.bigspark.cloudera.management.jobs.ClusterManagementJob;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -56,6 +53,7 @@ class HousekeepingJob {
     public AuditHelper auditHelper;
     public HousekeepingMetadata housekeepingMetadata;
     public SourceDescriptor sourceDescriptor;
+    public ImpalaHelper impalaHelper;
 
     String trashBaseLocation;
     Pattern pattern;
@@ -73,6 +71,8 @@ class HousekeepingJob {
         this.isDryRun = clusterManagementJob.isDryRun;
         this.jobProperties = clusterManagementJob.jobProperties;
         this.hiveMetaStoreClient = clusterManagementJob.hiveMetaStoreClient;
+        String connStr="jdbc:hive2://st1dhd001d.server.rbsgrp.mde:21050/default;principal=service-impala-d/st1dhd001d.server.rbsgrp.mde@M01RBSRES01.MDE;kerberosAuthType=fromSubject";
+        this.impalaHelper = new ImpalaHelper(connStr);
     }
 
     protected void getTablePartitionMonthEnds(String dbName, String tableName){

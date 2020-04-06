@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+#Assumes correct environment is set e.g. switch dev
 export PROJECT_DIR="/export/home/$USER/workspace/cluster-management"
 export PROJECT_JAR="$PROJECT_DIR/target/cluster-management-1.0-SNAPSHOT.jar"
 echo "SPARK_HOME=$SPARK_HOME"

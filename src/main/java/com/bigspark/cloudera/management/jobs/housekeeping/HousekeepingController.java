@@ -63,8 +63,8 @@ public class HousekeepingController {
      *
      * @return List<Row>
      */
-    private List<Row> getRetentionDatabases() {
-        return spark.sql("SELECT DISTINCT DATABASE FROM " + getRetentionTable()+ " WHERE ACTIVE='true'").collectAsList() ;
+    private List<Row> getRetentionDatabases2() {
+        return spark.sql("SELECT DISTINCT TBL_NAME FROM " + getRetentionTable()+ " WHERE ACTIVE='true'").collectAsList() ;
     }
 
     /**
@@ -74,10 +74,11 @@ public class HousekeepingController {
      */
     private List<Row> getRetentionGroupDatabases(int group) {
         logger.info("Now pulling list of databases for group : "+ group);
-        String sql = "SELECT DISTINCT DATABASE FROM " + getRetentionTable()+ " WHERE ACTIVE='true'";
+        String sql = "SELECT DISTINCT DB_NAME FROM " + getRetentionTable()+ " WHERE ACTIVE='true'";
         if(group > 0) {
-            sql += " and GROUP="+group;
+            sql += " and PROCESSING_GROUP="+group;
         }
+        logger.info("Returning DB Config SQL:\r\n" +sql);
         return spark.sql(sql).collectAsList();
     }
 
@@ -89,10 +90,11 @@ public class HousekeepingController {
      */
     private List<Row> getRetentionDataForDatabase(String database, int group) {
         logger.info("Now pulling configuration metadata for all tables in database : "+ database);
-        String sql  = "SELECT DISTINCT TABLE, RETENTION_PERIOD, RETAIN_MONTH_END FROM " + getRetentionTable() + " WHERE DATABASE = '" + database + "' AND ACTIVE='true'";
+        String sql  = "SELECT DISTINCT TBL_NAME, RETENTION_PERIOD, RETAIN_MONTH_END FROM " + getRetentionTable() + " WHERE DB_NAME = '" + database + "' AND ACTIVE='true'";
         if(group >=0 ) {
-            sql += " AND GROUP =" + group ;
+            sql += " AND PROCESSING_GROUP =" + group ;
         }
+        logger.info("Returning DB Table Config SQL:\r\n" +sql);
         return spark.sql(sql).collectAsList();
     }
 
@@ -126,7 +128,7 @@ public class HousekeepingController {
 
 
     public void execute() throws ConfigurationException, IOException, MetaException, SourceException {
-        List<Row> retentionGroup = getRetentionDatabases();
+        List<Row> retentionGroup = getRetentionGroupDatabases(-1);
         this.execute(retentionGroup, -1);
     }
 
