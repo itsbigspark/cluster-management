@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.Date;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -159,10 +160,10 @@ class HousekeepingJob {
      */
     protected void dropHivePartition(Partition partition) throws TException {
         if (isDryRun){
-            logger.info("DRY RUN - Dropped partition : "+partition.toString());
+            logger.info("DRY RUN - Dropped partition : "+partition.getValues().toString());
         } else {
             hiveMetaStoreClient.dropPartition(partition.getDbName(), partition.getTableName(), partition.getValues());
-            logger.info("Dropped partition : " + partition.toString());
+            logger.info("Dropped partition : " + partition.getValues().toString());
         }
     }
 
@@ -264,8 +265,11 @@ class HousekeepingJob {
     /**
      * Method to execute an Invalidate metadata statement on a table for Impala
      */
-    protected void invalidateMetadata() {
-        //todo
+    protected void invalidateMetadata(String dbName, String tableName) throws MetaException, SourceException, ConfigurationException, IOException, ClassNotFoundException, SQLException, InstantiationException, InterruptedException, IllegalAccessException {
+        String key = "com.bigspark.cloudera.management.impala";
+        String connStr = ClusterManagementJob.getInstance().jobProperties.getProperty(key);
+        ImpalaHelper impala = new ImpalaHelper(connStr);
+        impala.invalidateMetadata(dbName, tableName);
     }
 
     protected void getTableType(HousekeepingMetadata housekeepingMetadata) throws SourceException {
@@ -297,24 +301,37 @@ class HousekeepingJob {
     void execute(HousekeepingMetadata housekeepingMetadata) throws SourceException, IOException, URISyntaxException {
         this.housekeepingMetadata = housekeepingMetadata;
         this.sourceDescriptor = new SourceDescriptor(metadataHelper.getDatabase(housekeepingMetadata.database), housekeepingMetadata.tableDescriptor);
-        this.trashBaseLocation = getCreateTrashBaseLocation("Housekeeping");
-        getTableType(housekeepingMetadata);
-        if (this.pattern != null){
-            LocalDate purgeCeiling = calculatePurgeCeiling(housekeepingMetadata.retentionPeriod, LocalDate.now());
-            logger.debug("Purge ceiling calculated as : "+purgeCeiling.toString());
-            List<Partition> allPurgeCandidates = getAllPurgeCandidates(housekeepingMetadata.tableDescriptor.getPartitionList(), purgeCeiling);
-            logger.debug("Partitions returned as eligible for purge : "+allPurgeCandidates.size());
-            if (housekeepingMetadata.isRetainMonthEnd){
-                logger.debug("RetainMonthEnd config passed from metadata table");
-                getTablePartitionMonthEnds(housekeepingMetadata.database, housekeepingMetadata.tableName);
-                logger.debug("Creating swing table for month end partitions");
-                createMonthEndSwingTable(housekeepingMetadata.database, housekeepingMetadata.tableName);
-                trashDataOutwithRetention(allPurgeCandidates);
-                logger.debug("Resolving source table by reinstating month end partitions");
-                resolveSourceTableWithSwingTable(housekeepingMetadata.database, housekeepingMetadata.tableName);
-            } else {
-                trashDataOutwithRetention(allPurgeCandidates);
+        this.trashBaseLocation = FileSystemHelper.getCreateTrashBaseLocation("Housekeeping"
+                , housekeepingMetadata.database
+                , housekeepingMetadata.tableName);
+        if(housekeepingMetadata.tableDescriptor.hasPartitions()) {
+            getTableType(housekeepingMetadata);
+            if (this.pattern != null) {
+                LocalDate purgeCeiling = calculatePurgeCeiling(housekeepingMetadata.retentionPeriod, LocalDate.now());
+                logger.debug("Purge ceiling calculated as : " + purgeCeiling.toString());
+                List<Partition> allPurgeCandidates = getAllPurgeCandidates(housekeepingMetadata.tableDescriptor.getPartitionList(), purgeCeiling);
+                logger.debug("Partitions returned as eligible for purge : " + allPurgeCandidates.size());
+                if (housekeepingMetadata.isRetainMonthEnd) {
+                    logger.debug("RetainMonthEnd config passed from metadata table");
+                    getTablePartitionMonthEnds(housekeepingMetadata.database, housekeepingMetadata.tableName);
+                    logger.debug("Creating swing table for month end partitions");
+                    createMonthEndSwingTable(housekeepingMetadata.database, housekeepingMetadata.tableName);
+                    trashDataOutwithRetention(allPurgeCandidates);
+                    logger.debug("Resolving source table by reinstating month end partitions");
+                    resolveSourceTableWithSwingTable(housekeepingMetadata.database, housekeepingMetadata.tableName);
+                } else {
+                    trashDataOutwithRetention(allPurgeCandidates);
+                }
+                try {
+                    this.invalidateMetadata(housekeepingMetadata.database, housekeepingMetadata.tableName);
+                } catch(Exception ex) {
+                    logger.error("Failed to update Impala metadata", ex);
+                }
             }
+        } else {
+            logger.warn(String.format("Skipping table '%s.%s' as it has no partitions"
+                    , housekeepingMetadata.tableDescriptor.getDatabaseName()
+                    , housekeepingMetadata.tableDescriptor.getTableName()));
         }
     }
 }

@@ -1,10 +1,10 @@
 package com.bigspark.cloudera.management.helpers;
 
+import org.apache.hadoop.security.UserGroupInformation;
+
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.Driver;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.security.PrivilegedExceptionAction;
+import java.sql.*;
 import java.util.Properties;
 
 
@@ -53,18 +53,19 @@ public class ImpalaHelper {
 		}
 	}
 
-	public Connection getConnection() throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, InterruptedException, SQLException {
-		//UserGroupInformation ugi = UserGroupInformation.createProxyUser(SparkHelper.getSparkUser(), UserGroupInformation.getLoginUser());
-		//UserGroupInformation ugi  = UserGroupInformation.getCurrentUser();
+
+	public Connection getConnection() throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, InterruptedException {
+		UserGroupInformation ugi  = UserGroupInformation.getLoginUser();
+		System.out.println(ugi);
+		System.out.println(this.connectionString);
 		final Driver driver = (Driver) Class.forName("com.cloudera.impala.jdbc41.Driver").newInstance();
 		final String connectionString = this.connectionString;
-		return driver.connect(connectionString, new Properties());
 		
-		//return ugi.doAs(new PrivilegedExceptionAction<Connection>() {
-		//	@Override
-		//	public Connection run() throws Exception {
-		//		return driver.connect(connectionString, new Properties());
-		//	}
-		//});
+		return ugi.doAs(new PrivilegedExceptionAction<Connection>() {
+			@Override
+			public Connection run() throws Exception {
+				return driver.connect(connectionString, new Properties());
+			}
+		});
 	}
 }

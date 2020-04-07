@@ -1,3 +1,5 @@
+create database if not exists bddlsold01d
+
 drop table if exists bdmsyssit01d.sys_cm_housekeeping;
 CREATE TABLE IF NOT EXISTS  bdmsyssit01d.sys_cm_housekeeping (db_name STRING, tbl_name STRING, retention_period INT, retain_month_end STRING, processing_group INT, active STRING);
 

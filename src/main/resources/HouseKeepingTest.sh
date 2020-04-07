@@ -17,7 +17,7 @@ $SPARK_HOME/bin/spark-submit \
             --deploy-mode client \
             --keytab "${KEYTAB}" \
             --principal "${PRINCIPAL}" \
-            --files "$PROJECT_DIR/src/main/resources/config.properties" \
+            --jars hdfs:///user/oozie/libext/sqoop_jdbc/ImpalaJDBC41.jar \
             --conf spark.driver.extraJavaOptions=-Dlog4j.configuration=file:///${PROJECT_DIR}/src/main/resources/log4j.properties \
             --class com.bigspark.cloudera.management.jobs.housekeeping.HousekeepingRunner \
             $PROJECT_JAR

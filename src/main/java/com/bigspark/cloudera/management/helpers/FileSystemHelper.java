@@ -112,6 +112,18 @@ public class FileSystemHelper {
 		return sb.toString();
 	}
 
+	public static String getCreateTrashBaseLocation(String jobType, String dbName, String tableName) throws IOException {
+		FileSystem fileSystem = FileSystemHelper.getConnection();
+		String userHomeArea = FileSystemHelper.getUserHomeArea();
+		long seconds = System.currentTimeMillis() / 1000l;
+		String location = String.format("%s/.ClusterManagementTrash/%s/%s/%s/%d", userHomeArea, jobType, dbName, tableName, seconds);
+
+		if (! fileSystem.exists(new Path(location))){
+			fileSystem.mkdirs(new Path(location));
+		}
+		return location;
+	}
+
 	public static Boolean moveDataToUserTrashLocation(String sourceLocation, String trashBaseLocation, Boolean isDryRun, FileSystem fileSystem) throws URISyntaxException, IOException {
 		String trashTarget = trashBaseLocation+sourceLocation;
 		URI trashTargetURI = new URI(trashTarget);

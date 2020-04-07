@@ -44,6 +44,10 @@ public class TableDescriptor {
         return isPartitioned;
     }
 
+    public Boolean hasPartitions() {
+        return partitionList.size() > 0;
+    }
+
     public Table getTable() {
         return table;
     }
