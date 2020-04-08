@@ -9,7 +9,7 @@ import java.util.Properties;
 public class HousekeepingRunner {
     static Logger logger = LoggerFactory.getLogger(HousekeepingRunner.class);
     public static void main(String[] args) throws Exception {
-        logger.debug("HousekeepingRunner Initialised");
+        logger.info("HousekeepingRunner Initialised");
         HousekeepingController housekeepingController = new HousekeepingController();
         Properties argsp = PropertyUtils.getProgramArgsAsProps(args);
         int houseKeepingGroup = -1;
@@ -17,7 +17,7 @@ public class HousekeepingRunner {
             houseKeepingGroup = PropertyUtils.getOptionalProperty(argsp, "housekeepingGroup", -1);
         }
         housekeepingController.execute(houseKeepingGroup);
-        logger.debug("HousekeepingRunner Completed");
+        logger.info("HousekeepingRunner Completed");
     }
 
 }

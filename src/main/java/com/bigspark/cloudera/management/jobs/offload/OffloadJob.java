@@ -2,8 +2,8 @@ package com.bigspark.cloudera.management.jobs.offload;
 
 import com.bigspark.cloudera.management.common.enums.Pattern;
 import com.bigspark.cloudera.management.common.exceptions.SourceException;
-import com.bigspark.cloudera.management.common.model.SourceDescriptor;
 import com.bigspark.cloudera.management.common.metadata.HousekeepingMetadata;
+import com.bigspark.cloudera.management.common.model.SourceDescriptor;
 import com.bigspark.cloudera.management.helpers.AuditHelper;
 import com.bigspark.cloudera.management.helpers.MetadataHelper;
 import com.bigspark.cloudera.management.helpers.SparkHelper;
@@ -41,8 +41,8 @@ public class OffloadJob {
 
     public OffloadJob() throws MetaException, SourceException, ConfigurationException, IOException {
         this.clusterManagementJob = ClusterManagementJob.getInstance();
-        this.auditHelper = new AuditHelper(clusterManagementJob,"Storage offload job");
-        this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark,auditHelper);
+        this.auditHelper = new AuditHelper(clusterManagementJob, "Storage offload job");
+        this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark, auditHelper);
         this.fileSystem = clusterManagementJob.fileSystem;
         this.hadoopConfiguration = clusterManagementJob.hadoopConfiguration;
         this.metadataHelper = clusterManagementJob.metadataHelper;
@@ -53,11 +53,11 @@ public class OffloadJob {
 
     int distCP(Path src, Path tgt) throws Exception {
 
-        DistCpOptions options = new DistCpOptions(src,tgt);
+        DistCpOptions options = new DistCpOptions(src, tgt);
         options.setOverwrite(true);
-        hadoopConfiguration.set("fs.s3a.endpoint","object.ecstestdrive.com");
-        hadoopConfiguration.set("fs.s3a.awsAccessKeyId","131855586862166345@ecstestdrive.emc.com");
-        hadoopConfiguration.set("fs.s3a.awsSecretAccessKey","Q+f/ypU/Ii6s2tWLmpxyaIVgxT4+rBLWroAO4ufS");
+        hadoopConfiguration.set("fs.s3a.endpoint", "object.ecstestdrive.com");
+        hadoopConfiguration.set("fs.s3a.awsAccessKeyId", "131855586862166345@ecstestdrive.emc.com");
+        hadoopConfiguration.set("fs.s3a.awsSecretAccessKey", "Q+f/ypU/Ii6s2tWLmpxyaIVgxT4+rBLWroAO4ufS");
         DistCp distCp = new DistCp(hadoopConfiguration, options);
         return distCp.run(new String[]{src.toString(), tgt.toString()});
     }
@@ -65,19 +65,17 @@ public class OffloadJob {
 
     /**
      * Main entry point method for executing the offload process
+     *
      * @throws MetaException
      * @throws SourceException
      */
-    void execute(HousekeepingMetadata housekeepingMetadata) throws SourceException{
+    void execute(HousekeepingMetadata housekeepingMetadata) throws SourceException {
         this.housekeepingMetadata = housekeepingMetadata;
         this.sourceDescriptor = new SourceDescriptor(metadataHelper.getDatabase(housekeepingMetadata.database), housekeepingMetadata.tableDescriptor);
         this.pattern = MetadataHelper.getTableType(housekeepingMetadata);
-        if (this.pattern != null){
+        if (this.pattern != null) {
 
         }
     }
 
-    void executeTest() throws Exception {
-        distCP(new Path("/user/bigspark/*"),new Path("s3a://s3tab/bigspark"));
-    }
 }

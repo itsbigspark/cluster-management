@@ -3,12 +3,36 @@ package com.bigspark.cloudera.management.common.utils;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.Year;
+import java.time.YearMonth;
+import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Date;
 
 import org.apache.hadoop.fs.FileStatus;
 
 public class DateUtils {
+	public static Boolean isMonthEnd(LocalDate date) {
+		YearMonth ym = YearMonth.from(date);
+		if(date.isEqual(ym.atEndOfMonth())) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public static LocalDate getPriorMonthEnd(LocalDate date) {
+		if(DateUtils.isMonthEnd(date)) {
+			return date;
+		} else {
+			YearMonth ym = YearMonth.from(date);
+			Period p = Period.ofMonths(1);
+			return ym.minus(p).atEndOfMonth();
+		}
+	}
+
 	public static Date getDate(Date currDate, int daysToSubtract) {
 		Calendar c = Calendar.getInstance();
 		c.add(Calendar.DAY_OF_MONTH, 0 - daysToSubtract);
@@ -53,6 +77,7 @@ public class DateUtils {
 		}
 		return currFileDate;
 	}
+
 
 	public static Date getEDIFileDate(String fileName) throws ParseException {
 		if (fileName.endsWith(".gz")) {

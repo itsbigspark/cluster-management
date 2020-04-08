@@ -7,6 +7,7 @@ import com.bigspark.cloudera.management.helpers.AuditHelper;
 import com.bigspark.cloudera.management.helpers.MetadataHelper;
 import com.bigspark.cloudera.management.helpers.SparkHelper;
 import com.bigspark.cloudera.management.jobs.ClusterManagementJob;
+import com.google.protobuf.TextFormat;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -14,12 +15,14 @@ import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.spark.sql.Row;
+import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.naming.ConfigurationException;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -78,7 +81,7 @@ public class HousekeepingController {
         if(group > 0) {
             sql += " and PROCESSING_GROUP="+group;
         }
-        logger.info("Returning DB Config SQL:\r\n" +sql);
+        logger.debug("Returning DB Config SQL: " +sql);
         return spark.sql(sql).collectAsList();
     }
 
@@ -94,7 +97,7 @@ public class HousekeepingController {
         if(group >=0 ) {
             sql += " AND PROCESSING_GROUP =" + group ;
         }
-        logger.info("Returning DB Table Config SQL:\r\n" +sql);
+        logger.debug("Returning DB Table Config SQL: " +sql);
         return spark.sql(sql).collectAsList();
     }
 
@@ -114,7 +117,7 @@ public class HousekeepingController {
             Integer retentionPeriod = (Integer) table.get(1);
             boolean isRetainMonthEnd = Boolean.parseBoolean(String.valueOf(table.get(2)));
             try{
-                logger.debug(String.format("Going to get table %s.%s", database, tableName));
+                logger.debug(String.format("Getting metadata for Table %s.%s", database, tableName));
                 Table tableMeta = metadataHelper.getTable(database,tableName);
                 TableDescriptor tableDescriptor =  metadataHelper.getTableDescriptor(tableMeta);
                 HousekeepingMetadata housekeepingMetadata = new HousekeepingMetadata(database,tableName,retentionPeriod,isRetainMonthEnd,tableDescriptor);
@@ -137,12 +140,13 @@ public class HousekeepingController {
         this.execute(retentionGroup, executionGroup);
     }
 
-    public void execute(List<Row> retentionGroup, int executionGroup) throws ConfigurationException, IOException, MetaException, SourceException {
+    public void execute(List<Row> retentionGroup, int executionGroup) throws ConfigurationException, IOException, MetaException, SourceException, TextFormat.ParseException {
         HousekeepingJob housekeepingJob = new HousekeepingJob();
         auditHelper.startup();
 
         retentionGroup.forEach(retentionRecord -> {
             String database=retentionRecord.get(0).toString();
+            logger.info(String.format("Running Housekeeping for Database '%s'", database));
             ArrayList<HousekeepingMetadata> housekeepingMetadataList = new ArrayList<>();
             try {
                 housekeepingMetadataList.addAll(sourceDatabaseTablesFromMetaTable(database, executionGroup));
@@ -151,8 +155,9 @@ public class HousekeepingController {
             }
             housekeepingMetadataList.forEach(table ->{
                 try {
+                    logger.info(String.format("Running Housekeeping for Table '%s.%s'", database, table.tableName));
                     housekeepingJob.execute(table);
-                } catch (SourceException | IOException | URISyntaxException e) {
+                } catch (SourceException | IOException | URISyntaxException | TException | ParseException e) {
                     e.printStackTrace();
                 }
             });

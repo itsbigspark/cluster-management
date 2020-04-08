@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import javax.naming.ConfigurationException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -84,6 +85,7 @@ public class MetadataHelper {
         } catch (TException e) {
             throw new SourceException("Table not found : "+table, e.getCause());
         }
+
         return t;
     }
 
@@ -153,6 +155,43 @@ public class MetadataHelper {
         return partitionName.split("=")[1];
     }
 
+    public LocalDate getMaxBusinessDay(List<Partition> partitionList) {
+        LocalDate maxDate = LocalDate.MIN;
+        for (Partition partition : partitionList) {
+            if (this.isMonthEnd(partition)) {
+                LocalDate partDate = LocalDate.parse(partition.getValues().get(0));
+                if (partDate.isAfter(maxDate)) {
+                    maxDate = partDate;
+                }
+            }
+        }
+        return  maxDate;
+    }
+
+    public LocalDate getMinBusinessDay(List<Partition> partitionList) {
+        LocalDate minDate = LocalDate.MAX;
+        for (Partition partition : partitionList) {
+            if (this.isMonthEnd(partition)) {
+                LocalDate partDate = LocalDate.parse(partition.getValues().get(0));
+                if (partDate.isBefore(minDate)) {
+                    minDate = partDate;
+                }
+            }
+        }
+        return  minDate;
+    }
+
+
+    public Boolean isMonthEnd(Partition p) {
+        Boolean isMonthEnd = false;
+        String key = "month_end";
+        if (p.getParameters().containsKey(key) && p.getParameters().get(key).toLowerCase().equals("true")) {
+            isMonthEnd = true;
+        }
+
+        return isMonthEnd;
+    }
+
     public Date getPartitionDate(Partition partition, Pattern pattern) throws ParseException {
         String partitionDateString = getPartitionDateString(partition, pattern);
         return stringToDate(partitionDateString);
@@ -171,6 +210,7 @@ public class MetadataHelper {
      */
     public String getPartitionLocation(Partition partition) {
         return partition.getSd().getLocation();
+
     }
 
     /**

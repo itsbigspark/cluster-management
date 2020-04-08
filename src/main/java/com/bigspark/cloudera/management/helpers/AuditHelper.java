@@ -25,7 +25,6 @@ public class AuditHelper {
     public String jobType;
 
     public AuditHelper(ClusterManagementJob clusterManagementJob, String jobType) throws ConfigurationException, IOException, MetaException, SourceException {
-        logger.debug("Constructed instance");
         this.clusterManagementJob = clusterManagementJob;
         intitialiseAuditTable();
         setLogfile();
