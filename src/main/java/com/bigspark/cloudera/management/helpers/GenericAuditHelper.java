@@ -1,59 +1,47 @@
 package com.bigspark.cloudera.management.helpers;
 
 import com.bigspark.cloudera.management.common.exceptions.SourceException;
-import com.bigspark.cloudera.management.common.utils.PropertyUtils;
 import com.bigspark.cloudera.management.jobs.ClusterManagementJob;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import javax.naming.ConfigurationException;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.naming.ConfigurationException;
-
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-
-public class AuditHelper {
+public class GenericAuditHelper {
     Logger logger = LoggerFactory.getLogger(getClass());
     public ClusterManagementJob clusterManagementJob;
-    public SparkHelper.AuditedSparkSession spark;
+    public SparkSession spark;
     public String logfileLocation;
     public String logfileName;
     public String auditTable;
-    public String jobType;
+    public Boolean isInitialised;
+    public ImpalaHelper impala;
 
-    public AuditHelper(ClusterManagementJob clusterManagementJob, String jobType) throws ConfigurationException, IOException, MetaException, SourceException {
+    private int counter;
+
+    public GenericAuditHelper(ClusterManagementJob clusterManagementJob, String tableConfigKey, ImpalaHelper impala) throws ConfigurationException, IOException, MetaException, SourceException {
         this.clusterManagementJob = clusterManagementJob;
-        intitialiseAuditTable();
-        setLogfile();
+        this.impala = impala;
+        initialiseAuditTable(tableConfigKey);
     }
 
-    private void intitialiseAuditTable() throws IOException {
-        if(this.clusterManagementJob == null) logger.warn("cmj is null");
-        auditTable = clusterManagementJob.jobProperties.getProperty("com.bigspark.cloudera.management.services.auditTable");
+    private void initialiseAuditTable(String tableConfigKey) throws IOException, SourceException {
+        this.auditTable = clusterManagementJob.jobProperties.getProperty(tableConfigKey);
         String[] auditTable_ = auditTable.split("\\.");
         //Cannot do an audited spark session without the audit table!
         SparkSession spark = SparkHelper.getSparkSession();
-        if (! spark.catalog().tableExists(auditTable_[0],auditTable_[1]))
-              spark.sql(String.format("CREATE TABLE IF NOT EXISTS %s.%s (" +
-                      "class_name STRING" +
-                      ", method_name STRING" +
-                      ", application_id STRING" +
-                      ", tracking_url STRING" +
-                      ", action STRING" +
-                      ", descriptor STRING" +
-                      ", message STRING" +
-                      ", log_time TIMESTAMP" +
-                      ", status STRING" +
-                      ") " +
-                      " ROW FORMAT DELIMITED" +
-                      " FIELDS TERMINATED BY '~'" +
-                      " STORED AS TEXTFILE"
-              ,auditTable_[0],auditTable_[1])
-              );
-        this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark,this);
+        if (! spark.catalog().tableExists(auditTable_[0],auditTable_[1])) {
+            logger.error(String.format("Audit table does not exists: %s", auditTable));
+        } else {
+            setLogfile();
+            isInitialised = true;
+        }
+        this.spark =  SparkHelper.getSparkSession();
     }
 
     private void setLogfile() throws SourceException {
@@ -63,36 +51,29 @@ public class AuditHelper {
         logfileName = clusterManagementJob.applicationID;
     }
 
-    public void writeAuditLine(String action, String descriptor, String message, boolean isSuccess) throws IOException {
-        String className = Thread.currentThread().getStackTrace()[2].getClassName();
-        String methodName = Thread.currentThread().getStackTrace()[2].getMethodName();
-        String payload = String.format("%s~%s~%s~%s~%s~%s~\"%s\"~%s~%s\n"
-                , className
-                , methodName
-                , clusterManagementJob.applicationID
-                , clusterManagementJob.trackingURL
-                , action
-                , descriptor
-                , message
-                , LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-                , isSuccess
-        );
-
-        SparkHelper.Hdfs.appendFileContent(logfileLocation,logfileName,payload);
-
-//        TODO - Reinstate above line, remove below   append() not supported for local filesystem
+    public void write(String payload) throws IOException {
+        if(isInitialised) {
+            counter++;
+            SparkHelper.Hdfs.appendFileContent(logfileLocation, logfileName, payload);
+            if(counter % 500 == 0) {
+               this.invalidateAuditTableMetadata();
+            }
+        } else {
+            logger.warn(String.format("Unable to log record to %s: %s", this.auditTable, payload));
+        }
+//        TODO - Reinstate above line, remove below   append() not supported for local filesystem ACTUALY CAN SNIFF LOCAL FILE SYSTEM
 //        Exception in thread "main" java.io.IOException: Not supported
 //        at org.apache.hadoop.fs.ChecksumFileSystem.append(ChecksumFileSystem.java:357)
 //        File file = new File(logfileLocation.substring(5)+"/"+logfileName);
 //        Files.write(file.toPath(), payload.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
     }
 
-    public void startup() throws IOException {
-        writeAuditLine(jobType+" - Launch","","Process start",true);
-    }
-
-    public void completion() throws IOException {
-        writeAuditLine(jobType+" - Complete","","Process end",true);
+    public void invalidateAuditTableMetadata() {
+        try {
+            impala.invalidateMetadata(this.auditTable);
+        } catch (Exception e) {
+            logger.warn(String.format("Unable to invalidate metadata for audit table %s", this.auditTable));
+        }
     }
 
 }

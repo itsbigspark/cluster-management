@@ -33,6 +33,16 @@ public class DateUtils {
 		}
 	}
 
+	public static LocalDate getMonthStart(LocalDate date) {
+		if(DateUtils.isMonthEnd(date)) {
+			return date;
+		} else {
+			YearMonth ym = YearMonth.from(date);
+		//	Period p = Period.ofDays(1);
+			return ym.atDay(1);
+		}
+	}
+
 	public static Date getDate(Date currDate, int daysToSubtract) {
 		Calendar c = Calendar.getInstance();
 		c.add(Calendar.DAY_OF_MONTH, 0 - daysToSubtract);

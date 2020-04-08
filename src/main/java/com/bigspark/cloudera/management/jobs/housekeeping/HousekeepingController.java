@@ -1,16 +1,22 @@
 package com.bigspark.cloudera.management.jobs.housekeeping;
 
 import com.bigspark.cloudera.management.common.exceptions.SourceException;
-import com.bigspark.cloudera.management.common.model.TableDescriptor;
 import com.bigspark.cloudera.management.common.metadata.HousekeepingMetadata;
+import com.bigspark.cloudera.management.common.model.TableDescriptor;
 import com.bigspark.cloudera.management.helpers.AuditHelper;
 import com.bigspark.cloudera.management.helpers.MetadataHelper;
 import com.bigspark.cloudera.management.helpers.SparkHelper;
 import com.bigspark.cloudera.management.jobs.ClusterManagementJob;
 import com.google.protobuf.TextFormat;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+import javax.naming.ConfigurationException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.Table;
@@ -19,150 +25,155 @@ import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.naming.ConfigurationException;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-
 public class HousekeepingController {
 
-    public Properties jobProperties;
-    public SparkHelper.AuditedSparkSession spark;
-    public FileSystem fileSystem;
-    public Configuration hadoopConfiguration;
-    public HiveMetaStoreClient hiveMetaStoreClient;
-    public MetadataHelper metadataHelper;
-    public AuditHelper auditHelper;
-    public Boolean isDryRun;
+  public Properties jobProperties;
+  public SparkHelper.AuditedSparkSession spark;
+  public FileSystem fileSystem;
+  public Configuration hadoopConfiguration;
+  public HiveMetaStoreClient hiveMetaStoreClient;
+  public MetadataHelper metadataHelper;
+  public AuditHelper auditHelper;
+  public Boolean isDryRun;
 
-    Logger logger = LoggerFactory.getLogger(getClass());
+  Logger logger = LoggerFactory.getLogger(getClass());
 
-    public HousekeepingController() throws IOException, MetaException, ConfigurationException, SourceException {
-        ClusterManagementJob clusterManagementJob = ClusterManagementJob.getInstance();
-        this.auditHelper = new AuditHelper(clusterManagementJob, "EDH Cluster housekeeping");
-        this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark,auditHelper);
-        this.fileSystem = clusterManagementJob.fileSystem;
-        this.hadoopConfiguration = clusterManagementJob.hadoopConfiguration;
-        this.metadataHelper = clusterManagementJob.metadataHelper;
-        this.isDryRun = clusterManagementJob.isDryRun;
-        this.jobProperties = clusterManagementJob.jobProperties;
-        this.hiveMetaStoreClient = clusterManagementJob.hiveMetaStoreClient;
+  public HousekeepingController(Boolean isDryRun)
+      throws MetaException, SourceException, ConfigurationException, IOException {
+    this();
+    this.isDryRun = isDryRun;
+
+  }
+
+  public HousekeepingController()
+      throws IOException, MetaException, ConfigurationException, SourceException {
+    ClusterManagementJob clusterManagementJob = ClusterManagementJob.getInstance();
+    this.auditHelper = new AuditHelper(clusterManagementJob, "EDH Cluster housekeeping");
+    this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark, auditHelper);
+    this.fileSystem = clusterManagementJob.fileSystem;
+    this.hadoopConfiguration = clusterManagementJob.hadoopConfiguration;
+    this.metadataHelper = clusterManagementJob.metadataHelper;
+    this.isDryRun = clusterManagementJob.isDryRun;
+    this.jobProperties = clusterManagementJob.jobProperties;
+    this.hiveMetaStoreClient = clusterManagementJob.hiveMetaStoreClient;
+  }
+
+  /**
+   * Method to fetch metadata table value from properties file
+   *
+   * @return String fully qualified Name ([db].[tbl]) of the Retention table
+   */
+  private String getRetentionTable() {
+    return jobProperties
+        .getProperty("housekeeping.metatable");
+  }
+
+
+  /**
+   * Method to pull distinct list of databases in execution group.  If
+   * Retention Group is -1 all are returned
+   *
+   * @return List<Row> A list of database names within the specified retention group
+   */
+  private List<Row> getRetentionGroupDatabases(int group) {
+    logger.info("Now pulling list of databases for group : " + group);
+    String sql = "SELECT DISTINCT DB_NAME FROM " + getRetentionTable() + " WHERE ACTIVE='true'";
+    if (group > 0) {
+      sql += " and PROCESSING_GROUP=" + group;
     }
+    logger.debug("Returning DB Config SQL: " + sql);
+    return spark.sql(sql).collectAsList();
+  }
 
-    /**
-     * Method to fetch metadata table value from properties file
-     *
-     * @return String
-     */
-    private String getRetentionTable() {
-        return jobProperties.getProperty("com.bigspark.cloudera.management.services.housekeeping.metatable");
+  /**
+   * Method to pull list of tables within a specific database for purging
+   * @param database
+   * @param group
+   * @return List<Row> List of Records for the given DB/Group
+   */
+  private List<Row> getRetentionDataForDatabase(String database, int group) {
+    logger.info("Now pulling configuration metadata for all tables in database : " + database);
+    String sql =
+        "SELECT DISTINCT TBL_NAME, RETENTION_PERIOD, RETAIN_MONTH_END FROM " + getRetentionTable()
+            + " WHERE DB_NAME = '" + database + "' AND ACTIVE='true'";
+    if (group >= 0) {
+      sql += " AND PROCESSING_GROUP =" + group;
     }
+    logger.debug("Returning DB Table Config SQL: " + sql);
+    return spark.sql(sql).collectAsList();
+  }
 
-    /**
-     * Method to pull distinct list of databases for purging scoping
-     *
-     * @return List<Row>
-     */
-    private List<Row> getRetentionDatabases2() {
-        return spark.sql("SELECT DISTINCT TBL_NAME FROM " + getRetentionTable()+ " WHERE ACTIVE='true'").collectAsList() ;
+
+  /**
+   * Method to fetch the housekeeping metadata for a specific database
+   *
+   * @param database
+   * @param group
+   * @return RetentionMetadataContainer
+   */
+  private ArrayList<HousekeepingMetadata> sourceDatabaseTablesFromMetaTable(String database,
+      int group) throws SourceException {
+    List<Row> purgeTables = getRetentionDataForDatabase(database, group);
+    ArrayList<HousekeepingMetadata> housekeepingMetadataList = new ArrayList<>();
+    logger.info(purgeTables.size() + " tables returned with a purge configuration");
+    for (Row table : purgeTables) {
+      String tableName = table.get(0).toString();
+      Integer retentionPeriod = (Integer) table.get(1);
+      boolean isRetainMonthEnd = Boolean.parseBoolean(String.valueOf(table.get(2)));
+      try {
+        logger.debug(String.format("Getting metadata for Table %s.%s", database, tableName));
+        Table tableMeta = metadataHelper.getTable(database, tableName);
+        TableDescriptor tableDescriptor = metadataHelper.getTableDescriptor(tableMeta);
+        HousekeepingMetadata housekeepingMetadata = new HousekeepingMetadata(database, tableName,
+            retentionPeriod, isRetainMonthEnd, tableDescriptor);
+        housekeepingMetadataList.add(housekeepingMetadata);
+      } catch (SourceException e) {
+        logger
+            .error(tableName + " : provided in metadata configuration, but not found in database..",
+                e);
+      }
     }
+    return housekeepingMetadataList;
+  }
 
-    /**
-     * Method to pull distinct list of databases in execution group
-     *
-     * @return List<Row>
-     */
-    private List<Row> getRetentionGroupDatabases(int group) {
-        logger.info("Now pulling list of databases for group : "+ group);
-        String sql = "SELECT DISTINCT DB_NAME FROM " + getRetentionTable()+ " WHERE ACTIVE='true'";
-        if(group > 0) {
-            sql += " and PROCESSING_GROUP="+group;
+
+  public void execute() throws ConfigurationException, IOException, MetaException, SourceException {
+    List<Row> retentionGroup = getRetentionGroupDatabases(-1);
+    this.execute(retentionGroup, -1);
+  }
+
+  public void execute(int executionGroup)
+      throws ConfigurationException, IOException, MetaException, SourceException {
+    List<Row> retentionGroup = getRetentionGroupDatabases(executionGroup);
+    this.execute(retentionGroup, executionGroup);
+  }
+
+  public void execute(List<Row> databases, int executionGroup)
+      throws ConfigurationException, IOException, MetaException, SourceException {
+    HousekeepingJob housekeepingJob = new HousekeepingJob();
+    auditHelper.startup();
+
+    databases.forEach(retentionRecord -> {
+      String database = retentionRecord.get(0).toString();
+      logger.info(String.format("Running Housekeeping for Database '%s'", database));
+      ArrayList<HousekeepingMetadata> housekeepingMetadataList = new ArrayList<>();
+      try {
+        housekeepingMetadataList
+            .addAll(sourceDatabaseTablesFromMetaTable(database, executionGroup));
+      } catch (SourceException e) {
+        e.printStackTrace();
+      }
+      housekeepingMetadataList.forEach(table -> {
+        try {
+          logger.info(
+              String.format("Running Housekeeping for Table '%s.%s'", database, table.tableName));
+          housekeepingJob.execute(table);
+        } catch (SourceException | IOException | URISyntaxException | TException | ParseException e) {
+          e.printStackTrace();
         }
-        logger.debug("Returning DB Config SQL: " +sql);
-        return spark.sql(sql).collectAsList();
-    }
-
-
-    /**
-     * Method to pull list of tables in a specific database for purging
-     *
-     * @return List<Row>
-     */
-    private List<Row> getRetentionDataForDatabase(String database, int group) {
-        logger.info("Now pulling configuration metadata for all tables in database : "+ database);
-        String sql  = "SELECT DISTINCT TBL_NAME, RETENTION_PERIOD, RETAIN_MONTH_END FROM " + getRetentionTable() + " WHERE DB_NAME = '" + database + "' AND ACTIVE='true'";
-        if(group >=0 ) {
-            sql += " AND PROCESSING_GROUP =" + group ;
-        }
-        logger.debug("Returning DB Table Config SQL: " +sql);
-        return spark.sql(sql).collectAsList();
-    }
-
-
-    /**
-     * Method to fetch the housekeeping metadata for a specific database
-     *
-     * @param database
-     * @return RetentionMetadataContainer
-     */
-    private ArrayList<HousekeepingMetadata> sourceDatabaseTablesFromMetaTable(String database, int group) throws SourceException {
-        List<Row> purgeTables = getRetentionDataForDatabase(database, group);
-        ArrayList<HousekeepingMetadata> housekeepingMetadataList = new ArrayList<>();
-        logger.info(purgeTables.size() + " tables returned with a purge configuration");
-        for (Row table : purgeTables){
-            String tableName = table.get(0).toString();
-            Integer retentionPeriod = (Integer) table.get(1);
-            boolean isRetainMonthEnd = Boolean.parseBoolean(String.valueOf(table.get(2)));
-            try{
-                logger.debug(String.format("Getting metadata for Table %s.%s", database, tableName));
-                Table tableMeta = metadataHelper.getTable(database,tableName);
-                TableDescriptor tableDescriptor =  metadataHelper.getTableDescriptor(tableMeta);
-                HousekeepingMetadata housekeepingMetadata = new HousekeepingMetadata(database,tableName,retentionPeriod,isRetainMonthEnd,tableDescriptor);
-                housekeepingMetadataList.add(housekeepingMetadata);
-            } catch (SourceException e){
-                logger.error(tableName+" : provided in metadata configuration, but not found in database..", e);
-            }
-        }
-        return housekeepingMetadataList;
-    }
-
-
-    public void execute() throws ConfigurationException, IOException, MetaException, SourceException {
-        List<Row> retentionGroup = getRetentionGroupDatabases(-1);
-        this.execute(retentionGroup, -1);
-    }
-
-    public void execute(int executionGroup) throws ConfigurationException, IOException, MetaException, SourceException {
-        List<Row> retentionGroup = getRetentionGroupDatabases(executionGroup);
-        this.execute(retentionGroup, executionGroup);
-    }
-
-    public void execute(List<Row> retentionGroup, int executionGroup) throws ConfigurationException, IOException, MetaException, SourceException, TextFormat.ParseException {
-        HousekeepingJob housekeepingJob = new HousekeepingJob();
-        auditHelper.startup();
-
-        retentionGroup.forEach(retentionRecord -> {
-            String database=retentionRecord.get(0).toString();
-            logger.info(String.format("Running Housekeeping for Database '%s'", database));
-            ArrayList<HousekeepingMetadata> housekeepingMetadataList = new ArrayList<>();
-            try {
-                housekeepingMetadataList.addAll(sourceDatabaseTablesFromMetaTable(database, executionGroup));
-            } catch (SourceException e) {
-                e.printStackTrace();
-            }
-            housekeepingMetadataList.forEach(table ->{
-                try {
-                    logger.info(String.format("Running Housekeeping for Table '%s.%s'", database, table.tableName));
-                    housekeepingJob.execute(table);
-                } catch (SourceException | IOException | URISyntaxException | TException | ParseException e) {
-                    e.printStackTrace();
-                }
-            });
-        });
-        auditHelper.completion();
-    }
+      });
+    });
+    auditHelper.completion();
+  }
 }
 
