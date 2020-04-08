@@ -56,8 +56,6 @@ public class ImpalaHelper {
 
 	public Connection getConnection() throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, InterruptedException {
 		UserGroupInformation ugi  = UserGroupInformation.getLoginUser();
-		System.out.println(ugi);
-		System.out.println(this.connectionString);
 		final Driver driver = (Driver) Class.forName("com.cloudera.impala.jdbc41.Driver").newInstance();
 		final String connectionString = this.connectionString;
 		
