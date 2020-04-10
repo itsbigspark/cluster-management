@@ -15,6 +15,7 @@ import java.util.Properties;
 import javax.naming.ConfigurationException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.Table;
@@ -129,6 +130,8 @@ public class OffloadController {
     return offloadMetadataList;
   }
 
+
+
   public void execute() throws MetaException, SourceException, ConfigurationException, IOException {
     List<Row> processGroup = getGroupDatabases(-1);
     this.execute(processGroup, -1);
@@ -140,12 +143,24 @@ public class OffloadController {
     this.execute(offloadGroup, executionGroup);
   }
 
-  public void execute(List<Row> offloadGroup, int executionGroup)
+  public void execute(String location, String platform, String bucket)
+      throws Exception {
+    auditHelper.startup();
+    OffloadJob offloadJob = new OffloadJob();
+    OffloadMetadata offloadMetadata = new OffloadMetadata(new Path(location),Platform.valueOf(platform),bucket);
+    logger.info(String.format("Running offload for location : '%s'", location));
+    logger.debug(offloadMetadata.toString());
+    offloadJob.execute(offloadMetadata);
+
+  }
+
+
+  private void execute(List<Row> offloadGroup, int executionGroup)
       throws MetaException, SourceException, ConfigurationException, IOException {
     OffloadJob offloadJob = new OffloadJob();
     auditHelper.startup();
-    offloadGroup.forEach(retentionRecord -> {
-      String database = retentionRecord.get(0).toString();
+    offloadGroup.forEach(offloadRecord -> {
+      String database = offloadRecord.get(0).toString();
       logger.info(String.format("Running offload for database : '%s' and processing group : '%s'", database, executionGroup));
       ArrayList<OffloadMetadata> offloadMetadataList = new ArrayList<>();
       try {
@@ -158,8 +173,9 @@ public class OffloadController {
         try {
           logger.info(
               String.format("Running offload for table : '%s.%s'", database, table.tableName));
+          logger.debug(table.toString());
           offloadJob.execute(table);
-        } catch (SourceException e) {
+        } catch (Exception e) {
           e.printStackTrace();
         }
       });

@@ -11,6 +11,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import javax.naming.ConfigurationException;
@@ -141,6 +142,23 @@ public class MetadataHelper {
   public List<String> getAllDatabases() throws MetaException {
     return client.getAllDatabases();
   }
+
+  public static String getPartitionString(Partition partition, Pattern pattern) {
+    //SH - /prod/source-history/ADB/ADB_BRANCH/edi_business_day=2020-01-20/
+    //EAS - /prod/enterprise-analytics-store/data/AGREEMENT/edi_business_day=2020-01-20/src_sys_id=ADB/src_sys_inst_id=NWB/
+    String absPartitionLocation = partition.getSd().getLocation();
+    String[] absPartitionLocationParts = absPartitionLocation.split("/");
+    String[] partitionKeys = new String[0];
+    if (pattern == SH) {
+      partitionKeys = Arrays
+          .copyOfRange(absPartitionLocationParts, absPartitionLocationParts.length - 1, absPartitionLocationParts.length);
+    } else if (pattern == EAS) {
+      partitionKeys = Arrays
+          .copyOfRange(absPartitionLocationParts, absPartitionLocationParts.length - 3, absPartitionLocationParts.length);
+    }
+    return String.join("/",partitionKeys);
+  }
+
 
   public String getPartitionDateString(Partition partition, Pattern pattern) {
     //SH - /prod/source-history/ADB/ADB_BRANCH/edi_business_day=2020-01-20/
@@ -283,9 +301,39 @@ public class MetadataHelper {
               + " is not partitioned");
     }
     logger.debug("Pattern confirmed as : " + pattern.toString());
-
     return pattern;
   }
+
+  /**
+   * Method to determine if a partition should be included into  scope or not based on
+   * ceiling date
+   *
+   * @param partitionList
+   * @param purgeCeiling
+   * @return
+   */
+  public static List<Partition> removePartitionToRetain(List<Partition> partitionList,
+      LocalDate purgeCeiling) {
+    ArrayList<Partition> eligiblePartitions = new ArrayList<>();
+    partitionList.forEach(
+        partition -> {
+          LocalDate partitionDate = LocalDate.parse(partition.getValues().get(0));
+          Boolean purge = partitionDate.isBefore(purgeCeiling);
+          if (purge) {
+            eligiblePartitions.add(partition);
+            logger.trace(String
+                .format("Partition date '%s' added as prior to ceiling date: '%s''", partitionDate,
+                    purgeCeiling));
+          } else {
+            logger.trace(String
+                .format("Partition date '%s' excluded as after ceiling: '%s''",
+                    partitionDate, purgeCeiling));
+          }
+        }
+    );
+    return eligiblePartitions;
+  }
+
 
 
 

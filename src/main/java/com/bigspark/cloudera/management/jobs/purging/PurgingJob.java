@@ -112,7 +112,7 @@ class PurgingJob {
       List<String> dates = new ArrayList<>();
       this.partitionMonthEnds.collectAsList().forEach(row -> {
         logger.debug(String.format(
-            "Retained SH Month End Partition: edi_business_day=%s, src_sys_id=%s,src_sys_inst_id=%s"
+            "Retained EAS Month End Partition: edi_business_day=%s, src_sys_id=%s,src_sys_inst_id=%s"
             , row.getDate(row.fieldIndex("MONTH_END")).toString()
             , row.getDate(row.fieldIndex("SRC_SYS_ID")).toString()
             , row.getDate(row.fieldIndex("SRC_SYS_INST_ID")).toString()
@@ -204,35 +204,6 @@ class PurgingJob {
     }
   }
 
-  /**
-   * Method to determine if a partition should be included into purge scope or not based on
-   * purgeCeiling
-   *
-   * @param partitionList
-   * @param purgeCeiling
-   * @return
-   */
-  protected List<Partition> removePartitionToRetain(List<Partition> partitionList,
-      LocalDate purgeCeiling) {
-    ArrayList<Partition> eligiblePartitions = new ArrayList<>();
-    partitionList.forEach(
-        partition -> {
-          LocalDate partitionDate = LocalDate.parse(partition.getValues().get(0));
-          Boolean purge = partitionDate.isBefore(purgeCeiling);
-          if (purge) {
-            eligiblePartitions.add(partition);
-            logger.trace(String
-                .format("Partition date '%s' added as prior to purge ceiling: '%s''", partitionDate,
-                    purgeCeiling));
-          } else {
-            logger.trace(String
-                .format("Partition date '%s' excluded as after to purge ceiling: '%s''",
-                    partitionDate, purgeCeiling));
-          }
-        }
-    );
-    return eligiblePartitions;
-  }
 
   protected List<Partition> removePartitionMonthEnds(List<Partition> partitionList) {
     ArrayList<Partition> eligiblePartitions = new ArrayList<>();
@@ -404,14 +375,14 @@ class PurgingJob {
         , PurgingMetadata.tableDescriptor);
 
     if (PurgingMetadata.tableDescriptor.hasPartitions()) {
-      MetadataHelper.getTableType(PurgingMetadata.tableDescriptor);
+      this.pattern = MetadataHelper.getTableType(PurgingMetadata.tableDescriptor);
       if (this.pattern != null) {
         LocalDate purgeCeiling = this.calculatePurgeCeiling(
             PurgingMetadata.retentionPeriod
             , LocalDate.now()
             , PurgingMetadata.isRetainMonthEnd);
 
-        List<Partition> allPurgeCandidates = this.removePartitionToRetain(
+        List<Partition> allPurgeCandidates = MetadataHelper.removePartitionToRetain(
             PurgingMetadata.tableDescriptor.getPartitionList()
             , purgeCeiling);
 
@@ -425,8 +396,9 @@ class PurgingJob {
               PurgingMetadata.database,
               PurgingMetadata.tableName, allPurgeCandidates);
         }
-
         this.jobAudit.invalidateAuditTableMetadata();
+      } else {
+        logger.error("Table pattern not validated");
       }
     } else {
       logger.warn(String.format("Skipping table '%s.%s' as it has no partitions"

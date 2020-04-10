@@ -1,81 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="062bc843-fefb-4418-9027-9622054f9108" name="Default Changelist" comment="BIG-3 Additional logging">
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/metadata/PurgingMetadata.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/purging/PurgingRunner.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/jobs/purging/PurgingJobIntegrationTests.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/jobs/purging/PurgingJobTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/jobs/purging/PurgingJobTestRunner.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cluster-management.iml" beforeDir="false" afterPath="$PROJECT_DIR$/cluster-management.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/configuration/HadoopConfiguration.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/configuration/HadoopConfiguration.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/configuration/HiveConfiguration.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/configuration/HiveConfiguration.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/enums/Pattern.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/enums/Pattern.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/enums/Platform.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/enums/Platform.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/exceptions/SourceException.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/exceptions/SourceException.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/metadata/CompactionMetadata.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/metadata/CompactionMetadata.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/metadata/HousekeepingMetadata.java" beforeDir="false" />
+    <list default="true" id="062bc843-fefb-4418-9027-9622054f9108" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/metadata/OffloadMetadata.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/metadata/OffloadMetadata.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/model/EDIPublishMessage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/model/EDIPublishMessage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/model/PlatformDescriptor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/model/PlatformDescriptor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/model/SourceDescriptor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/model/SourceDescriptor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/model/TableDescriptor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/model/TableDescriptor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/utils/DateUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/utils/DateUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/utils/FileSystemUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/utils/FileSystemUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/utils/ParseUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/utils/ParseUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/utils/PropertyUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/utils/PropertyUtils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/utils/Utils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/utils/Utils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/AuditHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/AuditHelper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/FileSystemHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/FileSystemHelper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/GenericAuditHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/GenericAuditHelper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/HadoopKeyStoreHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/HadoopKeyStoreHelper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/ImpalaHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/ImpalaHelper.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/MetadataHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/MetadataHelper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/SourceHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/SourceHelper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/SparkHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/SparkHelper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/SparkJobDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/SparkJobDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/YarnHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/YarnHelper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/ClusterManagementJob.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/ClusterManagementJob.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/compaction/CompactionController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/compaction/CompactionController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/compaction/CompactionJob.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/compaction/CompactionJob.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/compaction/CompactionMistRunner.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/compaction/CompactionMistRunner.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/compaction/CompactionRunner.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/compaction/CompactionRunner.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/housekeeping/HousekeepingController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/purging/PurgingController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/housekeeping/HousekeepingJob.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/purging/PurgingJob.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/housekeeping/HousekeepingRunner.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/offload/OffloadController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/offload/OffloadController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/offload/OffloadJob.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/offload/OffloadJob.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/offload/OffloadRunner.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/offload/OffloadRunner.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/test/SmokeTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/test/SmokeTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/HouseKeepingTest.sh" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/HouseKeepingTest.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/config.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/config.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/deployment.ddl" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/deployment.ddl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/intellij-java-google-style.xml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/intellij-java-google-style.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/log4j.debug.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/log4j.debug.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/log4j.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/log4j.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/Common.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/Common.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/common/configuration/HadoopConfigurationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/common/configuration/HadoopConfigurationTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/common/model/TableDescriptorTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/common/model/TableDescriptorTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/helpers/FileSystemHelperTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/helpers/FileSystemHelperTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/helpers/HadoopKeyStoreHelperTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/helpers/HadoopKeyStoreHelperTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/helpers/ImpalaHelperTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/helpers/ImpalaHelperTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/helpers/MetadataHelperTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/helpers/MetadataHelperTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/helpers/SparkHelperTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/helpers/SparkHelperTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/helpers/YarnHelperTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/helpers/YarnHelperTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/jobs/TstDataSetup.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/jobs/TstDataSetup.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/jobs/compaction/CompactionJobIntegrationTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/jobs/compaction/CompactionJobIntegrationTests.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/jobs/compaction/CompactionJobTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/jobs/compaction/CompactionJobTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/jobs/compaction/CompactionJobTestRunner.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/jobs/compaction/CompactionJobTestRunner.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/jobs/housekeeping/HousekeepingJobIntegrationTests.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/jobs/housekeeping/HousekeepingJobTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/jobs/housekeeping/HousekeepingJobTestRunner.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/jobs/offload/OffloadJobIntegrationTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/jobs/offload/OffloadJobIntegrationTests.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/jobs/offload/OffloadJobTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/jobs/offload/OffloadJobTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/jobs/offload/OffloadJobTestRunner.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/jobs/offload/OffloadJobTestRunner.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/resources/config.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/config.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/purging/PurgingJob.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/purging/PurgingJob.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -415,7 +347,14 @@
       <option name="project" value="LOCAL" />
       <updated>1584392570789</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="Code styling and refactoring">
+      <created>1586501697936</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1586501697936</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -443,7 +382,8 @@
     <MESSAGE value="BIG-4 More testing and refactoring. Commit prior to testing on HDFS" />
     <MESSAGE value="BIG-4 More testing and defect resolution" />
     <MESSAGE value="BIG-3 Additional logging" />
-    <option name="LAST_COMMIT_MESSAGE" value="BIG-3 Additional logging" />
+    <MESSAGE value="Code styling and refactoring" />
+    <option name="LAST_COMMIT_MESSAGE" value="Code styling and refactoring" />
   </component>
   <component name="WindowStateProjectService">
     <state x="2385" y="104" key="#All_in_cluster-management" timestamp="1583222240044">
@@ -480,10 +420,11 @@
       <screen x="0" y="23" width="1920" height="1057" />
     </state>
     <state x="645" y="345" key="#com.intellij.fileTypes.FileTypeChooser/1920.23.1920.1057/0.23.1920.1057@0.23.1920.1057" timestamp="1583424044287" />
-    <state x="729" y="191" key="#com.intellij.ide.util.MemberChooser" timestamp="1585868124144">
+    <state x="729" y="191" key="#com.intellij.ide.util.MemberChooser" timestamp="1586504836405">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="729" y="191" key="#com.intellij.ide.util.MemberChooser/0.0.1920.1080@0.0.1920.1080" timestamp="1585868124144" />
+    <state x="729" y="191" key="#com.intellij.ide.util.MemberChooser/1920.0.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1586504836405" />
     <state x="2649" y="191" key="#com.intellij.ide.util.MemberChooser/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583490568429" />
     <state x="2649" y="210" key="#com.intellij.ide.util.MemberChooser/1920.23.1920.1057/0.23.1920.1057@1920.23.1920.1057" timestamp="1583937617273" />
     <state x="2615" y="253" key="#com.intellij.ide.util.PackageChooserDialog" timestamp="1583222499469">
@@ -536,13 +477,14 @@
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
     <state x="2425" y="359" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583333591658" />
-    <state x="178" y="74" key="CommitChangelistDialog2" timestamp="1586433205662">
+    <state x="178" y="74" key="CommitChangelistDialog2" timestamp="1586501697293">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="178" y="82" key="CommitChangelistDialog2/0.0.1920.1200@0.0.1920.1200" timestamp="1584392570329" />
     <state x="178" y="103" key="CommitChangelistDialog2/0.23.1920.1177@0.23.1920.1177" timestamp="1584390817131" />
     <state x="178" y="74" key="CommitChangelistDialog2/1920.0.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1586433205662" />
     <state x="2098" y="74" key="CommitChangelistDialog2/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583741032269" />
+    <state x="178" y="74" key="CommitChangelistDialog2/1920.23.1920.1057/0.0.1920.1080@0.0.1920.1080" timestamp="1586501697293" />
     <state x="2098" y="95" key="CommitChangelistDialog2/1920.23.1920.1057/0.23.1920.1057@1920.23.1920.1057" timestamp="1584120803884" />
     <state x="100" y="100" width="1720" height="880" key="DiffContextDialog" timestamp="1586433196563">
       <screen x="0" y="0" width="1920" height="1080" />
@@ -707,12 +649,12 @@
     </state>
     <state x="49" y="172" width="1255" height="653" key="dock-window-1/0.23.1920.1177@0.23.1920.1177" timestamp="1584390402598" />
     <state x="1969" y="52" width="1255" height="653" key="dock-window-1/1920.23.1920.1057/0.23.1920.1057@0.23.1920.1057" timestamp="1584374371121" />
-    <state x="452" y="13" width="1015" height="1054" key="find.popup" timestamp="1586438301148">
+    <state x="452" y="13" width="1015" height="1054" key="find.popup" timestamp="1586509614029">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="452" y="13" width="1015" height="1054" key="find.popup/0.0.1920.1080@0.0.1920.1080" timestamp="1585861872636" />
     <state x="452" y="37" width="1015" height="1149" key="find.popup/0.23.1920.1177@0.23.1920.1177" timestamp="1584196468316" />
-    <state x="452" y="13" width="1015" height="1054" key="find.popup/1920.0.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1586438301148" />
+    <state x="452" y="13" width="1015" height="1054" key="find.popup/1920.0.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1586509614029" />
     <state x="2372" y="13" width="1015" height="1054" key="find.popup/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583740150229" />
     <state x="2372" y="13" width="1015" height="1053" key="find.popup/1920.0.1920.1080/0.23.1920.1057@1920.0.1920.1080" timestamp="1583322379454" />
     <state x="2372" y="36" width="1015" height="1031" key="find.popup/1920.23.1920.1057/0.23.1920.1057@1920.23.1920.1057" timestamp="1584344045009" />
@@ -726,10 +668,11 @@
     <state x="650" y="102" key="refactoring.ChangeSignatureDialog/0.0.1920.1200@0.0.1920.1200" timestamp="1584391618858" />
     <state x="2570" y="92" key="refactoring.ChangeSignatureDialog/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583232494771" />
     <state x="2570" y="113" key="refactoring.ChangeSignatureDialog/1920.23.1920.1057/0.23.1920.1057@1920.23.1920.1057" timestamp="1583850364029" />
-    <state x="541" y="53" width="838" height="1147" key="search.everywhere.popup" timestamp="1585690033223">
-      <screen x="0" y="0" width="1920" height="1200" />
+    <state x="541" y="48" width="838" height="1033" key="search.everywhere.popup" timestamp="1586511125790">
+      <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="541" y="53" width="838" height="1147" key="search.everywhere.popup/0.0.1920.1200@0.0.1920.1200" timestamp="1585690033223" />
+    <state x="541" y="48" width="838" height="1033" key="search.everywhere.popup/1920.0.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1586511125790" />
     <state x="2461" y="48" width="838" height="1032" key="search.everywhere.popup/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583759737273" />
     <state x="2461" y="48" width="838" height="1032" key="search.everywhere.popup/1920.0.1920.1080/0.23.1920.1057@1920.0.1920.1080" timestamp="1583242136832" />
     <state x="541" y="70" width="838" height="1011" key="search.everywhere.popup/1920.23.1920.1057/0.23.1920.1057@0.23.1920.1057" timestamp="1584376160113" />
