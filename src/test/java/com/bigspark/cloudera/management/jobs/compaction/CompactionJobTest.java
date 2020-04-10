@@ -1,96 +1,96 @@
 package com.bigspark.cloudera.management.jobs.compaction;
 
+import static javolution.testing.TestContext.assertEquals;
+
 import com.bigspark.cloudera.management.common.exceptions.SourceException;
-import com.bigspark.cloudera.management.helpers.MetadataHelperTest;
+import java.io.IOException;
+import javax.naming.ConfigurationException;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.thrift.TException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.naming.ConfigurationException;
-import java.io.IOException;
-
-import static javolution.testing.TestContext.assertEquals;
-
 class CompactionJobTest {
 
-    CompactionJob compactionJob;
+  CompactionJob compactionJob;
 
-    public CompactionJobTest(CompactionJob compactionJob) throws MetaException, SourceException, ConfigurationException, IOException {
-        this.compactionJob = compactionJob;
-    }
+  public CompactionJobTest(CompactionJob compactionJob)
+      throws MetaException, SourceException, ConfigurationException, IOException {
+    this.compactionJob = compactionJob;
+  }
 
-    @BeforeEach
-    void setup() throws TException, ConfigurationException, IOException, SourceException {
+  @BeforeEach
+  void setup() throws TException, ConfigurationException, IOException, SourceException {
 //        compactionJob = new CompactionJob();
 //        MetadataHelperTest metadataHelperTest = new MetadataHelperTest();
 //        metadataHelperTest.setUp();
-    }
+  }
 
-    @Test
-    void getBlocksize() {
-    }
+  @Test
+  void getBlocksize() {
+  }
 
-    @Test
-    void getDatabases() {
-    }
+  @Test
+  void getDatabases() {
+  }
 
-    @Test
-    void getTables() {
-    }
+  @Test
+  void getTables() {
+  }
 
-    @Test
-    void getTablePartitions() {
-    }
+  @Test
+  void getTablePartitions() {
+  }
 
-    @Test
-    void getTableLocation() {
-    }
+  @Test
+  void getTableLocation() {
+  }
 
-    @Test
-    void getFileCountTotalSizePair() {
-    }
+  @Test
+  void getFileCountTotalSizePair() {
+  }
 
-    @Test
-    void getFileCountTotalSize() {
-    }
+  @Test
+  void getFileCountTotalSize() {
+  }
 
-    @Test
-    void isCompactionCandidate() {
-        assert compactionJob.isCompactionCandidate((long) 3, (long) 417894092);
-    }
+  @Test
+  void isCompactionCandidate() {
+    assert compactionJob.isCompactionCandidate((long) 3, (long) 417894092);
+  }
 
-    @Test
-    void getRepartitionFactor() {
-        //Assumes standard block size of 128MB
-        assertEquals(java.util.Optional.ofNullable(compactionJob.getRepartitionFactor((long) 217894092)), 2);
-    }
+  @Test
+  void getRepartitionFactor() {
+    //Assumes standard block size of 128MB
+    assertEquals(
+        java.util.Optional.ofNullable(compactionJob.getRepartitionFactor((long) 217894092)), 2);
+  }
 
-    @Test
-    void processTable() {
-    }
+  @Test
+  void processTable() {
+  }
 
-    @Test
-    void processPartition() {
-    }
+  @Test
+  void processPartition() {
+  }
 
-    @Test
-    void compactLocation() {
-    }
+  @Test
+  void compactLocation() {
+  }
 
-    @Test
-    void reconcileOutput() {
-    }
+  @Test
+  void reconcileOutput() {
+  }
 
-    @Test
-    void setTrashBaseLocation() {
-    }
+  @Test
+  void setTrashBaseLocation() {
+  }
 
-    @Test
-    void trashOriginalData() {
-    }
+  @Test
+  void trashOriginalData() {
+  }
 
-    @Test
-    void resolvePartition() {
-    }
+  @Test
+  void resolvePartition() {
+  }
 }

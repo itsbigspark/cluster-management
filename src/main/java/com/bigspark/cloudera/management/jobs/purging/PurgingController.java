@@ -1,13 +1,13 @@
-package com.bigspark.cloudera.management.jobs.housekeeping;
+package com.bigspark.cloudera.management.jobs.purging;
 
 import com.bigspark.cloudera.management.common.exceptions.SourceException;
-import com.bigspark.cloudera.management.common.metadata.HousekeepingMetadata;
+import com.bigspark.cloudera.management.common.metadata.PurgingMetadata;
 import com.bigspark.cloudera.management.common.model.TableDescriptor;
 import com.bigspark.cloudera.management.helpers.AuditHelper;
 import com.bigspark.cloudera.management.helpers.MetadataHelper;
 import com.bigspark.cloudera.management.helpers.SparkHelper;
 import com.bigspark.cloudera.management.jobs.ClusterManagementJob;
-import com.google.protobuf.TextFormat;
+import com.bigspark.cloudera.management.jobs.purging.PurgingJob;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
@@ -25,7 +25,7 @@ import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class HousekeepingController {
+public class PurgingController {
 
   public Properties jobProperties;
   public SparkHelper.AuditedSparkSession spark;
@@ -38,17 +38,17 @@ public class HousekeepingController {
 
   Logger logger = LoggerFactory.getLogger(getClass());
 
-  public HousekeepingController(Boolean isDryRun)
+  public PurgingController(Boolean isDryRun)
       throws MetaException, SourceException, ConfigurationException, IOException {
     this();
     this.isDryRun = isDryRun;
 
   }
 
-  public HousekeepingController()
+  public PurgingController()
       throws IOException, MetaException, ConfigurationException, SourceException {
     ClusterManagementJob clusterManagementJob = ClusterManagementJob.getInstance();
-    this.auditHelper = new AuditHelper(clusterManagementJob, "EDH Cluster housekeeping");
+    this.auditHelper = new AuditHelper(clusterManagementJob, "EDH Cluster Purging");
     this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark, auditHelper);
     this.fileSystem = clusterManagementJob.fileSystem;
     this.hadoopConfiguration = clusterManagementJob.hadoopConfiguration;
@@ -63,21 +63,21 @@ public class HousekeepingController {
    *
    * @return String fully qualified Name ([db].[tbl]) of the Retention table
    */
-  private String getRetentionTable() {
+  private String getMetadataTable() {
     return jobProperties
-        .getProperty("housekeeping.metatable");
+        .getProperty("Purging.metatable");
   }
 
 
   /**
-   * Method to pull distinct list of databases in execution group.  If
-   * Retention Group is -1 all are returned
+   * Method to pull distinct list of databases in execution group.  If Retention Group is -1 all are
+   * returned
    *
    * @return List<Row> A list of database names within the specified retention group
    */
-  private List<Row> getRetentionGroupDatabases(int group) {
+  private List<Row> getGroupDatabases(int group) {
     logger.info("Now pulling list of databases for group : " + group);
-    String sql = "SELECT DISTINCT DB_NAME FROM " + getRetentionTable() + " WHERE ACTIVE='true'";
+    String sql = "SELECT DISTINCT DB_NAME FROM " + getMetadataTable() + " WHERE ACTIVE='true'";
     if (group > 0) {
       sql += " and PROCESSING_GROUP=" + group;
     }
@@ -87,6 +87,7 @@ public class HousekeepingController {
 
   /**
    * Method to pull list of tables within a specific database for purging
+   *
    * @param database
    * @param group
    * @return List<Row> List of Records for the given DB/Group
@@ -94,8 +95,8 @@ public class HousekeepingController {
   private List<Row> getRetentionDataForDatabase(String database, int group) {
     logger.info("Now pulling configuration metadata for all tables in database : " + database);
     String sql =
-        "SELECT DISTINCT TBL_NAME, RETENTION_PERIOD, RETAIN_MONTH_END FROM " + getRetentionTable()
-            + " WHERE DB_NAME = '" + database + "' AND ACTIVE='true'";
+        "SELECT DISTINCT TBL_NAME, RETENTION_PERIOD, RETAIN_MONTH_END FROM " + getMetadataTable()
+            + " WHERE DB_NAME = '" + database + "' AND LOWER(ACTIVE)='true'";
     if (group >= 0) {
       sql += " AND PROCESSING_GROUP =" + group;
     }
@@ -105,16 +106,16 @@ public class HousekeepingController {
 
 
   /**
-   * Method to fetch the housekeeping metadata for a specific database
+   * Method to fetch the Purging metadata for a specific database
    *
    * @param database
    * @param group
    * @return RetentionMetadataContainer
    */
-  private ArrayList<HousekeepingMetadata> sourceDatabaseTablesFromMetaTable(String database,
+  private ArrayList<PurgingMetadata> sourceDatabaseTablesFromMetaTable(String database,
       int group) throws SourceException {
     List<Row> purgeTables = getRetentionDataForDatabase(database, group);
-    ArrayList<HousekeepingMetadata> housekeepingMetadataList = new ArrayList<>();
+    ArrayList<PurgingMetadata> PurgingMetadataList = new ArrayList<>();
     logger.info(purgeTables.size() + " tables returned with a purge configuration");
     for (Row table : purgeTables) {
       String tableName = table.get(0).toString();
@@ -124,50 +125,50 @@ public class HousekeepingController {
         logger.debug(String.format("Getting metadata for Table %s.%s", database, tableName));
         Table tableMeta = metadataHelper.getTable(database, tableName);
         TableDescriptor tableDescriptor = metadataHelper.getTableDescriptor(tableMeta);
-        HousekeepingMetadata housekeepingMetadata = new HousekeepingMetadata(database, tableName,
+        PurgingMetadata PurgingMetadata = new PurgingMetadata(database, tableName,
             retentionPeriod, isRetainMonthEnd, tableDescriptor);
-        housekeepingMetadataList.add(housekeepingMetadata);
+        PurgingMetadataList.add(PurgingMetadata);
       } catch (SourceException e) {
         logger
             .error(tableName + " : provided in metadata configuration, but not found in database..",
                 e);
       }
     }
-    return housekeepingMetadataList;
+    return PurgingMetadataList;
   }
 
 
   public void execute() throws ConfigurationException, IOException, MetaException, SourceException {
-    List<Row> retentionGroup = getRetentionGroupDatabases(-1);
+    List<Row> retentionGroup = getGroupDatabases(-1);
     this.execute(retentionGroup, -1);
   }
 
   public void execute(int executionGroup)
       throws ConfigurationException, IOException, MetaException, SourceException {
-    List<Row> retentionGroup = getRetentionGroupDatabases(executionGroup);
+    List<Row> retentionGroup = getGroupDatabases(executionGroup);
     this.execute(retentionGroup, executionGroup);
   }
 
   public void execute(List<Row> databases, int executionGroup)
       throws ConfigurationException, IOException, MetaException, SourceException {
-    HousekeepingJob housekeepingJob = new HousekeepingJob();
+    PurgingJob PurgingJob = new PurgingJob();
     auditHelper.startup();
 
     databases.forEach(retentionRecord -> {
       String database = retentionRecord.get(0).toString();
-      logger.info(String.format("Running Housekeeping for Database '%s'", database));
-      ArrayList<HousekeepingMetadata> housekeepingMetadataList = new ArrayList<>();
+      logger.info(String.format("Running Purging for database '%s' and processing group : %s ", database, executionGroup));
+      ArrayList<PurgingMetadata> PurgingMetadataList = new ArrayList<>();
       try {
-        housekeepingMetadataList
+        PurgingMetadataList
             .addAll(sourceDatabaseTablesFromMetaTable(database, executionGroup));
       } catch (SourceException e) {
         e.printStackTrace();
       }
-      housekeepingMetadataList.forEach(table -> {
+      PurgingMetadataList.forEach(table -> {
         try {
           logger.info(
-              String.format("Running Housekeeping for Table '%s.%s'", database, table.tableName));
-          housekeepingJob.execute(table);
+              String.format("Running purging for table '%s.%s'", database, table.tableName));
+          PurgingJob.execute(table);
         } catch (SourceException | IOException | URISyntaxException | TException | ParseException e) {
           e.printStackTrace();
         }

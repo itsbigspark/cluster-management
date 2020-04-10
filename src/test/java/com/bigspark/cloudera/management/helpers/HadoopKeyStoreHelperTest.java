@@ -4,15 +4,15 @@ import org.junit.jupiter.api.Test;
 
 class HadoopKeyStoreHelperTest {
 
-    @Test
-    void getAliasesFromHadoopKeyStore() {
-    }
+  @Test
+  void getAliasesFromHadoopKeyStore() {
+  }
 
-    @Test
-    void getFromHadoopKeyStore() {
-    }
+  @Test
+  void getFromHadoopKeyStore() {
+  }
 
-    @Test
-    void writeToHadoopKeyStore() {
-    }
+  @Test
+  void writeToHadoopKeyStore() {
+  }
 }

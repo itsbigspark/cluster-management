@@ -1,12 +1,11 @@
-package com.bigspark.cloudera.management.jobs.housekeeping;
+package com.bigspark.cloudera.management.jobs.purging;
 
 import static com.bigspark.cloudera.management.helpers.MetadataHelper.verifyPartitionKey;
 
 import com.bigspark.cloudera.management.common.enums.Pattern;
 import com.bigspark.cloudera.management.common.exceptions.SourceException;
-import com.bigspark.cloudera.management.common.metadata.HousekeepingMetadata;
+import com.bigspark.cloudera.management.common.metadata.PurgingMetadata;
 import com.bigspark.cloudera.management.common.model.SourceDescriptor;
-import com.bigspark.cloudera.management.common.model.TableDescriptor;
 import com.bigspark.cloudera.management.common.utils.DateUtils;
 import com.bigspark.cloudera.management.helpers.AuditHelper;
 import com.bigspark.cloudera.management.helpers.FileSystemHelper;
@@ -40,12 +39,12 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * Housekeeping job Used to purge files from HDFS/Hive based on a provided table retention
+ * purging job Used to purge files from HDFS/Hive based on a provided table retention
  * parameter
  *
  * @author Chris Finlayson
  */
-class HousekeepingJob {
+class PurgingJob {
 
   protected final ImpalaHelper impalaHelper;
   protected final Properties jobProperties;
@@ -59,23 +58,23 @@ class HousekeepingJob {
   protected final GenericAuditHelper jobAudit;
   public SourceDescriptor sourceDescriptor;
   protected Boolean isDryRun;
-  HousekeepingMetadata housekeepingMetadata;
+  PurgingMetadata PurgingMetadata;
   Pattern pattern;
   Dataset<Row> partitionMonthEnds;
 
   Logger logger = LoggerFactory.getLogger(getClass());
 
   /**
-   * Default Constructor for Housekeeping Job
+   * Default Constructor for purging Job
    *
    * @throws IOException
    * @throws MetaException
    * @throws ConfigurationException
    * @throws SourceException
    */
-  HousekeepingJob() throws IOException, MetaException, ConfigurationException, SourceException {
+  PurgingJob() throws IOException, MetaException, ConfigurationException, SourceException {
     this.clusterManagementJob = ClusterManagementJob.getInstance();
-    this.auditHelper = new AuditHelper(clusterManagementJob, "EDH Cluster housekeeping");
+    this.auditHelper = new AuditHelper(clusterManagementJob, "EDH Cluster purging");
     this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark, auditHelper);
     this.fileSystem = clusterManagementJob.fileSystem;
     this.hadoopConfiguration = clusterManagementJob.hadoopConfiguration;
@@ -85,7 +84,7 @@ class HousekeepingJob {
     this.hiveMetaStoreClient = clusterManagementJob.hiveMetaStoreClient;
     String connStr = this.jobProperties.getProperty("impala.connStr");
     this.impalaHelper = new ImpalaHelper(connStr);
-    this.jobAudit = new GenericAuditHelper(this.clusterManagementJob, "housekeeping.auditTable",
+    this.jobAudit = new GenericAuditHelper(this.clusterManagementJob, "purging.auditTable",
         this.impalaHelper);
   }
 
@@ -276,9 +275,9 @@ class HousekeepingJob {
   protected void trashDataOutwithRetention(List<Partition> purgeCandidates)
       throws IOException, URISyntaxException {
     if (purgeCandidates.size() >= 0) {
-      String trashBaseLocation = FileSystemHelper.getCreateTrashBaseLocation("Housekeeping"
-          , this.housekeepingMetadata.database
-          , this.housekeepingMetadata.tableName);
+      String trashBaseLocation = FileSystemHelper.getCreateTrashBaseLocation("purging"
+          , this.PurgingMetadata.database
+          , this.PurgingMetadata.tableName);
 
       for (Partition p : purgeCandidates) {
         URI partitionLocation = new URI(p.getSd().getLocation());
@@ -287,8 +286,8 @@ class HousekeepingJob {
                 getDryRun(),
                 fileSystem);
         String payload = this.getAuditLogRecord(
-            this.housekeepingMetadata.database
-            , this.housekeepingMetadata.tableName
+            this.PurgingMetadata.database
+            , this.PurgingMetadata.tableName
             , partitionLocation.getPath()
             , trashBaseLocation);
 
@@ -391,83 +390,58 @@ class HousekeepingJob {
     }
   }
 
-
-  protected void getTableType(HousekeepingMetadata housekeepingMetadata) throws SourceException {
-    TableDescriptor tableDescriptor = housekeepingMetadata.tableDescriptor;
-    logger.info("Now processing table " + tableDescriptor.getDatabaseName() + "." + tableDescriptor
-        .getTableName());
-    Pattern pattern = null;
-    if (tableDescriptor.isPartitioned()) {
-      Partition p = tableDescriptor.getPartitionList().get(0);
-      //Test that partition name starts with "edi_business_day" and value matches
-      if (verifyPartitionKey(tableDescriptor.getTable()) && p.getValues().size() == 3) {
-        pattern = Pattern.EAS;
-      } else if (verifyPartitionKey(tableDescriptor.getTable()) && p.getValues().size() == 1) {
-        pattern = Pattern.SH;
-      } else {
-        logger.error("Partition specification pattern not recognised");
-      }
-    } else {
-      logger.error(
-          "Table " + tableDescriptor.getDatabaseName() + "." + tableDescriptor.getTableName()
-              + " is not partitioned");
-    }
-    logger.debug("Pattern confirmed as : " + pattern.toString());
-    this.pattern = pattern;
-  }
-
   /**
-   * Main entry point method for executing the housekeeping process
+   * Main entry point method for executing the purging process
    *
    * @throws MetaException
    * @throws SourceException
    */
-  void execute(HousekeepingMetadata housekeepingMetadata)
+  void execute(PurgingMetadata PurgingMetadata)
       throws SourceException, IOException, URISyntaxException, TException, ParseException {
-    this.housekeepingMetadata = housekeepingMetadata;
+    this.PurgingMetadata = PurgingMetadata;
     this.sourceDescriptor = new SourceDescriptor(
-        metadataHelper.getDatabase(housekeepingMetadata.database)
-        , housekeepingMetadata.tableDescriptor);
+        metadataHelper.getDatabase(PurgingMetadata.database)
+        , PurgingMetadata.tableDescriptor);
 
-    if (housekeepingMetadata.tableDescriptor.hasPartitions()) {
-      this.getTableType(housekeepingMetadata);
+    if (PurgingMetadata.tableDescriptor.hasPartitions()) {
+      MetadataHelper.getTableType(PurgingMetadata.tableDescriptor);
       if (this.pattern != null) {
         LocalDate purgeCeiling = this.calculatePurgeCeiling(
-            housekeepingMetadata.retentionPeriod
+            PurgingMetadata.retentionPeriod
             , LocalDate.now()
-            , housekeepingMetadata.isRetainMonthEnd);
+            , PurgingMetadata.isRetainMonthEnd);
 
         List<Partition> allPurgeCandidates = this.removePartitionToRetain(
-            housekeepingMetadata.tableDescriptor.getPartitionList()
+            PurgingMetadata.tableDescriptor.getPartitionList()
             , purgeCeiling);
 
         logger.debug("Partitions returned as eligible for purge : " + allPurgeCandidates.size());
 
-        if (housekeepingMetadata.isRetainMonthEnd) {
-          executeMonthEndHousekeeping(allPurgeCandidates, purgeCeiling);
+        if (PurgingMetadata.isRetainMonthEnd) {
+          executeMonthEndpurging(allPurgeCandidates, purgeCeiling);
         } else {
           this.trashDataOutwithRetention(allPurgeCandidates);
           this.impalaInvalidateMetadata(
-              housekeepingMetadata.database,
-              housekeepingMetadata.tableName, allPurgeCandidates);
+              PurgingMetadata.database,
+              PurgingMetadata.tableName, allPurgeCandidates);
         }
 
         this.jobAudit.invalidateAuditTableMetadata();
       }
     } else {
       logger.warn(String.format("Skipping table '%s.%s' as it has no partitions"
-          , housekeepingMetadata.tableDescriptor.getDatabaseName()
-          , housekeepingMetadata.tableDescriptor.getTableName()));
+          , PurgingMetadata.tableDescriptor.getDatabaseName()
+          , PurgingMetadata.tableDescriptor.getTableName()));
     }
   }
 
-  private void executeMonthEndHousekeeping(List<Partition> allPurgeCandidates,
+  private void executeMonthEndpurging(List<Partition> allPurgeCandidates,
       LocalDate purgeCeiling)
       throws IOException, URISyntaxException, TException, ParseException {
     logger.debug("RetainMonthEnd config passed from metadata table");
     this.getTablePartitionMonthEnds(
-        this.housekeepingMetadata.database,
-        this.housekeepingMetadata.tableName
+        this.PurgingMetadata.database,
+        this.PurgingMetadata.tableName
         , allPurgeCandidates, purgeCeiling);
 
     logger.debug("Removing Month End Partitions that have been previously processed");
@@ -475,20 +449,20 @@ class HousekeepingJob {
 
     logger.debug("Creating swing table for month end partitions");
     this.createMonthEndSwingTable(
-        this.housekeepingMetadata.database,
-        this.housekeepingMetadata.tableName);
+        this.PurgingMetadata.database,
+        this.PurgingMetadata.tableName);
 
     this.trashDataOutwithRetention(allPurgeCandidates);
 
     logger.debug("Resolving source table by reinstating month end partitions");
     this.reinstateMonthEndPartitions(
-        this.housekeepingMetadata.database,
-        this.housekeepingMetadata.tableName);
+        this.PurgingMetadata.database,
+        this.PurgingMetadata.tableName);
 
     //Mark new Month End partitions as month_end:true and compute stats
     this.manageMonthEndPartitionMetadata(
-        housekeepingMetadata.database,
-        housekeepingMetadata.tableName);
+        PurgingMetadata.database,
+        PurgingMetadata.tableName);
   }
 
   private String getAuditLogRecord(String dbName, String tableName, String originalLocation,

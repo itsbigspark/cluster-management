@@ -6,7 +6,7 @@ package com.bigspark.cloudera.management.common.enums;
 
 
 public enum Platform {
-    HDFS, AWS, ECS
+  HDFS, AWS, ECS
 }
 
 

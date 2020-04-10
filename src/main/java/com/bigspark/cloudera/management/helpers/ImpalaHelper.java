@@ -13,13 +13,15 @@ import org.slf4j.LoggerFactory;
 
 
 public class ImpalaHelper {
+
   Logger logger = LoggerFactory.getLogger(getClass());
 
   private final String connectionString;
 
   public ImpalaHelper(String connectionString) {
     this.connectionString = connectionString;
-    logger.debug(String.format("Constructed ImpalaHelper with Connection String: %s", this.connectionString));
+    logger.debug(String
+        .format("Constructed ImpalaHelper with Connection String: %s", this.connectionString));
   }
 
   public void invalidateMetadata(String tableName)
@@ -39,7 +41,9 @@ public class ImpalaHelper {
     try (Connection conn = this.getConnection()) {
       try (Statement stmnt = conn.createStatement()) {
         stmnt.setQueryTimeout(600);
-        stmnt.execute(String.format("compute incremental stats %s.%s partition (%s)", dbName, tableName, partitionSpec));
+        stmnt.execute(String
+            .format("compute incremental stats %s.%s partition (%s)", dbName, tableName,
+                partitionSpec));
       }
     }
   }

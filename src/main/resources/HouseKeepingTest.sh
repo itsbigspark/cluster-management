@@ -19,7 +19,7 @@ $SPARK_HOME/bin/spark-submit \
             --principal "${PRINCIPAL}" \
             --jars hdfs:///user/oozie/libext/sqoop_jdbc/ImpalaJDBC41.jar \
             --conf spark.driver.extraJavaOptions="-Dlog4j.configuration=file://${PROJECT_DIR}/src/main/resources/log4j.properties -Djava.security.krb5.conf=$KRB5_CONFIG" \
-            --class com.bigspark.cloudera.management.jobs.housekeeping.HousekeepingRunner \
+            --class com.bigspark.cloudera.management.jobs.purging.purgingRunner \
             $PROJECT_JAR
 
 

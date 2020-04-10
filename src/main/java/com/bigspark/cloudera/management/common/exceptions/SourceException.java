@@ -5,24 +5,24 @@ package com.bigspark.cloudera.management.common.exceptions;
  */
 public class SourceException extends Exception {
 
-    public SourceException() {
-        // TODO Auto-generated constructor stub
-    }
+  public SourceException() {
+    // TODO Auto-generated constructor stub
+  }
 
-    public SourceException(String message) {
-        super(message);
-        // TODO Auto-generated constructor stub
-    }
+  public SourceException(String message) {
+    super(message);
+    // TODO Auto-generated constructor stub
+  }
 
-    public SourceException(Throwable cause) {
-        super(cause);
-        // TODO Auto-generated constructor stub
-    }
+  public SourceException(Throwable cause) {
+    super(cause);
+    // TODO Auto-generated constructor stub
+  }
 
-    public SourceException(String message, Throwable cause) {
-        super(message, cause);
-        // TODO Auto-generated constructor stub
-    }
+  public SourceException(String message, Throwable cause) {
+    super(message, cause);
+    // TODO Auto-generated constructor stub
+  }
 
 
 }
