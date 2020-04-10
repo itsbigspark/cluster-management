@@ -42,7 +42,7 @@ public class PurgingJobIntegrationTests {
 
     ClusterManagementJob clusterManagementJob = ClusterManagementJob.getInstance();
     this.purgingController = new PurgingController();
-    this.auditHelper = new AuditHelper(clusterManagementJob, "EDH Cluster purging test");
+    this.auditHelper = new AuditHelper(clusterManagementJob, "EDH Cluster purging test","purging.auditTable");
     this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark, auditHelper);
     this.fileSystem = clusterManagementJob.fileSystem;
     this.hadoopConfiguration = clusterManagementJob.hadoopConfiguration;

@@ -18,11 +18,8 @@ public class PurgingRunner {
       purgingGroup = PropertyUtils.getOptionalProperty(argsp, "purgingGroup", -1);
     }
     if (argsp.containsKey("purgingGroup")) {
-      // PurgingController.set PropertyUtils.getOptionalProperty(argsp, "isDryRun",  false);
-      //purgingControlle
 
     }
-
     PurgingController.execute(purgingGroup);
     logger.info("PurgingRunner Completed");
   }

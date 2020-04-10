@@ -31,4 +31,18 @@ public class OffloadMetadata {
     this.platform = platform;
     this.targetBucket = targetBucket;
   }
+
+  @Override
+  public String toString() {
+    return "OffloadMetadata{" +
+        "database='" + database + '\'' +
+        ", tableName='" + tableName + '\'' +
+        ", tableDescriptor=" + tableDescriptor +
+        ", platform=" + platform +
+        ", targetBucket='" + targetBucket + '\'' +
+        ", sourcePath=" + sourcePath +
+        ", hdfsRetention=" + hdfsRetention +
+        ", constructor=" + constructor +
+        '}';
+  }
 }

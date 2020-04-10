@@ -38,7 +38,7 @@ public class TstDataSetup {
 
   public TstDataSetup() throws IOException, MetaException, ConfigurationException, SourceException {
     ClusterManagementJob clusterManagementJob = ClusterManagementJob.getInstance();
-    this.auditHelper = new AuditHelper(clusterManagementJob, "Test data setup");
+    this.auditHelper = new AuditHelper(clusterManagementJob, "Test data setup", "purging.auditTable");
     this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark, auditHelper);
     this.fileSystem = clusterManagementJob.fileSystem;
     this.hadoopConfiguration = clusterManagementJob.hadoopConfiguration;

@@ -31,7 +31,6 @@ public class SmokeTest {
   public ClusterManagementJob clusterManagementJob;
   public AuditHelper auditHelper;
 
-
   public static void main(String[] args)
       throws TException, SourceException, ConfigurationException, IOException {
     logger.info("Starting main method");

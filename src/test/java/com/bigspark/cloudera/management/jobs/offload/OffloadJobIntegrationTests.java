@@ -39,7 +39,7 @@ public class OffloadJobIntegrationTests {
 
     ClusterManagementJob clusterManagementJob = ClusterManagementJob.getInstance();
     this.offloadController = new OffloadController();
-    this.auditHelper = new AuditHelper(clusterManagementJob, "Storage offload job test");
+    this.auditHelper = new AuditHelper(clusterManagementJob, "Storage offload job test", "offload.auditTable");
     this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark, auditHelper);
     this.fileSystem = clusterManagementJob.fileSystem;
     this.hadoopConfiguration = clusterManagementJob.hadoopConfiguration;
@@ -65,9 +65,12 @@ public class OffloadJobIntegrationTests {
         .getProperty("offload.testingDatabase");
     this.metatable = jobProperties
         .getProperty("offload.metatable");
-    TstDataSetup tstDataSetup = new TstDataSetup();
-    tstDataSetup.setUp(testingDatabase, metatable);
+//    TstDataSetup tstDataSetup = new TstDataSetup();
+//    tstDataSetup.setUp(testingDatabase, metatable);
     createMetadataTable();
+    OffloadController offloadController = new OffloadController();
+    offloadController.execute(1);
+
 
   }
 

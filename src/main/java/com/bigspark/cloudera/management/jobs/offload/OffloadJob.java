@@ -1,6 +1,7 @@
 package com.bigspark.cloudera.management.jobs.offload;
 
 import com.bigspark.cloudera.management.common.enums.Pattern;
+import com.bigspark.cloudera.management.common.enums.Platform;
 import com.bigspark.cloudera.management.common.exceptions.SourceException;
 import com.bigspark.cloudera.management.common.metadata.OffloadMetadata;
 import com.bigspark.cloudera.management.common.model.SourceDescriptor;
@@ -47,12 +48,14 @@ public class OffloadJob {
   public OffloadMetadata offloadMetadata;
   public SourceDescriptor sourceDescriptor;
 
+  Platform platform;
   Pattern pattern;
   String database;
   String sourceTable;
   String targetTable;
   String targetTablePath;
   String trashBaseLocation;
+
 
   private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -110,14 +113,14 @@ public class OffloadJob {
 
   void createS3Table() {
     String sql_s = String
-        .format("CREATE EXTERNAL TABLE %s.%s as SELECT * FROM %s.%s LOCATION %s",
-            this.database, this.targetTable, this.database, this.sourceTable, this.targetTablePath);
+        .format("CREATE EXTERNAL TABLE %s.%s LOCATION '%s' as SELECT * FROM %s.%s where 1=0",
+            this.database, this.targetTable, this.targetTablePath, this.database, this.sourceTable);
     spark.sql(sql_s);
   }
 
   void createS3Partition(String partitionName) {
     String sql_s = String.format(
-        "ALTER TABLE %s.%s ADD PARTITION IF NOT EXIST (%s)", this.database, this.targetTable,
+        "ALTER TABLE %s.%s ADD PARTITION IF NOT EXIST ('%s')", this.database, this.targetTable,
         partitionName);
     spark.sql(sql_s);
   }
@@ -183,6 +186,7 @@ public class OffloadJob {
    */
   void execute(OffloadMetadata offloadMetadata) throws Exception {
     this.offloadMetadata = offloadMetadata;
+    this.platform = offloadMetadata.platform;
     if (this.offloadMetadata.constructor == 1) // Database, table type
     {
       offloadTablePartitions();
@@ -199,7 +203,7 @@ public class OffloadJob {
     this.pattern = MetadataHelper.getTableType(offloadMetadata.tableDescriptor);
     this.database = offloadMetadata.tableDescriptor.getDatabaseName();
     this.sourceTable = offloadMetadata.tableDescriptor.getTableName();
-    this.targetTable = this.sourceTable + pattern;
+    this.targetTable = this.sourceTable + "_" + platform;
     this.targetTablePath = "s3a://" + offloadMetadata.targetBucket + "/"
         + pattern + "/"
         + offloadMetadata.database + "/"

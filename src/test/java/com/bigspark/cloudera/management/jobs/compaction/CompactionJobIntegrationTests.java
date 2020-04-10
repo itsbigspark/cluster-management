@@ -45,7 +45,7 @@ public class CompactionJobIntegrationTests {
       throws IOException, MetaException, ConfigurationException, SourceException {
     this.clusterManagementJob = ClusterManagementJob.getInstance();
     this.compactionController = new CompactionController();
-    this.auditHelper = new AuditHelper(clusterManagementJob, "Small file compaction test");
+    this.auditHelper = new AuditHelper(clusterManagementJob, "Small file compaction test", "compaction.auditTable");
     this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark, auditHelper);
     this.fileSystem = clusterManagementJob.fileSystem;
     this.hadoopConfiguration = clusterManagementJob.hadoopConfiguration;
