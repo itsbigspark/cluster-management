@@ -335,6 +335,27 @@ public class MetadataHelper {
   }
 
 
+  /**
+   * Method to drop table partition using HiveMetaStoreClient
+   *
+   * @param partition
+   * @throws TException
+   */
+  public static void dropHivePartition(Partition partition, HiveMetaStoreClient hiveMetaStoreClient) throws TException {
+      hiveMetaStoreClient
+          .dropPartition(partition.getDbName(), partition.getTableName(), partition.getValues());
+  }
 
+  /**
+   * Method to drop table partition and delete data using HiveMetaStoreClient
+   *
+   * @param partition
+   * @throws TException
+   */
+  public static void purgeHivePartition(Partition partition, HiveMetaStoreClient hiveMetaStoreClient) throws TException {
+      hiveMetaStoreClient
+          .dropPartition(partition.getDbName(), partition.getTableName(), partition.getValues(),
+              true);
+    }
 
 }

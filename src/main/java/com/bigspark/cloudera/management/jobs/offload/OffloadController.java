@@ -36,6 +36,12 @@ public class OffloadController {
 
   Logger logger = LoggerFactory.getLogger(getClass());
 
+  public OffloadController(Boolean isDryRun)
+      throws MetaException, SourceException, ConfigurationException, IOException {
+    this();
+    this.isDryRun = isDryRun;
+  }
+
   public OffloadController()
       throws IOException, MetaException, ConfigurationException, SourceException {
     ClusterManagementJob clusterManagementJob = ClusterManagementJob.getInstance();

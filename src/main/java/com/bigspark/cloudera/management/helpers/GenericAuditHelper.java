@@ -37,7 +37,7 @@ public class GenericAuditHelper {
     //Cannot do an audited spark session without the audit table!
     SparkSession spark = SparkHelper.getSparkSession();
     if (!spark.catalog().tableExists(auditTable_[0], auditTable_[1])) {
-      logger.error(String.format("Audit table does not exists: %s", auditTable));
+      logger.error(String.format("Audit table does not exist : %s", auditTable));
     } else {
       setLogfile();
       isInitialised = true;

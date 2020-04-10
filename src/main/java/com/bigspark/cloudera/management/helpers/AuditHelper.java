@@ -5,8 +5,6 @@ import com.bigspark.cloudera.management.jobs.ClusterManagementJob;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import javax.naming.ConfigurationException;
-import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
@@ -22,19 +20,19 @@ public class AuditHelper {
   public String auditTable;
   public String jobType;
 
-  public AuditHelper(ClusterManagementJob clusterManagementJob, String jobType)
-      throws ConfigurationException, IOException, MetaException, SourceException {
+  public AuditHelper(ClusterManagementJob clusterManagementJob, String jobType, String tableConfigKey)
+      throws IOException, SourceException {
     this.clusterManagementJob = clusterManagementJob;
-    intitialiseAuditTable();
+    intitialiseAuditTable(tableConfigKey);
     setLogfile();
   }
 
-  private void intitialiseAuditTable() throws IOException {
+  private void intitialiseAuditTable(String tableConfigKey) throws IOException {
     if (this.clusterManagementJob == null) {
       logger.warn("cmj is null");
     }
-    auditTable = clusterManagementJob.jobProperties
-        .getProperty("compaction.auditTable");
+    this.auditTable = clusterManagementJob.jobProperties
+        .getProperty(tableConfigKey);
     String[] auditTable_ = auditTable.split("\\.");
     //Cannot do an audited spark session without the audit table!
     SparkSession spark = SparkHelper.getSparkSession();

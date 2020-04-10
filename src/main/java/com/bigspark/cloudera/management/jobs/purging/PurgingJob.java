@@ -58,7 +58,7 @@ class PurgingJob {
   protected final GenericAuditHelper jobAudit;
   public SourceDescriptor sourceDescriptor;
   protected Boolean isDryRun;
-  PurgingMetadata PurgingMetadata;
+  PurgingMetadata purgingMetadata;
   Pattern pattern;
   Dataset<Row> partitionMonthEnds;
 
@@ -177,33 +177,14 @@ class PurgingJob {
    * @param partition
    * @throws TException
    */
-  protected void dropHivePartition(Partition partition) throws TException {
+  void dropHivePartition(Partition partition) throws TException {
     if (getDryRun()) {
       logger.info("DRY RUN - Dropped partition : " + partition.getValues().toString());
     } else {
-      hiveMetaStoreClient
-          .dropPartition(partition.getDbName(), partition.getTableName(), partition.getValues());
+      MetadataHelper.dropHivePartition(partition,this.hiveMetaStoreClient);
       logger.debug("Dropped partition : " + partition.getValues().toString());
     }
   }
-
-  /**
-   * Method to drop table partition and delete data using HiveMetaStoreClient
-   *
-   * @param partition
-   * @throws TException
-   */
-  protected void purgeHivePartition(Partition partition) throws TException {
-    if (getDryRun()) {
-      logger.info("DRY RUN - Purged partition : " + partition.toString());
-    } else {
-      hiveMetaStoreClient
-          .dropPartition(partition.getDbName(), partition.getTableName(), partition.getValues(),
-              true);
-      logger.info("Purged partition : " + partition.toString());
-    }
-  }
-
 
   protected List<Partition> removePartitionMonthEnds(List<Partition> partitionList) {
     ArrayList<Partition> eligiblePartitions = new ArrayList<>();
@@ -215,7 +196,7 @@ class PurgingJob {
           if (!isMonthEnd) {
             eligiblePartitions.add(partition);
             logger.trace(
-                String.format("Partition '%s' added  as it is not a month end'", partitionDate));
+                String.format("Partition '%s' added as it is not a month end'", partitionDate));
           } else {
             logger.trace(
                 String.format("Partition '%s' excluded as it is a month end'", partitionDate));
@@ -247,8 +228,8 @@ class PurgingJob {
       throws IOException, URISyntaxException {
     if (purgeCandidates.size() >= 0) {
       String trashBaseLocation = FileSystemHelper.getCreateTrashBaseLocation("purging"
-          , this.PurgingMetadata.database
-          , this.PurgingMetadata.tableName);
+          , this.purgingMetadata.database
+          , this.purgingMetadata.tableName);
 
       for (Partition p : purgeCandidates) {
         URI partitionLocation = new URI(p.getSd().getLocation());
@@ -257,8 +238,8 @@ class PurgingJob {
                 getDryRun(),
                 fileSystem);
         String payload = this.getAuditLogRecord(
-            this.PurgingMetadata.database
-            , this.PurgingMetadata.tableName
+            this.purgingMetadata.database
+            , this.purgingMetadata.tableName
             , partitionLocation.getPath()
             , trashBaseLocation);
 
@@ -367,34 +348,34 @@ class PurgingJob {
    * @throws MetaException
    * @throws SourceException
    */
-  void execute(PurgingMetadata PurgingMetadata)
+  void execute(PurgingMetadata purgingMetadata)
       throws SourceException, IOException, URISyntaxException, TException, ParseException {
-    this.PurgingMetadata = PurgingMetadata;
+    this.purgingMetadata = purgingMetadata;
     this.sourceDescriptor = new SourceDescriptor(
-        metadataHelper.getDatabase(PurgingMetadata.database)
-        , PurgingMetadata.tableDescriptor);
+        metadataHelper.getDatabase(purgingMetadata.database)
+        , purgingMetadata.tableDescriptor);
 
-    if (PurgingMetadata.tableDescriptor.hasPartitions()) {
-      this.pattern = MetadataHelper.getTableType(PurgingMetadata.tableDescriptor);
+    if (purgingMetadata.tableDescriptor.hasPartitions()) {
+      this.pattern = MetadataHelper.getTableType(purgingMetadata.tableDescriptor);
       if (this.pattern != null) {
         LocalDate purgeCeiling = this.calculatePurgeCeiling(
-            PurgingMetadata.retentionPeriod
+            purgingMetadata.retentionPeriod
             , LocalDate.now()
-            , PurgingMetadata.isRetainMonthEnd);
+            , purgingMetadata.isRetainMonthEnd);
 
         List<Partition> allPurgeCandidates = MetadataHelper.removePartitionToRetain(
-            PurgingMetadata.tableDescriptor.getPartitionList()
+            purgingMetadata.tableDescriptor.getPartitionList()
             , purgeCeiling);
 
         logger.debug("Partitions returned as eligible for purge : " + allPurgeCandidates.size());
 
-        if (PurgingMetadata.isRetainMonthEnd) {
+        if (purgingMetadata.isRetainMonthEnd) {
           executeMonthEndpurging(allPurgeCandidates, purgeCeiling);
         } else {
           this.trashDataOutwithRetention(allPurgeCandidates);
           this.impalaInvalidateMetadata(
-              PurgingMetadata.database,
-              PurgingMetadata.tableName, allPurgeCandidates);
+              purgingMetadata.database,
+              purgingMetadata.tableName, allPurgeCandidates);
         }
         this.jobAudit.invalidateAuditTableMetadata();
       } else {
@@ -402,8 +383,8 @@ class PurgingJob {
       }
     } else {
       logger.warn(String.format("Skipping table '%s.%s' as it has no partitions"
-          , PurgingMetadata.tableDescriptor.getDatabaseName()
-          , PurgingMetadata.tableDescriptor.getTableName()));
+          , purgingMetadata.tableDescriptor.getDatabaseName()
+          , purgingMetadata.tableDescriptor.getTableName()));
     }
   }
 
@@ -412,8 +393,8 @@ class PurgingJob {
       throws IOException, URISyntaxException, TException, ParseException {
     logger.debug("RetainMonthEnd config passed from metadata table");
     this.getTablePartitionMonthEnds(
-        this.PurgingMetadata.database,
-        this.PurgingMetadata.tableName
+        this.purgingMetadata.database,
+        this.purgingMetadata.tableName
         , allPurgeCandidates, purgeCeiling);
 
     logger.debug("Removing Month End Partitions that have been previously processed");
@@ -421,20 +402,20 @@ class PurgingJob {
 
     logger.debug("Creating swing table for month end partitions");
     this.createMonthEndSwingTable(
-        this.PurgingMetadata.database,
-        this.PurgingMetadata.tableName);
+        this.purgingMetadata.database,
+        this.purgingMetadata.tableName);
 
     this.trashDataOutwithRetention(allPurgeCandidates);
 
     logger.debug("Resolving source table by reinstating month end partitions");
     this.reinstateMonthEndPartitions(
-        this.PurgingMetadata.database,
-        this.PurgingMetadata.tableName);
+        this.purgingMetadata.database,
+        this.purgingMetadata.tableName);
 
     //Mark new Month End partitions as month_end:true and compute stats
     this.manageMonthEndPartitionMetadata(
-        PurgingMetadata.database,
-        PurgingMetadata.tableName);
+        purgingMetadata.database,
+        purgingMetadata.tableName);
   }
 
   private String getAuditLogRecord(String dbName, String tableName, String originalLocation,

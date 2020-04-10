@@ -64,7 +64,7 @@ public class CompactionJob {
   public CompactionJob()
       throws IOException, MetaException, ConfigurationException, SourceException {
     ClusterManagementJob clusterManagementJob = ClusterManagementJob.getInstance();
-    this.auditHelper = new AuditHelper(clusterManagementJob, "Small file compaction");
+    this.auditHelper = new AuditHelper(clusterManagementJob, "Small file compaction","compaction.AuditTable");
     this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark, auditHelper);
     this.fileSystem = clusterManagementJob.fileSystem;
     this.hadoopConfiguration = clusterManagementJob.hadoopConfiguration;

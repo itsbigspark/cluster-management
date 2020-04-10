@@ -3,11 +3,14 @@
   <component name="ChangeListManager">
     <list default="true" id="062bc843-fefb-4418-9027-9622054f9108" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/metadata/OffloadMetadata.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/metadata/OffloadMetadata.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/AuditHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/AuditHelper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/GenericAuditHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/GenericAuditHelper.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/MetadataHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/MetadataHelper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/compaction/CompactionJob.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/compaction/CompactionJob.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/offload/OffloadController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/offload/OffloadController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/offload/OffloadJob.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/offload/OffloadJob.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/purging/PurgingJob.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/purging/PurgingJob.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/config.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/config.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -354,7 +357,14 @@
       <option name="project" value="LOCAL" />
       <updated>1586501697936</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="Offload job initial">
+      <created>1586511329549</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1586511329549</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -383,7 +393,8 @@
     <MESSAGE value="BIG-4 More testing and defect resolution" />
     <MESSAGE value="BIG-3 Additional logging" />
     <MESSAGE value="Code styling and refactoring" />
-    <option name="LAST_COMMIT_MESSAGE" value="Code styling and refactoring" />
+    <MESSAGE value="Offload job initial" />
+    <option name="LAST_COMMIT_MESSAGE" value="Offload job initial" />
   </component>
   <component name="WindowStateProjectService">
     <state x="2385" y="104" key="#All_in_cluster-management" timestamp="1583222240044">
@@ -398,6 +409,10 @@
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
     <state x="2380" y="124" key="#Project_Structure/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583222303223" />
+    <state x="635" y="258" key="#com.intellij.codeInsight.editorActions.RestoreReferencesDialog" timestamp="1586519748169">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state x="635" y="258" key="#com.intellij.codeInsight.editorActions.RestoreReferencesDialog/1920.0.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1586519748169" />
     <state x="2545" y="457" key="#com.intellij.debugger.ui.breakpoints.BreakpointsConfigurationDialogFactory.BreakpointsConfigurationDialog.AddFieldBreakpointDialog" timestamp="1583772345743">
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
@@ -420,11 +435,11 @@
       <screen x="0" y="23" width="1920" height="1057" />
     </state>
     <state x="645" y="345" key="#com.intellij.fileTypes.FileTypeChooser/1920.23.1920.1057/0.23.1920.1057@0.23.1920.1057" timestamp="1583424044287" />
-    <state x="729" y="191" key="#com.intellij.ide.util.MemberChooser" timestamp="1586504836405">
+    <state x="729" y="191" key="#com.intellij.ide.util.MemberChooser" timestamp="1586519359275">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="729" y="191" key="#com.intellij.ide.util.MemberChooser/0.0.1920.1080@0.0.1920.1080" timestamp="1585868124144" />
-    <state x="729" y="191" key="#com.intellij.ide.util.MemberChooser/1920.0.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1586504836405" />
+    <state x="729" y="191" key="#com.intellij.ide.util.MemberChooser/1920.0.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1586519359275" />
     <state x="2649" y="191" key="#com.intellij.ide.util.MemberChooser/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583490568429" />
     <state x="2649" y="210" key="#com.intellij.ide.util.MemberChooser/1920.23.1920.1057/0.23.1920.1057@1920.23.1920.1057" timestamp="1583937617273" />
     <state x="2615" y="253" key="#com.intellij.ide.util.PackageChooserDialog" timestamp="1583222499469">
@@ -477,12 +492,12 @@
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
     <state x="2425" y="359" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583333591658" />
-    <state x="178" y="74" key="CommitChangelistDialog2" timestamp="1586501697293">
+    <state x="178" y="74" key="CommitChangelistDialog2" timestamp="1586511329181">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="178" y="82" key="CommitChangelistDialog2/0.0.1920.1200@0.0.1920.1200" timestamp="1584392570329" />
     <state x="178" y="103" key="CommitChangelistDialog2/0.23.1920.1177@0.23.1920.1177" timestamp="1584390817131" />
-    <state x="178" y="74" key="CommitChangelistDialog2/1920.0.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1586433205662" />
+    <state x="178" y="74" key="CommitChangelistDialog2/1920.0.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1586511329181" />
     <state x="2098" y="74" key="CommitChangelistDialog2/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583741032269" />
     <state x="178" y="74" key="CommitChangelistDialog2/1920.23.1920.1057/0.0.1920.1080@0.0.1920.1080" timestamp="1586501697293" />
     <state x="2098" y="95" key="CommitChangelistDialog2/1920.23.1920.1057/0.23.1920.1057@1920.23.1920.1057" timestamp="1584120803884" />
