@@ -74,7 +74,7 @@ class PurgingJob {
    */
   PurgingJob() throws IOException, MetaException, ConfigurationException, SourceException {
     this.clusterManagementJob = ClusterManagementJob.getInstance();
-    this.auditHelper = new AuditHelper(clusterManagementJob, "Purging job","purging.auditTable");
+    this.auditHelper = new AuditHelper(clusterManagementJob, "Purging job","purging.sqlAuditTable");
     this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark, auditHelper);
     this.fileSystem = clusterManagementJob.fileSystem;
     this.hadoopConfiguration = clusterManagementJob.hadoopConfiguration;
@@ -209,6 +209,7 @@ class PurgingJob {
 
   protected void createMonthEndSwingTable(String database, String table) {
     if ((this.partitionMonthEnds.count() > 0)) {
+      logger.debug("Creating swing table for month end partitions");
       this.partitionMonthEnds.createOrReplaceTempView("partitionMonthEnds");
       if (this.pattern == Pattern.SH) {
         this.spark.sql(String.format("DROP TABLE IF EXISTS %s.%s_swing", database, table));
@@ -221,6 +222,8 @@ class PurgingJob {
             "CREATE TABLE %s.%s_swing AS SELECT t.* from %s.%s t join partitionMonthEnds me on t.EDI_BUSINESS_DAY = me.MONTH_END and t.SRC_SYS_ID = me.SRC_SYS_ID and t.SRC_SYS_INST_ID = me.SRC_SYS_INST_ID",
             database, table, database, table));
       }
+    } else {
+      logger.debug("Skipping Creating swing table as no month ends");
     }
   }
 
@@ -261,6 +264,7 @@ class PurgingJob {
 
   protected void reinstateMonthEndPartitions(String database, String table) {
     if (this.partitionMonthEnds.count() > 0) {
+      logger.debug("Resolving source table by reinstating month end partitions");
       Dataset<Row> swingTable = clusterManagementJob.spark
           .table(String.format("%s.%s_swing", database, table));
       if (pattern == Pattern.SH) {
@@ -323,11 +327,20 @@ class PurgingJob {
       List<Partition> purgeCandidates) {
     if (purgeCandidates == null || purgeCandidates.size() > 0) {
       try {
+        logger.debug(String.format("Invalidating  Metadata for %s.%s", dbName, tableName));
         this.impalaHelper.invalidateMetadata(dbName, tableName);
       } catch (Exception ex) {
-        logger
-            .error(String.format("Unable to invalidate metadata for %s.%s", dbName, tableName), ex);
+
+        if(logger.isDebugEnabled()) {
+          logger
+              .error(String.format("Unable to invalidate metadata for %s.%s", dbName, tableName), ex);
+        } else {
+          logger
+              .error(String.format("Unable to invalidate metadata for %s.%s.  Turn on DEBUG logging for full Stack Trace", dbName, tableName));
+        }
       }
+    } else {
+      logger.debug(String.format("Skipping Invalidating  Metadata for %s.%s"), dbName, tableName);
     }
   }
 
@@ -392,6 +405,8 @@ class PurgingJob {
       LocalDate purgeCeiling)
       throws IOException, URISyntaxException, TException, ParseException {
     logger.debug("RetainMonthEnd config passed from metadata table");
+
+
     this.getTablePartitionMonthEnds(
         this.purgingMetadata.database,
         this.purgingMetadata.tableName
@@ -400,14 +415,13 @@ class PurgingJob {
     logger.debug("Removing Month End Partitions that have been previously processed");
     allPurgeCandidates = this.removePartitionMonthEnds(allPurgeCandidates);
 
-    logger.debug("Creating swing table for month end partitions");
+
     this.createMonthEndSwingTable(
         this.purgingMetadata.database,
         this.purgingMetadata.tableName);
 
     this.trashDataOutwithRetention(allPurgeCandidates);
 
-    logger.debug("Resolving source table by reinstating month end partitions");
     this.reinstateMonthEndPartitions(
         this.purgingMetadata.database,
         this.purgingMetadata.tableName);

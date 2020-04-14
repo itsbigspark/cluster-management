@@ -50,7 +50,7 @@ public class AuditHelper {
               ") " +
               " ROW FORMAT DELIMITED" +
               " FIELDS TERMINATED BY '~'" +
-              " STORED AS TEXTFILE"
+              " "
           , auditTable_[0], auditTable_[1])
       );
     }
