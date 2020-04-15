@@ -39,7 +39,7 @@ public class SmokeTest {
   //protected final  AuditHelper auditHelper;
 
   public static void main(String[] args)
-      throws TException, SourceException, ConfigurationException, IOException, ClassNotFoundException, SQLException, InstantiationException, InterruptedException, IllegalAccessException {
+      throws Exception {
     logger.info("Starting main method");
     SmokeTest st = new SmokeTest();
     st.execute();
@@ -65,8 +65,23 @@ public class SmokeTest {
 
 
   private void execute()
-      throws SourceException, TException, ClassNotFoundException, InstantiationException, IllegalAccessException, InterruptedException, IOException, SQLException {
+      throws Exception {
+    testPartitionMarking();
+  }
 
+  private void testPartitionMarking() throws Exception {
+    String database = "bddlsold01d";
+    String table = "test_table_sh";
+
+    for(Partition p : this.hiveMetaStoreClient.listPartitions(database, table, (short)10000)) {
+
+      p.getParameters().put("month_end", "true");
+      hiveMetaStoreClient.alter_partition(database, table, p);
+      logger.info(p.toString());
+    }
+  }
+
+  private void testImpalaConnection() throws Exception {
     try (Connection conn = this.impalaHelper.getConnection()) {
       try (Statement stmnt = conn.createStatement()) {
         try(ResultSet rs = stmnt.executeQuery("show databases")) {
@@ -77,5 +92,4 @@ public class SmokeTest {
       }
     }
   }
-
 }

@@ -26,7 +26,8 @@ public class ImpalaHelper {
 
   public void invalidateMetadata(String tableName)
       throws IllegalAccessException, InterruptedException, InstantiationException, IOException, SQLException, ClassNotFoundException {
-    invalidateMetadata(tableName.split(".")[0], tableName.split(".")[1]);
+    String[] parts_  = tableName.split("\\.");
+    invalidateMetadata(parts_[0], parts_[1]);
   }
 
   public void invalidateMetadata(String dbName, String tableName)
@@ -87,8 +88,6 @@ public class ImpalaHelper {
       throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, InterruptedException {
     UserGroupInformation ugi = UserGroupInformation.getCurrentUser();
     final Driver driver = (Driver) Class.forName("com.cloudera.impala.jdbc41.Driver").newInstance();
-    logger.trace(String.format("Using Connection String: %s", this.connectionString));
-    logger.trace(String.format("UGI: %s", ugi));
     final String connectionString = this.connectionString;
     return ugi.doAs(new PrivilegedExceptionAction<Connection>() {
       @Override

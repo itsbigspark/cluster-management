@@ -196,10 +196,10 @@ class PurgingJob {
           if (!isMonthEnd) {
             eligiblePartitions.add(partition);
             logger.trace(
-                String.format("Partition '%s' added as it is not a month end'", partitionDate));
+                String.format("Partition '%s' added as it is not currently marked as a month end'", partitionDate));
           } else {
             logger.trace(
-                String.format("Partition '%s' excluded as it is a month end'", partitionDate));
+                String.format("Partition '%s' excluded as it is marked as a month end'", partitionDate));
           }
         }
     );
@@ -284,8 +284,10 @@ class PurgingJob {
 
   protected void manageMonthEndPartitionMetadata(String database, String table)
       throws TException, ParseException {
-    this.impalaInvalidateMetadata(database, table);
+
     List<Row> partitions = this.partitionMonthEnds.collectAsList();
+
+    //Loop 1 - Mark Partitions as month_end:true in the  Hive Metastore
     for (Row partition : partitions) {
       String edi_business_day = DateUtils.getFormattedDate(partition.getDate(1), "yyyy-MM-dd");
       logger.debug(String
@@ -293,11 +295,21 @@ class PurgingJob {
               table));
       Partition p = this.hiveMetaStoreClient
           .getPartition(database, table, String.format("edi_business_day=%s", edi_business_day));
+
       p.getParameters().put("month_end", "true");
-      hiveMetaStoreClient.alter_partition(database, table, p);
-      this.impalaIComputeStats(database, table,
-          String.format("edi_business_day ='%s'", edi_business_day));
+      this.hiveMetaStoreClient.alter_partition(database, table, p);
     }
+
+    //Loop 2 - compute stats for impala - NOTE this cannot be done in loop 1 or it
+    //wipes out the month_end parameter unless we invalidate metadata each time!
+    this.impalaInvalidateMetadata(database, table);
+    for (Row partition : partitions) {
+      String edi_business_day = DateUtils.getFormattedDate(partition.getDate(1), "yyyy-MM-dd");
+
+      this.impalaComputeStats(database, table, String.format("edi_business_day ='%s'", edi_business_day));
+    }
+
+
     this.partitionMonthEnds.unpersist();
   }
 
@@ -340,11 +352,11 @@ class PurgingJob {
         }
       }
     } else {
-      logger.debug(String.format("Skipping Invalidating  Metadata for %s.%s"), dbName, tableName);
+      logger.debug(String.format("Skipping Invalidating  Metadata for %s.%s", dbName, tableName));
     }
   }
 
-  protected void impalaIComputeStats(String dbName, String tableName, String partitionSpec) {
+  protected void impalaComputeStats(String dbName, String tableName, String partitionSpec) {
     try {
       this.impalaHelper.computeStats(dbName, tableName, partitionSpec);
     } catch (Exception ex) {
@@ -375,7 +387,7 @@ class PurgingJob {
             purgingMetadata.retentionPeriod
             , LocalDate.now()
             , purgingMetadata.isRetainMonthEnd);
-
+        
         List<Partition> allPurgeCandidates = MetadataHelper.removePartitionToRetain(
             purgingMetadata.tableDescriptor.getPartitionList()
             , purgeCeiling);
@@ -383,7 +395,7 @@ class PurgingJob {
         logger.debug("Partitions returned as eligible for purge : " + allPurgeCandidates.size());
 
         if (purgingMetadata.isRetainMonthEnd) {
-          executeMonthEndpurging(allPurgeCandidates, purgeCeiling);
+          executeMonthEndPurging(allPurgeCandidates, purgeCeiling);
         } else {
           this.trashDataOutwithRetention(allPurgeCandidates);
           this.impalaInvalidateMetadata(
@@ -401,7 +413,7 @@ class PurgingJob {
     }
   }
 
-  private void executeMonthEndpurging(List<Partition> allPurgeCandidates,
+  private void executeMonthEndPurging(List<Partition> allPurgeCandidates,
       LocalDate purgeCeiling)
       throws IOException, URISyntaxException, TException, ParseException {
     logger.debug("RetainMonthEnd config passed from metadata table");
