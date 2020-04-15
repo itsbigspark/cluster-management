@@ -2,7 +2,6 @@ package com.bigspark.cloudera.management.common.model;
 
 
 import com.bigspark.cloudera.management.common.enums.Platform;
-
 import java.net.URI;
 import java.util.HashMap;
 
@@ -11,8 +10,8 @@ import java.util.HashMap;
  */
 public class PlatformDescriptor {
 
-    private Platform platform;
-    private URI URI;
-    private HashMap replicationParams;
+  private Platform platform;
+  private URI URI;
+  private HashMap replicationParams;
 
 }

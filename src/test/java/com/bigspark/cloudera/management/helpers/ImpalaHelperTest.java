@@ -4,19 +4,19 @@ import org.junit.jupiter.api.Test;
 
 class ImpalaHelperTest {
 
-    @Test
-    void invalidateMetadata() {
-    }
+  @Test
+  void invalidateMetadata() {
+  }
 
-    @Test
-    void testInvalidateMetadata() {
-    }
+  @Test
+  void testInvalidateMetadata() {
+  }
 
-    @Test
-    void execute() {
-    }
+  @Test
+  void execute() {
+  }
 
-    @Test
-    void getConnection() {
-    }
+  @Test
+  void getConnection() {
+  }
 }

@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 
 class YarnHelperTest {
 
-    @Test
-    void main() {
-    }
+  @Test
+  void main() {
+  }
 }

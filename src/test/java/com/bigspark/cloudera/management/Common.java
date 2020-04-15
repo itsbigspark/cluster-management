@@ -1,20 +1,18 @@
 package com.bigspark.cloudera.management;
 
+import com.bigspark.cloudera.management.common.utils.DateUtils;
+import com.bigspark.cloudera.management.common.utils.PropertyUtils;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Properties;
-
-import com.bigspark.cloudera.management.common.utils.DateUtils;
-import com.bigspark.cloudera.management.common.utils.PropertyUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.hadoop.security.UserGroupInformation;
 
 
 public class Common {
 
-	private static final Log LOGGER = LogFactory.getLog(Common.class);
+  private static final Log LOGGER = LogFactory.getLog(Common.class);
 
 //	public static void testHdfsConnection(Configuration conf) throws IOException {
 //		FileSystem fs = FileSystem.get(conf);
@@ -27,13 +25,15 @@ public class Common {
 //		}
 //	}
 
-	private static Properties testProperties;
-	public synchronized static Properties getIntegrationTestProperties() throws IOException {
-		if(testProperties == null) {
-			testProperties = PropertyUtils.getPropertiesFile("src/main/resources/integration-test.properties");
-		}
-		return testProperties;
-	}
+  private static Properties testProperties;
+
+  public synchronized static Properties getIntegrationTestProperties() throws IOException {
+    if (testProperties == null) {
+      testProperties = PropertyUtils
+          .getPropertiesFile("src/main/resources/integration-test.properties");
+    }
+    return testProperties;
+  }
 
 //	private static SecurityHelperInstance testSecurityHelper;
 //	public synchronized static SecurityHelperInstance getSecurityHelper() throws IOException {
@@ -46,12 +46,12 @@ public class Common {
 //		return testSecurityHelper;
 //	}
 
-	public static void logUserGroupInformation(UserGroupInformation ugi) throws IOException {
-		LOGGER.info(String.format("isFromKeytab: %s", ugi.isFromKeytab()));
-		LOGGER.info(String.format("isLoginKeytabBased: %s", UserGroupInformation.isLoginKeytabBased()));
-		LOGGER.info(String.format("isLoginTicketBased: %s", UserGroupInformation.isLoginTicketBased()));
-		LOGGER.info(String.format("userGroupInformation: %s", ugi));
-	}
+//	public static void logUserGroupInformation(UserGroupInformation ugi) throws IOException {
+//		LOGGER.info(String.format("isFromKeytab: %s", ugi.isFromKeytab()));
+//		LOGGER.info(String.format("isLoginKeytabBased: %s", UserGroupInformation.isLoginKeytabBased()));
+//		LOGGER.info(String.format("isLoginTicketBased: %s", UserGroupInformation.isLoginTicketBased()));
+//		LOGGER.info(String.format("userGroupInformation: %s", ugi));
+//	}
 
 //	public static void setLoginUser(UserGroupInformation ugi) throws IOException {
 //		SecurityHelper.loginUserFromUgi(ugi);
@@ -59,25 +59,31 @@ public class Common {
 //		LOGGER.info(String.format("isLoginTicketBased: %s", UserGroupInformation.isLoginTicketBased()));
 //	}
 
-	public static String getBannerStart(String testName) throws ParseException {
-		StringBuilder sb = new StringBuilder();
-		sb.append("/******************************************************************************/\r\n");
-		sb.append(String.format("	Test: %s\r\n", testName));
-		sb.append(String.format("	Start Time:%s\r\n", DateUtils.getFormattedDateTime(Calendar.getInstance().getTime())));
-		sb.append("/******************************************************************************/\r\n");
-		return sb.toString();
-	}
+  public static String getBannerStart(String testName) throws ParseException {
+    StringBuilder sb = new StringBuilder();
+    sb.append(
+        "/******************************************************************************/\r\n");
+    sb.append(String.format("	Test: %s\r\n", testName));
+    sb.append(String.format("	Start Time:%s\r\n",
+        DateUtils.getFormattedDateTime(Calendar.getInstance().getTime())));
+    sb.append(
+        "/******************************************************************************/\r\n");
+    return sb.toString();
+  }
 
-	public static String getBannerFinish(String testName) throws ParseException {
-		StringBuilder sb = new StringBuilder();
+  public static String getBannerFinish(String testName) throws ParseException {
+    StringBuilder sb = new StringBuilder();
 
-		sb.append("/******************************************************************************/\r\n");
-		sb.append(String.format("	Test: %s\r\n", testName));
-		sb.append(String.format("	End Time:%s\r\n", DateUtils.getFormattedDateTime(Calendar.getInstance().getTime())));
-		sb.append("/******************************************************************************/\r\n");
-		sb.append("\r\n\r\n");
-		return sb.toString();
-	}
+    sb.append(
+        "/******************************************************************************/\r\n");
+    sb.append(String.format("	Test: %s\r\n", testName));
+    sb.append(String.format("	End Time:%s\r\n",
+        DateUtils.getFormattedDateTime(Calendar.getInstance().getTime())));
+    sb.append(
+        "/******************************************************************************/\r\n");
+    sb.append("\r\n\r\n");
+    return sb.toString();
+  }
 
 
 }
