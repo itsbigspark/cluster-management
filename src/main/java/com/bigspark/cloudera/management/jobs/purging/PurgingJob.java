@@ -73,6 +73,7 @@ class PurgingJob {
    * @throws SourceException
    */
   PurgingJob() throws IOException, MetaException, ConfigurationException, SourceException {
+    logger.info("Got HERE");
     this.clusterManagementJob = ClusterManagementJob.getInstance();
     this.auditHelper = new AuditHelper(clusterManagementJob, "Purging job","purging.sqlAuditTable");
     this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark, auditHelper);

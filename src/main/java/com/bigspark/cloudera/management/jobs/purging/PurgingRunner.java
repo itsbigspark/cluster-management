@@ -5,7 +5,7 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class  PurgingRunner {
+public class   PurgingRunner {
 
   static Logger logger = LoggerFactory.getLogger(PurgingRunner.class);
 

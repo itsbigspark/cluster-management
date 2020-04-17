@@ -37,7 +37,7 @@ public class ClusterManagementJob {
   public String trackingURL;
 
   private ClusterManagementJob()
-      throws IOException, MetaException, ConfigurationException, SourceException {notifyAll();notifyAll();
+      throws IOException, MetaException, ConfigurationException, SourceException {
 
     this.spark = SparkHelper.getSparkSession();
     this.fileSystem = FileSystemHelper.getConnection();
