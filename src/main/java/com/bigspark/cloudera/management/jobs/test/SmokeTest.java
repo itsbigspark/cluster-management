@@ -65,8 +65,7 @@ public class SmokeTest {
       this.jobProperties = clusterManagementJob.jobProperties;
       this.hiveMetaStoreClient = clusterManagementJob.hiveMetaStoreClient;
       logger.info("Finished constructing SmokeTest method");
-      String connStr = this.jobProperties.getProperty("impala.connStr");
-      this.impalaHelper = new ImpalaHelper(connStr);
+      this.impalaHelper =  ImpalaHelper.getInstanceFromProperties(this.jobProperties);
     } catch (Exception ex) {
       logger.error("Failed to instantiate SmokeTest Class through standard constructor", ex);
       System.exit(1);

@@ -7,6 +7,8 @@ import java.sql.Driver;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
+import javax.naming.ConfigurationException;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,12 +16,22 @@ import org.slf4j.LoggerFactory;
 
 public class ImpalaHelper {
 
-  Logger logger = LoggerFactory.getLogger(getClass());
+  static Logger logger = LoggerFactory.getLogger(ImpalaHelper.class);
 
   private final String connectionString;
+  private final Boolean isKerberos;
+
+  //"jdbc:impala://dh-uwc-impala.server.rbsgrp.net:21051/default;AuthMech=3;transportMode=sasl"
+  public ImpalaHelper(String connectionString, String userName, String password) {
+    this.isKerberos = true;
+    logger.debug(String
+        .format("Constructed ImpalaHelper with LDAP Connection String: %s", connectionString));
+    this.connectionString = String.format("%s;UID=%s;PWD=%s", connectionString, userName, password);
+  }
 
   public ImpalaHelper(String connectionString) {
     this.connectionString = connectionString;
+    this.isKerberos = false;
     logger.debug(String
         .format("Constructed ImpalaHelper with Connection String: %s", this.connectionString));
   }
@@ -85,15 +97,49 @@ public class ImpalaHelper {
 
 
   public Connection getConnection()
-      throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, InterruptedException {
+      throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, InterruptedException, SQLException {
     UserGroupInformation ugi = UserGroupInformation.getCurrentUser();
     final Driver driver = (Driver) Class.forName("com.cloudera.impala.jdbc41.Driver").newInstance();
     final String connectionString = this.connectionString;
-    return ugi.doAs(new PrivilegedExceptionAction<Connection>() {
-      @Override
-      public Connection run() throws Exception {
-        return driver.connect(connectionString, new Properties());
+    if(this.isKerberos) {
+      return ugi.doAs(new PrivilegedExceptionAction<Connection>() {
+        @Override
+        public Connection run() throws Exception {
+          return driver.connect(connectionString, new Properties());
+        }
+      });
+    } else {
+      return driver.connect(connectionString, new Properties());
+    }
+  }
+
+  public static ImpalaHelper getInstanceFromProperties(Properties  jobProperties) throws Exception {
+
+      if (jobProperties.containsKey("impala.connStr.LDAP")) {
+        try {
+          logger.debug("Attempting to construct LDAP Impala Helper");
+          String connStr = jobProperties.getProperty("impala.connStr.LDAP");
+          String userName = SparkHelper.getSparkUser();
+          String keyStore = String.format("%s/keystore.jceks", SparkHelper.Hdfs.getUserHomeArea());
+          String keyName  = String.format("%s.pwd", userName);
+          logger.debug("Attempting to construct LDAP Impala Helper - gOT kEYS");
+          if(FileSystemHelper.getConnection().exists(new Path(keyStore))) {
+            logger.trace(String.format("Getting password for key %s from %s", keyName, keyStore));
+            String password = SparkHelper.Security.getFromHadoopKeyStore(
+                keyStore
+                , keyName
+            );
+            return new ImpalaHelper(connStr, userName, password);
+          } else {
+            throw new ConfigurationException("Keystore in format /user/<racf>/keystore.jceks does not exist");
+          }
+        } catch(Exception ex) {
+          throw new Exception ("Could not initialise LDAP Impala, check exception", ex);
+        }
+      } else {
+        logger.debug("Attempting to construct KRB5 Impala Helper");
+        String connStr = jobProperties.getProperty("impala.connStr");
+        return new ImpalaHelper(connStr);
       }
-    });
   }
 }

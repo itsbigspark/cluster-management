@@ -80,7 +80,7 @@ public class PurgingJobIntegrationTests {
 
 
   void execute()
-      throws ConfigurationException, IOException, MetaException, ParseException, SourceException {
+      throws Exception {
 
     this.testingDatabase = jobProperties
         .getProperty("purging.testingDatabase");

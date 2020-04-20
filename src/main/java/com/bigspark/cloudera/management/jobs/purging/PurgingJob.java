@@ -72,8 +72,7 @@ class PurgingJob {
    * @throws ConfigurationException
    * @throws SourceException
    */
-  PurgingJob() throws IOException, MetaException, ConfigurationException, SourceException {
-    logger.info("Got HERE");
+  PurgingJob() throws Exception {
     this.clusterManagementJob = ClusterManagementJob.getInstance();
     this.auditHelper = new AuditHelper(clusterManagementJob, "Purging job","purging.sqlAuditTable");
     this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark, auditHelper);
@@ -83,11 +82,12 @@ class PurgingJob {
     this.setDryRun(clusterManagementJob.isDryRun);
     this.jobProperties = clusterManagementJob.jobProperties;
     this.hiveMetaStoreClient = clusterManagementJob.hiveMetaStoreClient;
-    String connStr = this.jobProperties.getProperty("impala.connStr");
-    this.impalaHelper = new ImpalaHelper(connStr);
+    this.impalaHelper = ImpalaHelper.getInstanceFromProperties(this.jobProperties);
     this.jobAudit = new GenericAuditHelper(this.clusterManagementJob, "purging.auditTable",
         this.impalaHelper);
   }
+
+
 
   protected void getTablePartitionMonthEnds(String dbName, String tableName,
       List<Partition> partitions, LocalDate purgeCeiling) {

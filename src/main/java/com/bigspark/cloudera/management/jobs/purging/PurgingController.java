@@ -138,19 +138,19 @@ public class PurgingController {
   }
 
 
-  public void execute() throws ConfigurationException, IOException, MetaException, SourceException {
+  public void execute() throws Exception {
     List<Row> retentionGroup = getGroupDatabases(-1);
     this.execute(retentionGroup, -1);
   }
 
   public void execute(int executionGroup)
-      throws ConfigurationException, IOException, MetaException, SourceException {
+      throws Exception {
     List<Row> retentionGroup = getGroupDatabases(executionGroup);
     this.execute(retentionGroup, executionGroup);
   }
 
   public void execute(List<Row> databases, int executionGroup)
-      throws ConfigurationException, IOException, MetaException, SourceException {
+      throws Exception {
     PurgingJob PurgingJob = new PurgingJob();
     auditHelper.startup();
 
