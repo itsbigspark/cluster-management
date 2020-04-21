@@ -317,18 +317,26 @@ public class MetadataHelper {
     ArrayList<Partition> eligiblePartitions = new ArrayList<>();
     partitionList.forEach(
         partition -> {
-          LocalDate partitionDate = LocalDate.parse(partition.getValues().get(0));
-          Boolean purge = partitionDate.isBefore(purgeCeiling);
-          if (purge) {
-            eligiblePartitions.add(partition);
-            logger.trace(String
-                .format("Partition date '%s' added as prior to ceiling date: '%s''", partitionDate,
-                    purgeCeiling));
-          } else {
-            logger.trace(String
-                .format("Partition date '%s' excluded as after ceiling: '%s''",
-                    partitionDate, purgeCeiling));
+          Boolean purge = false;
+          try {
+            LocalDate partitionDate = LocalDate.parse(partition.getValues().get(0));
+            purge = partitionDate.isBefore(purgeCeiling);
+            if (purge) {
+              eligiblePartitions.add(partition);
+              logger.trace(String
+                  .format("Partition date '%s' added as prior to ceiling date: '%s''",
+                      partitionDate,
+                      purgeCeiling));
+            } else {
+              logger.trace(String
+                  .format("Partition date '%s' excluded as after ceiling: '%s''",
+                      partitionDate, purgeCeiling));
+            }
+          } catch (Exception ex) {
+            logger.error(String.format("Unexpected error parsing partition date '%s'",
+                partition.getValues().get(0)), ex);
           }
+
         }
     );
     return eligiblePartitions;

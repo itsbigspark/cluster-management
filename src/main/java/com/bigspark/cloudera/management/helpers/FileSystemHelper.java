@@ -143,12 +143,18 @@ public class FileSystemHelper {
     if (!isDryRun) {
       try {
         logger.debug("Dropped location :" + sourceLocation + " to Trash");
-        boolean isRenameSuccess = fileSystem
-            .rename(new Path(sourceLocation), new Path(trashTarget));
-        if (!isRenameSuccess) {
-          throw new IOException(
-              String.format("Failed to move files from : %s ==> %s", sourceLocation, trashTarget));
+        if(fileSystem.exists(new Path(sourceLocation))) {
+          boolean isRenameSuccess = fileSystem
+              .rename(new Path(sourceLocation), new Path(trashTarget));
+          if (!isRenameSuccess) {
+            throw new IOException(
+                String
+                    .format("Failed to move files from : %s ==> %s", sourceLocation, trashTarget));
+          }
+        } else {
+          logger.warn(String.format("Source location '%s' does not exists. Skipping", sourceLocation));
         }
+
         return true;
       } catch (Exception e) {
         throw e;

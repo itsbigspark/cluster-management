@@ -4,6 +4,7 @@ import static com.bigspark.cloudera.management.helpers.SparkHelper.getSparkAppli
 import static com.bigspark.cloudera.management.helpers.SparkHelper.getSparkSession;
 
 import com.bigspark.cloudera.management.common.exceptions.SourceException;
+import com.bigspark.cloudera.management.common.utils.PropertyUtils;
 import com.bigspark.cloudera.management.helpers.FileSystemHelper;
 import com.bigspark.cloudera.management.helpers.MetadataHelper;
 import com.bigspark.cloudera.management.helpers.SparkHelper;
@@ -85,6 +86,12 @@ public class ClusterManagementJob {
     }
 
     return prop;
+  }
+
+  public void dumpProperties() {
+    if(this.jobProperties != null) {
+      logger.debug(String.format("Loaded Properties:\r\n",PropertyUtils.dumpProperties(this.jobProperties)));
+    }
   }
 
 }

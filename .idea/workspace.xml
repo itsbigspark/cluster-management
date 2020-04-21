@@ -34,14 +34,15 @@
   <component name="ChangeListManager">
     <list default="true" id="062bc843-fefb-4418-9027-9622054f9108" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/model/TableDescriptor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/model/TableDescriptor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/AuditHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/AuditHelper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/FileSystemHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/FileSystemHelper.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/ImpalaHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/ImpalaHelper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/SparkHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/SparkHelper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/MetadataHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/MetadataHelper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/ClusterManagementJob.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/ClusterManagementJob.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/offload/OffloadController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/offload/OffloadController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/purging/PurgingController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/purging/PurgingController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/purging/PurgingJob.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/purging/PurgingJob.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/test/SmokeTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/test/SmokeTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/log4j.debug.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/log4j.debug.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/log4j.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/log4j.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/jobs/purging/PurgingJobIntegrationTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/jobs/purging/PurgingJobIntegrationTests.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />

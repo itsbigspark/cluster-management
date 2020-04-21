@@ -98,8 +98,10 @@ public class ImpalaHelper {
 
   public Connection getConnection()
       throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, InterruptedException, SQLException {
-    UserGroupInformation ugi = UserGroupInformation.getCurrentUser();
+    UserGroupInformation ugi = UserGroupInformation.getLoginUser();
+    logger.debug(String.format("UGI: %s, keytab based: %s", ugi.toString(), ugi.isFromKeytab()));
     final Driver driver = (Driver) Class.forName("com.cloudera.impala.jdbc41.Driver").newInstance();
+    logger.debug(String.format("Impala JDBC Version %d.%d", driver.getMajorVersion(), driver.getMinorVersion()));
     final String connectionString = this.connectionString;
     if(this.isKerberos) {
       return ugi.doAs(new PrivilegedExceptionAction<Connection>() {
@@ -122,7 +124,6 @@ public class ImpalaHelper {
           String userName = SparkHelper.getSparkUser();
           String keyStore = String.format("%s/keystore.jceks", SparkHelper.Hdfs.getUserHomeArea());
           String keyName  = String.format("%s.pwd", userName);
-          logger.debug("Attempting to construct LDAP Impala Helper - gOT kEYS");
           if(FileSystemHelper.getConnection().exists(new Path(keyStore))) {
             logger.trace(String.format("Getting password for key %s from %s", keyName, keyStore));
             String password = SparkHelper.Security.getFromHadoopKeyStore(

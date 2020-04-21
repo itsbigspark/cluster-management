@@ -47,7 +47,10 @@ public class TableDescriptor {
   }
 
   public Boolean hasPartitions() {
-    return partitionList.size() > 0;
+    if(this.partitionList != null && this.partitionList.size() > 0 ) {
+      return true;
+    }
+    return false;
   }
 
   public Table getTable() {

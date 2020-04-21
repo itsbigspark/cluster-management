@@ -25,6 +25,11 @@ public class AuditHelper {
     this.clusterManagementJob = clusterManagementJob;
     intitialiseAuditTable(tableConfigKey);
     setLogfile();
+
+    logger.info(String.format("Spark SQL audit table key: %s", tableConfigKey));
+    logger.info(String.format("Spark SQL audit table name: %s", this.auditTable));
+    logger.info(String.format("Spark SQL audit table location: %s", this.logfileLocation));
+    logger.info(String.format("Spark SQL audit table name: %s", this.logfileName));
   }
 
   private void intitialiseAuditTable(String tableConfigKey) throws IOException {
@@ -33,6 +38,8 @@ public class AuditHelper {
     }
     this.auditTable = clusterManagementJob.jobProperties
         .getProperty(tableConfigKey);
+
+
     String[] auditTable_ = auditTable.split("\\.");
     //Cannot do an audited spark session without the audit table!
     SparkSession spark = SparkHelper.getSparkSession();

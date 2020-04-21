@@ -48,7 +48,7 @@ public class PurgingController {
   public PurgingController()
       throws IOException, MetaException, ConfigurationException, SourceException {
     ClusterManagementJob clusterManagementJob = ClusterManagementJob.getInstance();
-    this.auditHelper = new AuditHelper(clusterManagementJob, "Purging job","purging.auditTable");
+    this.auditHelper = new AuditHelper(clusterManagementJob, "Purging job","purging.sqlAuditTable");
     this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark, auditHelper);
     this.fileSystem = clusterManagementJob.fileSystem;
     this.hadoopConfiguration = clusterManagementJob.hadoopConfiguration;

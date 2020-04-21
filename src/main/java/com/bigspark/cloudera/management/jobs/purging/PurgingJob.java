@@ -74,6 +74,7 @@ class PurgingJob {
    */
   PurgingJob() throws Exception {
     this.clusterManagementJob = ClusterManagementJob.getInstance();
+    this.clusterManagementJob.dumpProperties();
     this.auditHelper = new AuditHelper(clusterManagementJob, "Purging job","purging.sqlAuditTable");
     this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark, auditHelper);
     this.fileSystem = clusterManagementJob.fileSystem;
@@ -270,7 +271,7 @@ class PurgingJob {
           .table(String.format("%s.%s_swing", database, table));
       if (pattern == Pattern.SH) {
 //            swingTable.write().partitionBy("EDI_BUSINESS_DAY").insertInto(String.format("%s.%s", database, table));
-        swingTable.write().insertInto(String.format("%s.%s", database, table));
+        swingTable.coalesce(1).write().insertInto(String.format("%s.%s", database, table));
 //            insertInto() can't be used together with partitionBy()
 //            Partition columns have already been defined for the table.
 //            It is not necessary to use partitionBy().
