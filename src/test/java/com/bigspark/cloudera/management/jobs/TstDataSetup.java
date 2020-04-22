@@ -71,7 +71,7 @@ public class TstDataSetup {
     generateTestData("ADB", "UBR", 90, sb);
     generateTestData("ADB", "UBN", 80, sb);
     generateTestData("ADB", "RBS", 70, sb);
-    System.out.println(sb.toString());
+//    logger.info(sb.toString());
 
     if (spark.sparkContext().master().equals("local")
         && spark.sparkContext().hadoopConfiguration().size() == 0) {
@@ -112,20 +112,20 @@ public class TstDataSetup {
   }
 
   private void createTestTables() throws IOException {
-    System.out.println("Check test tables exist...");
+    logger.info("Check test tables exist...");
     spark.sql("USE " + testingDatabase);
     spark.sql("SHOW TABLES").show();
     spark.conf().set("spark.sql.legacy.allowCreatingManagedTableUsingNonemptyLocation", "true");
     Dataset<Row> csv = spark.read().option("header", "true").csv(testFile);
     csv.cache();
     if (!spark.catalog().tableExists(testingDatabase, "test_table_sh")) {
-      System.out.println("Creating SH test table...");
+      logger.info("Creating SH test table...");
       csv.write().partitionBy("edi_business_day").mode("overwrite")
           .saveAsTable(testingDatabase + ".test_table_sh");
       spark.sql("SHOW TABLES").show();
     }
     if (!spark.catalog().tableExists(testingDatabase, "test_table_eas")) {
-      System.out.println("Creating EAS test table...");
+      logger.info("Creating EAS test table...");
       csv.write().partitionBy("edi_business_day", "src_sys_id", "src_sys_inst_id").mode("overwrite")
           .saveAsTable(testingDatabase + ".test_table_eas");
       spark.sql("SHOW TABLES").show();

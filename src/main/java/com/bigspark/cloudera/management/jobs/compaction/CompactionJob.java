@@ -326,7 +326,7 @@ public class CompactionJob {
           .rename(new Path(partitionLocation + "_tmp"), new Path(partitionLocation));
       if (rename) {
         auditHelper.writeAuditLine("Move", sourceDescriptor.toString(),
-            String.format("Moving : %s ==> %s", partitionLocation + "_tmp", partitionLocation),
+            String.format("Moved : %s ==> %s", partitionLocation + "_tmp", partitionLocation),
             true);
       } else {
         throw new IOException("Failed to move files");

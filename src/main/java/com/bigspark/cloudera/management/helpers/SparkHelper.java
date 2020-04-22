@@ -244,7 +244,8 @@ public class SparkHelper {
     return getSparkSession().sparkContext().applicationId();
   }
 
-  /**
+  /*  *
+   *
    * Method to Find the SparkSession within which we are operation
    *
    * @return SparkSession created by spark-submit within which this process is running

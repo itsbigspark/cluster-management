@@ -104,6 +104,7 @@ public class FileSystemHelper {
 
   public static String getCreateTrashBaseLocation(String jobType) throws IOException {
     FileSystem fileSystem = FileSystemHelper.getConnection();
+
     StringBuilder sb = new StringBuilder();
     String userHomeArea = FileSystemHelper.getUserHomeArea();
     long seconds = System.currentTimeMillis() / 1000l;
@@ -142,13 +143,13 @@ public class FileSystemHelper {
     logger.debug("Trash location : " + trashTarget);
     if (!isDryRun) {
       try {
-        logger.debug("Dropped location :" + sourceLocation + " to Trash");
         boolean isRenameSuccess = fileSystem
             .rename(new Path(sourceLocation), new Path(trashTarget));
         if (!isRenameSuccess) {
           throw new IOException(
               String.format("Failed to move files from : %s ==> %s", sourceLocation, trashTarget));
         }
+        logger.debug("Dropped location : " + sourceLocation + " to Trash");
         return true;
       } catch (Exception e) {
         throw e;

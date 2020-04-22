@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <repositories>
         <repository>
@@ -15,9 +15,8 @@
     <packaging>jar</packaging>
 
     <properties>
-        <junit.jupiter.version>5.6.1</junit.jupiter.version>
-        <hadoop.version>2.6.0-cdh5.12.1</hadoop.version>
-        <hive-jdbc.version>1.1.0-cdh5.12.1</hive-jdbc.version>
+        <hadoop.version>2.6.0-cdh5.13.0</hadoop.version>
+        <hive-jdbc.version>1.1.0-cdh5.13.0</hive-jdbc.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <spark.version>2.4.3</spark.version>
@@ -25,14 +24,6 @@
     </properties>
 
     <build>
-       <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <excludes>
-                    <exclude>*</exclude>
-                </excludes>
-            </resource>
-        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -101,33 +92,30 @@
         </dependency>
         <dependency>
             <groupId>org.apache.hadoop</groupId>
-            <artifactId>hadoop-aws</artifactId>
-            <version>${hadoop.version}</version>
-        </dependency>
-        <!--        <dependency>-->
-        <!--            <groupId>org.apache.hive</groupId>-->
-        <!--            <artifactId>hive-metastore</artifactId>-->
-        <!--            <version>1.1.1</version>-->
-        <!--        </dependency>-->
-        <dependency>
-            <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-distcp</artifactId>
             <version>${hadoop.version}</version>
         </dependency>
-        <!--        <dependency>-->
-        <!--            <groupId>org.apache.hadoop</groupId>-->
-        <!--            <artifactId>hadoop-tools</artifactId>-->
-        <!--            <version>1.2.1</version>-->
-        <!--        </dependency>-->
         <dependency>
             <groupId>io.hydrosphere</groupId>
             <artifactId>mist-lib_2.11</artifactId>
             <version>1.1.1</version>
         </dependency>
         <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>RELEASE</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>${junit.jupiter.version}</version>
+            <version>RELEASE</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-commons</artifactId>
+            <version>1.6.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
