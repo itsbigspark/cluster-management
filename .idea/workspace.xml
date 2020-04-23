@@ -1,20 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="062bc843-fefb-4418-9027-9622054f9108" name="Default Changelist" comment="">
+    <list default="true" id="062bc843-fefb-4418-9027-9622054f9108" name="Default Changelist" comment="Adjustment to metadata table for consistency">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/compaction/compaction.MD" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/offload/offload.MD" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/purging/purging.MD" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/cluster-management.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/cluster-management.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/metadata/CompactionMetadata.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/metadata/CompactionMetadata.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/AuditHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/AuditHelper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/compaction/CompactionController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/compaction/CompactionController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/compaction/CompactionJob.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/compaction/CompactionJob.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/compaction/CompactionRunner.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/compaction/CompactionRunner.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/offload/OffloadController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/offload/OffloadController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/offload/OffloadJob.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/offload/OffloadJob.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/offload/OffloadRunner.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/offload/OffloadRunner.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/purging/PurgingController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/purging/PurgingController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/purging/PurgingJob.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/purging/PurgingJob.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/config.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/config.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/jobs/offload/OffloadJobIntegrationTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/jobs/offload/OffloadJobIntegrationTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/offload/Offload.java" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -83,7 +76,7 @@
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5" value="" />
     <property name="com.intellij.testIntegration.createTest.CreateTestDialog.includeInheritedMembers" value="true" />
     <property name="create.test.in.the.same.root" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/test/resources" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/purging" />
     <property name="project.structure.last.edited" value="SDKs" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
@@ -118,11 +111,11 @@
       <recent name="com.bigspark.cloudera.management.helpers" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/purging" />
       <recent name="$PROJECT_DIR$/src/test/resources" />
       <recent name="$PROJECT_DIR$/target" />
       <recent name="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common" />
       <recent name="$PROJECT_DIR$/test/com/bigspark/cloudera/management" />
-      <recent name="$PROJECT_DIR$/test" />
     </key>
   </component>
   <component name="RunManager" selected="Remote.SparkSubmit t20">
@@ -404,7 +397,49 @@
       <option name="project" value="LOCAL" />
       <updated>1587586516163</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="Compaction - Updates to controller logic, untested">
+      <created>1587643732141</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1587643732141</updated>
+    </task>
+    <task id="LOCAL-00016" summary="Minor fix to initialise jobType field">
+      <created>1587643763161</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1587643763161</updated>
+    </task>
+    <task id="LOCAL-00017" summary="Addition of second contructor type to handle invocation for location only">
+      <created>1587643808562</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1587643808562</updated>
+    </task>
+    <task id="LOCAL-00018" summary="Offload - General tidyup and completion work">
+      <created>1587643845614</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1587643845614</updated>
+    </task>
+    <task id="LOCAL-00019" summary="Adjustment to metadata table for consistency">
+      <created>1587643877065</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1587643877065</updated>
+    </task>
+    <task id="LOCAL-00020" summary="Update the main README.md file">
+      <created>1587651352302</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1587651352302</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -437,7 +472,13 @@
     <MESSAGE value="Offload job prior to testing" />
     <MESSAGE value="Offload end of day.   Hit s3a:// missing aws jar error" />
     <MESSAGE value="Offload  - all intital testing complete" />
-    <option name="LAST_COMMIT_MESSAGE" value="Offload  - all intital testing complete" />
+    <MESSAGE value="Compaction - Updates to controller logic, untested" />
+    <MESSAGE value="Minor fix to initialise jobType field" />
+    <MESSAGE value="Addition of second contructor type to handle invocation for location only" />
+    <MESSAGE value="Offload - General tidyup and completion work" />
+    <MESSAGE value="Adjustment to metadata table for consistency" />
+    <MESSAGE value="Update the main README.md file" />
+    <option name="LAST_COMMIT_MESSAGE" value="Update the main README.md file" />
   </component>
   <component name="WindowStateProjectService">
     <state x="2385" y="104" key="#All_in_cluster-management" timestamp="1583222240044">
@@ -539,20 +580,20 @@
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
     <state x="2425" y="359" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583333591658" />
-    <state x="178" y="74" key="CommitChangelistDialog2" timestamp="1587643808405">
+    <state x="178" y="74" key="CommitChangelistDialog2" timestamp="1587651352042">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state x="178" y="74" key="CommitChangelistDialog2/0.0.1920.1080@0.0.1920.1080" timestamp="1587643808405" />
+    <state x="178" y="74" key="CommitChangelistDialog2/0.0.1920.1080@0.0.1920.1080" timestamp="1587651352042" />
     <state x="178" y="82" key="CommitChangelistDialog2/0.0.1920.1200@0.0.1920.1200" timestamp="1587586515600" />
     <state x="178" y="103" key="CommitChangelistDialog2/0.23.1920.1177@0.23.1920.1177" timestamp="1584390817131" />
     <state x="178" y="74" key="CommitChangelistDialog2/1920.0.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1586525414579" />
     <state x="2098" y="74" key="CommitChangelistDialog2/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583741032269" />
     <state x="178" y="74" key="CommitChangelistDialog2/1920.23.1920.1057/0.0.1920.1080@0.0.1920.1080" timestamp="1586501697293" />
     <state x="2098" y="95" key="CommitChangelistDialog2/1920.23.1920.1057/0.23.1920.1057@1920.23.1920.1057" timestamp="1584120803884" />
-    <state x="100" y="100" width="1720" height="880" key="DiffContextDialog" timestamp="1587643775643">
+    <state x="100" y="100" width="1720" height="880" key="DiffContextDialog" timestamp="1587643894878">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state x="100" y="100" width="1720" height="880" key="DiffContextDialog/0.0.1920.1080@0.0.1920.1080" timestamp="1587643775643" />
+    <state x="100" y="100" width="1720" height="880" key="DiffContextDialog/0.0.1920.1080@0.0.1920.1080" timestamp="1587643894877" />
     <state x="100" y="100" key="DiffContextDialog/1920.0.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1586433196563" />
     <state x="721" y="236" key="EnvironmentVariablesDialog" timestamp="1586435144284">
       <screen x="0" y="0" width="1920" height="1080" />
@@ -646,10 +687,15 @@
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="192" y="97" key="MergeDialog/1920.0.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1586432721897" />
-    <state x="601" y="195" key="MultipleFileMergeDialog" timestamp="1586432730616">
+    <state x="601" y="195" key="MultipleFileMergeDialog" timestamp="1587643945773">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
+    <state x="601" y="195" key="MultipleFileMergeDialog/0.0.1920.1080@0.0.1920.1080" timestamp="1587643945773" />
     <state x="601" y="195" key="MultipleFileMergeDialog/1920.0.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1586432730616" />
+    <state x="380" y="192" key="RollbackChangesDialog" timestamp="1587643899028">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state x="380" y="192" key="RollbackChangesDialog/0.0.1920.1080@0.0.1920.1080" timestamp="1587643899028" />
     <state x="320" y="19" key="SettingsEditor" timestamp="1586432906759">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
@@ -663,10 +709,10 @@
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="536" y="185" key="VCS.ChangeListViewerDialog/0.0.1920.1080@0.0.1920.1080" timestamp="1585657220819" />
-    <state x="460" y="217" key="Vcs.Push.Dialog.v2" timestamp="1587021069715">
+    <state x="460" y="217" key="Vcs.Push.Dialog.v2" timestamp="1587644013750">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state x="460" y="217" key="Vcs.Push.Dialog.v2/0.0.1920.1080@0.0.1920.1080" timestamp="1587021069715" />
+    <state x="460" y="217" key="Vcs.Push.Dialog.v2/0.0.1920.1080@0.0.1920.1080" timestamp="1587644013750" />
     <state x="460" y="241" key="Vcs.Push.Dialog.v2/0.0.1920.1200@0.0.1920.1200" timestamp="1584392573704" />
     <state x="460" y="259" key="Vcs.Push.Dialog.v2/0.23.1920.1177@0.23.1920.1177" timestamp="1584390820531" />
     <state x="460" y="217" key="Vcs.Push.Dialog.v2/1920.0.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1586525420071" />
