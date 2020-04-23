@@ -72,9 +72,9 @@ public class GenericAuditHelper {
   public void invalidateAuditTableMetadata() {
     try {
       impala.invalidateMetadata(this.auditTable);
-    } catch (Exception e) {
+    } catch (Exception ex) {
       logger
-          .warn(String.format("Unable to invalidate metadata for audit table %s", this.auditTable));
+          .warn(String.format("Unable to invalidate metadata for audit table %s", this.auditTable), ex);
     }
   }
 

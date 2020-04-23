@@ -65,7 +65,7 @@ public class PurgingController {
    */
   private String getMetadataTable() {
     return jobProperties
-        .getProperty("Purging.metatable");
+        .getProperty("purging.metatable");
   }
 
 

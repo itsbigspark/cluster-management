@@ -38,7 +38,6 @@ public class ClusterManagementJob {
 
   private ClusterManagementJob()
       throws IOException, MetaException, ConfigurationException, SourceException {
-    logger.debug("Constructed instance");
 
     this.spark = SparkHelper.getSparkSession();
     this.fileSystem = FileSystemHelper.getConnection();
