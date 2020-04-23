@@ -2,9 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="062bc843-fefb-4418-9027-9622054f9108" name="Default Changelist" comment="Adjustment to metadata table for consistency">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/compaction/compaction.MD" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/purging/purging.MD" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/offload/Offload.java" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/purging/purging.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/compaction/compaction.MD" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/compaction/compaction.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/offload/offload.MD" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/offload/offload.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -443,7 +444,28 @@
       <option name="project" value="LOCAL" />
       <updated>1587651843563</updated>
     </task>
-    <option name="localTasksCounter" value="22" />
+    <task id="LOCAL-00022" summary="purging.MD initial draft">
+      <created>1587651858003</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1587651858003</updated>
+    </task>
+    <task id="LOCAL-00023" summary="Tidyup test class">
+      <created>1587651885250</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1587651885250</updated>
+    </task>
+    <task id="LOCAL-00024" summary="compaction.MD intitial draft">
+      <created>1587651907216</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1587651907216</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -483,7 +505,10 @@
     <MESSAGE value="Adjustment to metadata table for consistency" />
     <MESSAGE value="Update the main README.md file" />
     <MESSAGE value="offload.MD intial draft" />
-    <option name="LAST_COMMIT_MESSAGE" value="offload.MD intial draft" />
+    <MESSAGE value="purging.MD initial draft" />
+    <MESSAGE value="Tidyup test class" />
+    <MESSAGE value="compaction.MD intitial draft" />
+    <option name="LAST_COMMIT_MESSAGE" value="compaction.MD intitial draft" />
   </component>
   <component name="WindowStateProjectService">
     <state x="2385" y="104" key="#All_in_cluster-management" timestamp="1583222240044">
@@ -585,10 +610,10 @@
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
     <state x="2425" y="359" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583333591658" />
-    <state x="178" y="74" key="CommitChangelistDialog2" timestamp="1587651884935">
+    <state x="178" y="74" key="CommitChangelistDialog2" timestamp="1587651907033">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state x="178" y="74" key="CommitChangelistDialog2/0.0.1920.1080@0.0.1920.1080" timestamp="1587651884935" />
+    <state x="178" y="74" key="CommitChangelistDialog2/0.0.1920.1080@0.0.1920.1080" timestamp="1587651907033" />
     <state x="178" y="82" key="CommitChangelistDialog2/0.0.1920.1200@0.0.1920.1200" timestamp="1587586515600" />
     <state x="178" y="103" key="CommitChangelistDialog2/0.23.1920.1177@0.23.1920.1177" timestamp="1584390817131" />
     <state x="178" y="74" key="CommitChangelistDialog2/1920.0.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1586525414579" />
@@ -714,10 +739,10 @@
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
     <state x="536" y="185" key="VCS.ChangeListViewerDialog/0.0.1920.1080@0.0.1920.1080" timestamp="1585657220819" />
-    <state x="460" y="217" key="Vcs.Push.Dialog.v2" timestamp="1587644013750">
+    <state x="460" y="217" key="Vcs.Push.Dialog.v2" timestamp="1587651914290">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state x="460" y="217" key="Vcs.Push.Dialog.v2/0.0.1920.1080@0.0.1920.1080" timestamp="1587644013750" />
+    <state x="460" y="217" key="Vcs.Push.Dialog.v2/0.0.1920.1080@0.0.1920.1080" timestamp="1587651914290" />
     <state x="460" y="241" key="Vcs.Push.Dialog.v2/0.0.1920.1200@0.0.1920.1200" timestamp="1584392573704" />
     <state x="460" y="259" key="Vcs.Push.Dialog.v2/0.23.1920.1177@0.23.1920.1177" timestamp="1584390820531" />
     <state x="460" y="217" key="Vcs.Push.Dialog.v2/1920.0.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1586525420071" />
