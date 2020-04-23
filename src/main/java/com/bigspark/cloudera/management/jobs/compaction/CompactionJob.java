@@ -13,6 +13,8 @@ import com.bigspark.cloudera.management.helpers.SparkHelper;
 import com.bigspark.cloudera.management.jobs.ClusterManagementJob;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import javax.naming.ConfigurationException;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -23,6 +25,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.MetaException;
+import org.apache.hadoop.hive.metastore.api.Partition;
 import org.apache.spark.sql.AnalysisException;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -32,6 +35,7 @@ import org.apache.spark.sql.catalog.Table;
 import org.apache.spark.sql.catalyst.TableIdentifier;
 import org.apache.spark.sql.catalyst.analysis.NoSuchDatabaseException;
 import org.apache.spark.sql.catalyst.analysis.NoSuchTableException;
+import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Some;
@@ -111,8 +115,8 @@ public class CompactionJob {
    * @param tableName
    * @return Row[]
    */
-  protected Row[] getTablePartitions(String dbName, String tableName) {
-    return (Row[]) spark.sql("SHOW PARTITIONS " + dbName + "." + tableName).collect();
+  protected List<Partition> getTablePartitions(String dbName, String tableName) throws SourceException {
+    return metadataHelper.getTablePartitions(dbName, tableName);
   }
 
   /**
@@ -209,47 +213,65 @@ public class CompactionJob {
    * @throws IOException
    */
   protected void processTable(String dbName, String tableName)
-      throws NoSuchDatabaseException, NoSuchTableException, IOException, SourceException {
+      throws IOException, SourceException, TException {
     logger.info("Now processing table : " + dbName + "." + tableName);
     org.apache.hadoop.hive.metastore.api.Table tableMeta = metadataHelper
         .getTable(dbName, tableName);
     TableDescriptor tableDescriptor = metadataHelper.getTableDescriptor(tableMeta);
     this.sourceDescriptor = new SourceDescriptor(metadataHelper.getDatabase(dbName),
         tableDescriptor);
-    String tableLocation = getTableLocation(dbName, tableName);
-    Row[] partitions = getTablePartitions(dbName, tableName);
-    logger.info("Partitions returned for checking : " + partitions.length);
-    for (Row row : partitions) {
-      processPartition(tableLocation, row.get(0).toString());
+    List<Partition> partitions = getTablePartitions(dbName, tableName);
+    logger.info("Partitions returned for checking : " + partitions.size());
+    ArrayList<Partition> eligiblePartitions = new ArrayList<>();
+    partitions.forEach( partition -> {
+      if (partition.getParameters().get("compacted").equals("true")){
+        logger.trace("Partition already previously compacted : "+partition.toString());
+      } else {
+        logger.trace("Adding partition : "+partition.toString());
+        eligiblePartitions.add(partition);
+      }
+    });
+    for (Partition partition : eligiblePartitions) {
+      try {
+        processPartition(partition);
+      } catch (IOException | TException e) {
+        e.printStackTrace();
+      }
     }
   }
 
   /**
    * Method to execute all required actions against a table partition
    *
-   * @param tableLocation
    * @param partition
    * @throws IOException
    */
-  protected void processPartition(String tableLocation, String partition) throws IOException {
-    logger.info("Now processing partition : " + database + "." + table + " [ " + partition + " ]");
-    String absPartitionLocation = tableLocation + "/" + partition;
-    long[] countSize = getFileCountTotalSize(absPartitionLocation);
+  protected void processPartition(Partition partition) throws IOException, TException {
+    logger.info("Now processing partition : " + database + "." + table + " [ " + partition.toString() + " ]");
+    String absLocation = partition.getSd().getLocation();
+    processLocation(absLocation);
+    partition.getParameters().put("compacted", "true");
+    hiveMetaStoreClient.alter_partition(partition.getDbName(),partition.getTableName(),partition);
+  }
+
+  protected void processLocation(String absLocation) throws IOException {
+    long[] countSize = getFileCountTotalSize(absLocation);
     logger.info("Original file count : " + countSize[0]);
     if (isCompactionCandidate(countSize[0], countSize[1])) {
       auditHelper.writeAuditLine("Compact", sourceDescriptor.toString(),
           "Original file count : " + countSize[0], true);
       Integer repartitionFactor = getRepartitionFactor(countSize[1]);
-      compactLocation(absPartitionLocation, repartitionFactor);
-      long[] newCountSize = getFileCountTotalSize(absPartitionLocation + "_tmp");
+      compactLocation(absLocation, repartitionFactor);
+      long[] newCountSize = getFileCountTotalSize(absLocation + "_tmp");
       logger.info("Resulting file count : " + newCountSize[0]);
       auditHelper.writeAuditLine("Compact", sourceDescriptor.toString(),
-          "Original file count : " + countSize[0], true);
-      resolvePartition(absPartitionLocation);
+          "Resulting file count : " + countSize[0], true);
+      resolveLocation(absLocation);
     } else {
-      logger.info(
-          "No compaction required for partition : " + database + "." + table + " [ " + partition
-              + " ]");
+      logger.debug(
+          "No compaction required for location : [ " + absLocation + " ]");
+      auditHelper.writeAuditLine("Compact", sourceDescriptor.toString(),
+          "No compaction required : location - "+absLocation+" , file count - " + countSize[0] + " , location size - " + countSize[1], true);
     }
   }
 
@@ -305,54 +327,54 @@ public class CompactionJob {
   /**
    * Method to complete the HDFS actions required to swap the compacted data with the original
    *
-   * @param partitionLocation
+   * @param location
    * @throws IOException
    */
-  protected void resolvePartition(String partitionLocation) throws IOException {
+  protected void resolveLocation(String location) throws IOException {
     String trashLocation = null;
     try {
-      moveDataToTrash(trashBaseLocation, partitionLocation, sourceDescriptor);
+      moveDataToTrash(trashBaseLocation, location, sourceDescriptor);
       auditHelper.writeAuditLine("Trash", sourceDescriptor.toString(),
-          String.format("Moved files from : %s to : %s", partitionLocation, trashBaseLocation),
+          String.format("Moved files from : %s to : %s", location, trashBaseLocation),
           true);
     } catch (Exception e) {
-      logger.error("FATAL: Unable to move uncompacted files from : " + partitionLocation
+      logger.error("FATAL: Unable to move uncompacted files from : " + location
           + " to Trash location");
       e.printStackTrace();
       System.exit(1);
     }
     try {
       boolean rename = fileSystem
-          .rename(new Path(partitionLocation + "_tmp"), new Path(partitionLocation));
+          .rename(new Path(location + "_tmp"), new Path(location));
       if (rename) {
         auditHelper.writeAuditLine("Move", sourceDescriptor.toString(),
-            String.format("Moved : %s ==> %s", partitionLocation + "_tmp", partitionLocation),
+            String.format("Moved : %s ==> %s", location + "_tmp", location),
             true);
       } else {
         throw new IOException("Failed to move files");
       }
     } catch (Exception e) {
-      logger.error("ERROR: Unable to move files from temp : " + partitionLocation
+      logger.error("ERROR: Unable to move files from temp : " + location
           + "_tmp to partition location");
       auditHelper.writeAuditLine("Move", sourceDescriptor.toString(),
-          String.format("Moving : %s ==> %s", partitionLocation + "_tmp", partitionLocation),
+          String.format("Moving : %s ==> %s", location + "_tmp", location),
           false);
       e.printStackTrace();
       // If this happens, we need to try and resolve, otherwise the partition is impacted
       try {
-        trashLocation = trashBaseLocation + partitionLocation;
-        boolean rename = fileSystem.rename(new Path(trashLocation), new Path(partitionLocation));
+        trashLocation = trashBaseLocation + location;
+        boolean rename = fileSystem.rename(new Path(trashLocation), new Path(location));
         if (rename) {
           auditHelper.writeAuditLine("Move", sourceDescriptor.toString(),
-              String.format("Moving : %s ==> %s", trashLocation, partitionLocation), true);
+              String.format("Moving : %s ==> %s", trashLocation, location), true);
         } else {
           throw new IOException("Failed to move files");
         }
       } catch (Exception e_) {
         auditHelper.writeAuditLine("Move", sourceDescriptor.toString(),
-            String.format("Moving : %s ==> %s", trashLocation, partitionLocation), false);
-        logger.error("FATAL: Error while reinstating partition at " + partitionLocation);
-        logger.error("FATAL: !!!  Partition is now impacted, resolution required  !!!!");
+            String.format("Moving : %s ==> %s", trashLocation, location), false);
+        logger.error("FATAL: Error while reinstating location at " + location);
+        logger.error("FATAL: !!!  Locaion is now impacted, resolution required  !!!!");
         e_.printStackTrace();
         System.exit(1);
       }
@@ -367,7 +389,7 @@ public class CompactionJob {
    * @throws NoSuchDatabaseException
    */
   void executeMist(String database, String table, SparkSession spark)
-      throws IOException, NoSuchTableException, NoSuchDatabaseException, SourceException {
+      throws IOException,SourceException, TException {
     processTable(database, table);
   }
 
@@ -379,12 +401,15 @@ public class CompactionJob {
    * @throws NoSuchDatabaseException
    */
   void execute(CompactionMetadata tm)
-      throws IOException, NoSuchTableException, NoSuchDatabaseException, SourceException {
-    this.table = tm.tableName;
-    this.database = tm.database;
-    this.trashBaseLocation = getCreateTrashBaseLocation("Compaction");
-    processTable(database, table);
+      throws IOException, SourceException, TException {
+    if (tm.constructor == 1) {
+      this.table = tm.tableName;
+      this.database = tm.database;
+      this.trashBaseLocation = getCreateTrashBaseLocation("Compaction");
+      processTable(database, table);
+    }
+    if (tm.constructor == 2)
+      processLocation(tm.path.toString());
   }
-
 }
 
