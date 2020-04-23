@@ -235,7 +235,7 @@ public class OffloadJob {
       logger.info("DRY RUN - Dropped partition : " + partition.getValues().toString());
     } else {
       MetadataHelper.dropHivePartition(partition, this.hiveMetaStoreClient);
-      logger.debug("Dropped HDFS partition : " + partition.getValues().toString());
+      logger.debug("Dropped HDFS partition : " + partition.toString());
     }
   }
 
@@ -365,15 +365,15 @@ public class OffloadJob {
     ArrayList<Path> sourcePaths = new ArrayList<>();
     allOffloadCandidates
         .forEach(partition -> sourcePaths.add(new Path(partition.getSd().getLocation())));
-//    int distcpReturnCode = distCP(sourcePaths, this.targetTablePath);
-//    if (distcpReturnCode != 0){
-//      System.exit(distcpReturnCode);
-//    }
+    int distcpReturnCode = distCP(sourcePaths, this.targetTablePath);
+    if (distcpReturnCode != 0){
+      System.exit(distcpReturnCode);
+    }
     allOffloadCandidates.forEach(partition -> {
       try {
         createS3Partition(partition);
+        trashSourcePartition(partition);
         dropSourcePartition(partition);
-//        trashSourcePartition(partition);
       } catch (Exception e) {
         e.printStackTrace();
       }
