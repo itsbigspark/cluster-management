@@ -9,15 +9,18 @@ public class CompactionMetadata {
   public String tableName;
   public TableDescriptor tableDescriptor;
   public Path path;
+  public int constructor;
 
   public CompactionMetadata(TableDescriptor tableDescriptor) {
     this.database = tableDescriptor.getDatabaseName();
     this.tableName = tableDescriptor.getTableName();
     this.tableDescriptor = tableDescriptor;
+    this.constructor = 1;
   }
 
   public CompactionMetadata(Path path) {
     this.path = path;
+    this.constructor = 2;
   }
 
 }

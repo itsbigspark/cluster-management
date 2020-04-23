@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="062bc843-fefb-4418-9027-9622054f9108" name="Default Changelist" comment="Offload end of day.   Hit s3a:// missing aws jar error">
+    <list default="true" id="062bc843-fefb-4418-9027-9622054f9108" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cluster-management.iml" beforeDir="false" afterPath="$PROJECT_DIR$/cluster-management.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/FileSystemHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/FileSystemHelper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/MetadataHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/MetadataHelper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/SparkHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/SparkHelper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/metadata/CompactionMetadata.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/common/metadata/CompactionMetadata.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/AuditHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/AuditHelper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/compaction/CompactionController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/compaction/CompactionController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/compaction/CompactionJob.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/compaction/CompactionJob.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/compaction/CompactionRunner.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/compaction/CompactionRunner.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/offload/OffloadController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/offload/OffloadController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/offload/OffloadJob.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/offload/OffloadJob.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/offload/OffloadRunner.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/offload/OffloadRunner.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/purging/PurgingController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/purging/PurgingController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/purging/PurgingJob.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/purging/PurgingJob.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/config.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/config.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/jobs/TstDataSetup.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/jobs/TstDataSetup.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/jobs/offload/OffloadJobIntegrationTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/jobs/offload/OffloadJobIntegrationTests.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -395,7 +397,14 @@
       <option name="project" value="LOCAL" />
       <updated>1586525414862</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="Offload  - all intital testing complete">
+      <created>1587586516163</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1587586516163</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -427,7 +436,8 @@
     <MESSAGE value="Offload job initial" />
     <MESSAGE value="Offload job prior to testing" />
     <MESSAGE value="Offload end of day.   Hit s3a:// missing aws jar error" />
-    <option name="LAST_COMMIT_MESSAGE" value="Offload end of day.   Hit s3a:// missing aws jar error" />
+    <MESSAGE value="Offload  - all intital testing complete" />
+    <option name="LAST_COMMIT_MESSAGE" value="Offload  - all intital testing complete" />
   </component>
   <component name="WindowStateProjectService">
     <state x="2385" y="104" key="#All_in_cluster-management" timestamp="1583222240044">
@@ -529,20 +539,20 @@
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
     <state x="2425" y="359" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583333591658" />
-    <state x="178" y="74" key="CommitChangelistDialog2" timestamp="1587021052859">
+    <state x="178" y="74" key="CommitChangelistDialog2" timestamp="1587643762960">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state x="178" y="74" key="CommitChangelistDialog2/0.0.1920.1080@0.0.1920.1080" timestamp="1587021052859" />
-    <state x="178" y="82" key="CommitChangelistDialog2/0.0.1920.1200@0.0.1920.1200" timestamp="1584392570329" />
+    <state x="178" y="74" key="CommitChangelistDialog2/0.0.1920.1080@0.0.1920.1080" timestamp="1587643762960" />
+    <state x="178" y="82" key="CommitChangelistDialog2/0.0.1920.1200@0.0.1920.1200" timestamp="1587586515600" />
     <state x="178" y="103" key="CommitChangelistDialog2/0.23.1920.1177@0.23.1920.1177" timestamp="1584390817131" />
     <state x="178" y="74" key="CommitChangelistDialog2/1920.0.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1586525414579" />
     <state x="2098" y="74" key="CommitChangelistDialog2/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583741032269" />
     <state x="178" y="74" key="CommitChangelistDialog2/1920.23.1920.1057/0.0.1920.1080@0.0.1920.1080" timestamp="1586501697293" />
     <state x="2098" y="95" key="CommitChangelistDialog2/1920.23.1920.1057/0.23.1920.1057@1920.23.1920.1057" timestamp="1584120803884" />
-    <state x="100" y="100" width="1720" height="880" key="DiffContextDialog" timestamp="1586433196563">
+    <state x="100" y="100" width="1720" height="880" key="DiffContextDialog" timestamp="1587643742005">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state x="100" y="100" width="1720" height="880" key="DiffContextDialog/0.0.1920.1080@0.0.1920.1080" timestamp="1585865321109" />
+    <state x="100" y="100" width="1720" height="880" key="DiffContextDialog/0.0.1920.1080@0.0.1920.1080" timestamp="1587643742005" />
     <state x="100" y="100" key="DiffContextDialog/1920.0.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1586433196563" />
     <state x="721" y="236" key="EnvironmentVariablesDialog" timestamp="1586435144284">
       <screen x="0" y="0" width="1920" height="1080" />
@@ -712,10 +722,10 @@
     </state>
     <state x="49" y="172" width="1255" height="653" key="dock-window-1/0.23.1920.1177@0.23.1920.1177" timestamp="1584390402598" />
     <state x="1969" y="52" width="1255" height="653" key="dock-window-1/1920.23.1920.1057/0.23.1920.1057@0.23.1920.1057" timestamp="1584374371121" />
-    <state x="452" y="13" width="1015" height="1054" key="find.popup" timestamp="1586509614029">
+    <state x="452" y="13" width="1015" height="1054" key="find.popup" timestamp="1587634731451">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state x="452" y="13" width="1015" height="1054" key="find.popup/0.0.1920.1080@0.0.1920.1080" timestamp="1585861872636" />
+    <state x="452" y="13" width="1015" height="1054" key="find.popup/0.0.1920.1080@0.0.1920.1080" timestamp="1587634731451" />
     <state x="452" y="37" width="1015" height="1149" key="find.popup/0.23.1920.1177@0.23.1920.1177" timestamp="1584196468316" />
     <state x="452" y="13" width="1015" height="1054" key="find.popup/1920.0.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1586509614029" />
     <state x="2372" y="13" width="1015" height="1054" key="find.popup/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583740150229" />
@@ -768,11 +778,6 @@
           <url>file://$PROJECT_DIR$/src/test/java/com/bigspark/cloudera/management/helpers/MetadataHelperTest.java</url>
           <line>97</line>
           <option name="timeStamp" value="64" />
-        </line-breakpoint>
-        <line-breakpoint type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/offload/OffloadRunner.java</url>
-          <line>6</line>
-          <option name="timeStamp" value="77" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/helpers/FileSystemHelper.java</url>
