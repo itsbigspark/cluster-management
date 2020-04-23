@@ -3,10 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="062bc843-fefb-4418-9027-9622054f9108" name="Default Changelist" comment="Adjustment to metadata table for consistency">
       <change afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/compaction/compaction.MD" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/offload/offload.MD" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/purging/purging.MD" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/cluster-management.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/cluster-management.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/bigspark/cloudera/management/jobs/offload/Offload.java" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -439,7 +436,14 @@
       <option name="project" value="LOCAL" />
       <updated>1587651352302</updated>
     </task>
-    <option name="localTasksCounter" value="21" />
+    <task id="LOCAL-00021" summary="offload.MD intial draft">
+      <created>1587651843563</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1587651843563</updated>
+    </task>
+    <option name="localTasksCounter" value="22" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -478,7 +482,8 @@
     <MESSAGE value="Offload - General tidyup and completion work" />
     <MESSAGE value="Adjustment to metadata table for consistency" />
     <MESSAGE value="Update the main README.md file" />
-    <option name="LAST_COMMIT_MESSAGE" value="Update the main README.md file" />
+    <MESSAGE value="offload.MD intial draft" />
+    <option name="LAST_COMMIT_MESSAGE" value="offload.MD intial draft" />
   </component>
   <component name="WindowStateProjectService">
     <state x="2385" y="104" key="#All_in_cluster-management" timestamp="1583222240044">
@@ -580,10 +585,10 @@
       <screen x="1920" y="0" width="1920" height="1080" />
     </state>
     <state x="2425" y="359" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/1920.0.1920.1080/0.0.1920.1080@1920.0.1920.1080" timestamp="1583333591658" />
-    <state x="178" y="74" key="CommitChangelistDialog2" timestamp="1587651352042">
+    <state x="178" y="74" key="CommitChangelistDialog2" timestamp="1587651843308">
       <screen x="0" y="0" width="1920" height="1080" />
     </state>
-    <state x="178" y="74" key="CommitChangelistDialog2/0.0.1920.1080@0.0.1920.1080" timestamp="1587651352042" />
+    <state x="178" y="74" key="CommitChangelistDialog2/0.0.1920.1080@0.0.1920.1080" timestamp="1587651843308" />
     <state x="178" y="82" key="CommitChangelistDialog2/0.0.1920.1200@0.0.1920.1200" timestamp="1587586515600" />
     <state x="178" y="103" key="CommitChangelistDialog2/0.23.1920.1177@0.23.1920.1177" timestamp="1584390817131" />
     <state x="178" y="74" key="CommitChangelistDialog2/1920.0.1920.1080/0.0.1920.1080@0.0.1920.1080" timestamp="1586525414579" />
