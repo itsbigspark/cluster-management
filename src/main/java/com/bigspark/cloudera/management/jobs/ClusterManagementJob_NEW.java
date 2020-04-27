@@ -36,7 +36,7 @@ public abstract class ClusterManagementJob_NEW {
   public String applicationID;
   public String trackingURL;
 
-  private ClusterManagementJob_NEW()
+  protected ClusterManagementJob_NEW()
       throws IOException, MetaException, ConfigurationException, SourceException {
 
     this.spark = SparkHelper.getSparkSession();
@@ -57,6 +57,19 @@ public abstract class ClusterManagementJob_NEW {
     //Spark options set into base SparkSession object
     spark.conf().set("spark.sql.legacy.allowCreatingManagedTableUsingNonemptyLocation", "true");
 
+  }
+
+  protected ClusterManagementJob_NEW(ClusterManagementJob_NEW existing) {
+    this.spark=existing.spark;
+    this.fileSystem=existing.fileSystem;
+    this.jobProperties=existing.jobProperties;
+    this.isDryRun=existing.isDryRun;
+    this.appPrefix=existing.appPrefix;
+    this.hadoopConfiguration=existing.hadoopConfiguration;
+    this.metadataHelper=existing.metadataHelper;
+    this.hiveMetaStoreClient=existing.hiveMetaStoreClient;
+    this.applicationID=existing.applicationID;
+    this.trackingURL=existing.trackingURL;
   }
 
   private synchronized Properties getClusterManagementProperties() throws IOException {

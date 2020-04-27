@@ -4,7 +4,7 @@ import com.bigspark.cloudera.management.common.enums.Platform;
 import com.bigspark.cloudera.management.common.exceptions.SourceException;
 import com.bigspark.cloudera.management.common.metadata.OffloadMetadata;
 import com.bigspark.cloudera.management.common.model.TableDescriptor;
-import com.bigspark.cloudera.management.helpers.AuditHelper;
+import com.bigspark.cloudera.management.helpers.AuditHelper_OLD;
 import com.bigspark.cloudera.management.helpers.MetadataHelper;
 import com.bigspark.cloudera.management.helpers.SparkHelper;
 import com.bigspark.cloudera.management.jobs.ClusterManagementJob;
@@ -31,7 +31,7 @@ public class OffloadController {
   public Configuration hadoopConfiguration;
   public HiveMetaStoreClient hiveMetaStoreClient;
   public MetadataHelper metadataHelper;
-  public AuditHelper auditHelper;
+  public AuditHelper_OLD auditHelperOLD;
   public Boolean isDryRun;
 
   Logger logger = LoggerFactory.getLogger(getClass());
@@ -45,8 +45,8 @@ public class OffloadController {
   public OffloadController()
       throws IOException, MetaException, ConfigurationException, SourceException {
     ClusterManagementJob clusterManagementJob = ClusterManagementJob.getInstance();
-    this.auditHelper = new AuditHelper(clusterManagementJob, "Storage offload job", "offload.sqlAuditTable");
-    this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark, auditHelper);
+    this.auditHelperOLD = new AuditHelper_OLD(clusterManagementJob, "Storage offload job", "offload.sqlAuditTable");
+    this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark, auditHelperOLD);
     this.fileSystem = clusterManagementJob.fileSystem;
     this.hadoopConfiguration = clusterManagementJob.hadoopConfiguration;
     this.metadataHelper = clusterManagementJob.metadataHelper;
@@ -151,7 +151,7 @@ public class OffloadController {
 
   public void execute(String location, String platform, String bucket)
       throws Exception {
-    auditHelper.startup();
+    auditHelperOLD.startup();
     OffloadJob offloadJob = new OffloadJob();
     OffloadMetadata offloadMetadata = new OffloadMetadata(new Path(location),Platform.valueOf(platform),bucket);
     logger.info(String.format("Running offload for location : '%s'", location));
@@ -164,7 +164,7 @@ public class OffloadController {
   private void execute(List<Row> offloadGroup, int executionGroup)
       throws MetaException, SourceException, ConfigurationException, IOException {
     OffloadJob offloadJob = new OffloadJob();
-    auditHelper.startup();
+    auditHelperOLD.startup();
     offloadGroup.forEach(offloadRecord -> {
       String database = offloadRecord.get(0).toString();
       logger.info(String.format("Running offload for database : '%s' and processing group : '%s'", database, executionGroup));
@@ -186,7 +186,7 @@ public class OffloadController {
         }
       });
     });
-    auditHelper.completion();
+    auditHelperOLD.completion();
   }
 }
 

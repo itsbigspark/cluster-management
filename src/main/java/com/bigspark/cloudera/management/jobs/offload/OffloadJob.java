@@ -5,7 +5,7 @@ import com.bigspark.cloudera.management.common.enums.Platform;
 import com.bigspark.cloudera.management.common.exceptions.SourceException;
 import com.bigspark.cloudera.management.common.metadata.OffloadMetadata;
 import com.bigspark.cloudera.management.common.model.SourceDescriptor;
-import com.bigspark.cloudera.management.helpers.AuditHelper;
+import com.bigspark.cloudera.management.helpers.AuditHelper_OLD;
 import com.bigspark.cloudera.management.helpers.FileSystemHelper;
 import com.bigspark.cloudera.management.helpers.GenericAuditHelper;
 import com.bigspark.cloudera.management.helpers.ImpalaHelper;
@@ -54,7 +54,7 @@ public class OffloadJob {
   public MetadataHelper metadataHelper;
   public Boolean isDryRun;
   public ClusterManagementJob clusterManagementJob;
-  public AuditHelper auditHelper;
+  public AuditHelper_OLD auditHelperOLD;
   public OffloadMetadata offloadMetadata;
   public SourceDescriptor sourceDescriptor;
 
@@ -73,9 +73,9 @@ public class OffloadJob {
 
   public OffloadJob() throws MetaException, SourceException, ConfigurationException, IOException {
     this.clusterManagementJob = ClusterManagementJob.getInstance();
-    this.auditHelper = new AuditHelper(clusterManagementJob, "Storage offload job",
+    this.auditHelperOLD = new AuditHelper_OLD(clusterManagementJob, "Storage offload job",
         "offload.auditTable");
-    this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark, auditHelper);
+    this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark, auditHelperOLD);
     this.fileSystem = clusterManagementJob.fileSystem;
     this.hadoopConfiguration = clusterManagementJob.hadoopConfiguration;
     this.hadoopConfiguration.set("fs.s3a.endpoint", "object.ecstestdrive.com");

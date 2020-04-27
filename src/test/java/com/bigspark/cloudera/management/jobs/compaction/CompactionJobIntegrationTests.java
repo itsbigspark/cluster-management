@@ -3,7 +3,7 @@ package com.bigspark.cloudera.management.jobs.compaction;
 import com.bigspark.cloudera.management.Common;
 import com.bigspark.cloudera.management.common.exceptions.SourceException;
 import com.bigspark.cloudera.management.common.metadata.CompactionMetadata;
-import com.bigspark.cloudera.management.helpers.AuditHelper;
+import com.bigspark.cloudera.management.helpers.AuditHelper_OLD;
 import com.bigspark.cloudera.management.helpers.MetadataHelper;
 import com.bigspark.cloudera.management.helpers.SparkHelper;
 import com.bigspark.cloudera.management.jobs.ClusterManagementJob;
@@ -38,7 +38,7 @@ public class CompactionJobIntegrationTests {
   public String testingDatabase;
   public String testingTable;
   private String metatable;
-  public AuditHelper auditHelper;
+  public AuditHelper_OLD auditHelperOLD;
   public ClusterManagementJob clusterManagementJob;
 
 
@@ -46,8 +46,8 @@ public class CompactionJobIntegrationTests {
       throws IOException, MetaException, ConfigurationException, SourceException {
     this.clusterManagementJob = ClusterManagementJob.getInstance();
     this.compactionController = new CompactionController();
-    this.auditHelper = new AuditHelper(clusterManagementJob, "Small file compaction test", "compaction.auditTable");
-    this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark, auditHelper);
+    this.auditHelperOLD = new AuditHelper_OLD(clusterManagementJob, "Small file compaction test", "compaction.auditTable");
+    this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark, auditHelperOLD);
     this.fileSystem = clusterManagementJob.fileSystem;
     this.hadoopConfiguration = clusterManagementJob.hadoopConfiguration;
     this.metadataHelper = clusterManagementJob.metadataHelper;

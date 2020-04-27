@@ -1,7 +1,7 @@
 package com.bigspark.cloudera.management.jobs.offload;
 
 import com.bigspark.cloudera.management.common.exceptions.SourceException;
-import com.bigspark.cloudera.management.helpers.AuditHelper;
+import com.bigspark.cloudera.management.helpers.AuditHelper_OLD;
 import com.bigspark.cloudera.management.helpers.MetadataHelper;
 import com.bigspark.cloudera.management.helpers.SparkHelper;
 import com.bigspark.cloudera.management.jobs.ClusterManagementJob;
@@ -30,7 +30,7 @@ public class OffloadJobIntegrationTests {
   public String testingDatabase;
   public String testFile;
   public String metatable;
-  public AuditHelper auditHelper;
+  public AuditHelper_OLD auditHelperOLD;
 
   Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -39,8 +39,8 @@ public class OffloadJobIntegrationTests {
 
     ClusterManagementJob clusterManagementJob = ClusterManagementJob.getInstance();
     this.offloadController = new OffloadController();
-    this.auditHelper = new AuditHelper(clusterManagementJob, "Storage offload job test", "offload.auditTable");
-    this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark, auditHelper);
+    this.auditHelperOLD = new AuditHelper_OLD(clusterManagementJob, "Storage offload job test", "offload.auditTable");
+    this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark, auditHelperOLD);
     this.fileSystem = clusterManagementJob.fileSystem;
     this.hadoopConfiguration = clusterManagementJob.hadoopConfiguration;
     this.metadataHelper = clusterManagementJob.metadataHelper;

@@ -5,13 +5,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.bigspark.cloudera.management.Common;
 import com.bigspark.cloudera.management.common.enums.Pattern;
 import com.bigspark.cloudera.management.common.exceptions.SourceException;
-import com.bigspark.cloudera.management.helpers.AuditHelper;
+import com.bigspark.cloudera.management.helpers.AuditHelper_OLD;
 import com.bigspark.cloudera.management.helpers.MetadataHelper;
 import com.bigspark.cloudera.management.helpers.SparkHelper;
 import com.bigspark.cloudera.management.jobs.ClusterManagementJob;
 import com.bigspark.cloudera.management.jobs.TstDataSetup;
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.Properties;
 import javax.naming.ConfigurationException;
 import org.apache.hadoop.conf.Configuration;
@@ -34,7 +33,7 @@ public class PurgingJobIntegrationTests {
   public String testingDatabase;
   public String testFile;
   private String metatable;
-  public AuditHelper auditHelper;
+  public AuditHelper_OLD auditHelperOLD;
   Logger logger = LoggerFactory.getLogger(getClass());
 
   public PurgingJobIntegrationTests()
@@ -42,8 +41,8 @@ public class PurgingJobIntegrationTests {
 
     ClusterManagementJob clusterManagementJob = ClusterManagementJob.getInstance();
     this.purgingController = new PurgingController();
-    this.auditHelper = new AuditHelper(clusterManagementJob, "EDH Cluster purging test","purging.auditTable");
-    this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark, auditHelper);
+    this.auditHelperOLD = new AuditHelper_OLD(clusterManagementJob, "EDH Cluster purging test","purging.auditTable");
+    this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark, auditHelperOLD);
     this.fileSystem = clusterManagementJob.fileSystem;
     this.hadoopConfiguration = clusterManagementJob.hadoopConfiguration;
     this.metadataHelper = clusterManagementJob.metadataHelper;

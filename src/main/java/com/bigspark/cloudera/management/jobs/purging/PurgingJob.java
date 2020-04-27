@@ -7,7 +7,7 @@ import com.bigspark.cloudera.management.common.exceptions.SourceException;
 import com.bigspark.cloudera.management.common.metadata.PurgingMetadata;
 import com.bigspark.cloudera.management.common.model.SourceDescriptor;
 import com.bigspark.cloudera.management.common.utils.DateUtils;
-import com.bigspark.cloudera.management.helpers.AuditHelper;
+import com.bigspark.cloudera.management.helpers.AuditHelper_OLD;
 import com.bigspark.cloudera.management.helpers.FileSystemHelper;
 import com.bigspark.cloudera.management.helpers.GenericAuditHelper;
 import com.bigspark.cloudera.management.helpers.ImpalaHelper;
@@ -54,7 +54,7 @@ class PurgingJob {
   protected final HiveMetaStoreClient hiveMetaStoreClient;
   protected final MetadataHelper metadataHelper;
   protected final ClusterManagementJob clusterManagementJob;
-  protected final AuditHelper auditHelper;
+  protected final AuditHelper_OLD auditHelperOLD;
   protected final GenericAuditHelper jobAudit;
   public SourceDescriptor sourceDescriptor;
   protected Boolean isDryRun;
@@ -75,8 +75,8 @@ class PurgingJob {
   PurgingJob() throws Exception {
     this.clusterManagementJob = ClusterManagementJob.getInstance();
     this.clusterManagementJob.dumpProperties();
-    this.auditHelper = new AuditHelper(clusterManagementJob, "Purging job","purging.sqlAuditTable");
-    this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark, auditHelper);
+    this.auditHelperOLD = new AuditHelper_OLD(clusterManagementJob, "Purging job","purging.sqlAuditTable");
+    this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark, auditHelperOLD);
     this.fileSystem = clusterManagementJob.fileSystem;
     this.hadoopConfiguration = clusterManagementJob.hadoopConfiguration;
     this.metadataHelper = clusterManagementJob.metadataHelper;

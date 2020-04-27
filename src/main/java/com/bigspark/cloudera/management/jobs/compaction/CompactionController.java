@@ -3,7 +3,7 @@ package com.bigspark.cloudera.management.jobs.compaction;
 import com.bigspark.cloudera.management.common.exceptions.SourceException;
 import com.bigspark.cloudera.management.common.metadata.CompactionMetadata;
 import com.bigspark.cloudera.management.common.model.TableDescriptor;
-import com.bigspark.cloudera.management.helpers.AuditHelper;
+import com.bigspark.cloudera.management.helpers.AuditHelper_OLD;
 import com.bigspark.cloudera.management.helpers.MetadataHelper;
 import com.bigspark.cloudera.management.helpers.SparkHelper;
 import com.bigspark.cloudera.management.jobs.ClusterManagementJob;
@@ -19,8 +19,6 @@ import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.spark.sql.Row;
-import org.apache.spark.sql.catalyst.analysis.NoSuchDatabaseException;
-import org.apache.spark.sql.catalyst.analysis.NoSuchTableException;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +31,7 @@ public class CompactionController {
   public Configuration hadoopConfiguration;
   public HiveMetaStoreClient hiveMetaStoreClient;
   public MetadataHelper metadataHelper;
-  public AuditHelper auditHelper;
+  public AuditHelper_OLD auditHelperOLD;
   public Boolean isDryRun;
 
   Logger logger = LoggerFactory.getLogger(getClass());
@@ -41,8 +39,8 @@ public class CompactionController {
   public CompactionController()
       throws IOException, MetaException, ConfigurationException, SourceException {
     ClusterManagementJob clusterManagementJob = ClusterManagementJob.getInstance();
-    this.auditHelper = new AuditHelper(clusterManagementJob, "Small file compaction job","compaction.AuditTable");
-    this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark, auditHelper);
+    this.auditHelperOLD = new AuditHelper_OLD(clusterManagementJob, "Small file compaction job","compaction.AuditTable");
+    this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark, auditHelperOLD);
     this.fileSystem = clusterManagementJob.fileSystem;
     this.hadoopConfiguration = clusterManagementJob.hadoopConfiguration;
     this.metadataHelper = clusterManagementJob.metadataHelper;
@@ -141,7 +139,7 @@ public class CompactionController {
   public void executeCompactionGroup(int executionGroup)
       throws ConfigurationException, IOException, MetaException, SourceException {
     CompactionJob CompactionJob = new CompactionJob();
-    auditHelper.startup();
+    auditHelperOLD.startup();
     List<Row> retentionGroup = getCompactionGroupDatabases(executionGroup);
     retentionGroup.forEach(retentionRecord -> {
       String database = retentionRecord.get(0).toString();
@@ -159,7 +157,7 @@ public class CompactionController {
         }
       });
     });
-    auditHelper.completion();
+    auditHelperOLD.completion();
   }
 }
 

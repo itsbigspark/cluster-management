@@ -6,7 +6,7 @@ import com.bigspark.cloudera.management.common.exceptions.SourceException;
 import com.bigspark.cloudera.management.common.metadata.CompactionMetadata;
 import com.bigspark.cloudera.management.common.model.SourceDescriptor;
 import com.bigspark.cloudera.management.common.model.TableDescriptor;
-import com.bigspark.cloudera.management.helpers.AuditHelper;
+import com.bigspark.cloudera.management.helpers.AuditHelper_OLD;
 import com.bigspark.cloudera.management.helpers.FileSystemHelper;
 import com.bigspark.cloudera.management.helpers.MetadataHelper;
 import com.bigspark.cloudera.management.helpers.SparkHelper;
@@ -28,7 +28,6 @@ import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.Partition;
 import org.apache.spark.sql.AnalysisException;
 import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.catalog.Database;
 import org.apache.spark.sql.catalog.Table;
@@ -58,7 +57,7 @@ public class CompactionJob {
   public String applicationID;
   public String table;
   public String database;
-  public AuditHelper auditHelper;
+  public AuditHelper_OLD auditHelperOLD;
   protected String trashBaseLocation;
 
   Logger logger = LoggerFactory.getLogger(getClass());
@@ -68,8 +67,8 @@ public class CompactionJob {
   public CompactionJob()
       throws IOException, MetaException, ConfigurationException, SourceException {
     ClusterManagementJob clusterManagementJob = ClusterManagementJob.getInstance();
-    this.auditHelper = new AuditHelper(clusterManagementJob, "Small file compaction job","compaction.AuditTable");
-    this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark, auditHelper);
+    this.auditHelperOLD = new AuditHelper_OLD(clusterManagementJob, "Small file compaction job","compaction.AuditTable");
+    this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark, auditHelperOLD);
     this.fileSystem = clusterManagementJob.fileSystem;
     this.hadoopConfiguration = clusterManagementJob.hadoopConfiguration;
     this.metadataHelper = clusterManagementJob.metadataHelper;
@@ -258,19 +257,19 @@ public class CompactionJob {
     long[] countSize = getFileCountTotalSize(absLocation);
     logger.info("Original file count : " + countSize[0]);
     if (isCompactionCandidate(countSize[0], countSize[1])) {
-      auditHelper.writeAuditLine("Compact", sourceDescriptor.toString(),
+      auditHelperOLD.writeAuditLine("Compact", sourceDescriptor.toString(),
           "Original file count : " + countSize[0], true);
       Integer repartitionFactor = getRepartitionFactor(countSize[1]);
       compactLocation(absLocation, repartitionFactor);
       long[] newCountSize = getFileCountTotalSize(absLocation + "_tmp");
       logger.info("Resulting file count : " + newCountSize[0]);
-      auditHelper.writeAuditLine("Compact", sourceDescriptor.toString(),
+      auditHelperOLD.writeAuditLine("Compact", sourceDescriptor.toString(),
           "Resulting file count : " + countSize[0], true);
       resolveLocation(absLocation);
     } else {
       logger.debug(
           "No compaction required for location : [ " + absLocation + " ]");
-      auditHelper.writeAuditLine("Compact", sourceDescriptor.toString(),
+      auditHelperOLD.writeAuditLine("Compact", sourceDescriptor.toString(),
           "No compaction required : location - "+absLocation+" , file count - " + countSize[0] + " , location size - " + countSize[1], true);
     }
   }
@@ -334,7 +333,7 @@ public class CompactionJob {
     String trashLocation = null;
     try {
       moveDataToTrash(trashBaseLocation, location, sourceDescriptor);
-      auditHelper.writeAuditLine("Trash", sourceDescriptor.toString(),
+      auditHelperOLD.writeAuditLine("Trash", sourceDescriptor.toString(),
           String.format("Moved files from : %s to : %s", location, trashBaseLocation),
           true);
     } catch (Exception e) {
@@ -347,7 +346,7 @@ public class CompactionJob {
       boolean rename = fileSystem
           .rename(new Path(location + "_tmp"), new Path(location));
       if (rename) {
-        auditHelper.writeAuditLine("Move", sourceDescriptor.toString(),
+        auditHelperOLD.writeAuditLine("Move", sourceDescriptor.toString(),
             String.format("Moved : %s ==> %s", location + "_tmp", location),
             true);
       } else {
@@ -356,7 +355,7 @@ public class CompactionJob {
     } catch (Exception e) {
       logger.error("ERROR: Unable to move files from temp : " + location
           + "_tmp to partition location");
-      auditHelper.writeAuditLine("Move", sourceDescriptor.toString(),
+      auditHelperOLD.writeAuditLine("Move", sourceDescriptor.toString(),
           String.format("Moving : %s ==> %s", location + "_tmp", location),
           false);
       e.printStackTrace();
@@ -365,13 +364,13 @@ public class CompactionJob {
         trashLocation = trashBaseLocation + location;
         boolean rename = fileSystem.rename(new Path(trashLocation), new Path(location));
         if (rename) {
-          auditHelper.writeAuditLine("Move", sourceDescriptor.toString(),
+          auditHelperOLD.writeAuditLine("Move", sourceDescriptor.toString(),
               String.format("Moving : %s ==> %s", trashLocation, location), true);
         } else {
           throw new IOException("Failed to move files");
         }
       } catch (Exception e_) {
-        auditHelper.writeAuditLine("Move", sourceDescriptor.toString(),
+        auditHelperOLD.writeAuditLine("Move", sourceDescriptor.toString(),
             String.format("Moving : %s ==> %s", trashLocation, location), false);
         logger.error("FATAL: Error while reinstating location at " + location);
         logger.error("FATAL: !!!  Locaion is now impacted, resolution required  !!!!");

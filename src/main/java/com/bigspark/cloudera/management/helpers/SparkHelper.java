@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -288,10 +287,35 @@ public class SparkHelper {
    */
   public static class AuditedSparkSession extends SparkSession {
 
-    AuditHelper auditHelper;
+    AuditHelper_OLD auditHelperOLD;
     SparkSession spark;
 
-    public AuditedSparkSession(SparkSession spark, AuditHelper auditHelper) {
+    public AuditedSparkSession(SparkSession spark, AuditHelper_OLD auditHelperOLD) {
+      super(spark.sparkContext());
+      this.spark = spark;
+      this.auditHelperOLD = auditHelperOLD;
+    }
+
+    @Override
+    public Dataset<Row> sql(String sqlText) {
+      try {
+        auditHelperOLD.writeAuditLine("spark.sql", "", sqlText, true);
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+      return spark.sql(sqlText);
+    }
+  }
+
+  /**
+   * Nested class to override spark.sql method and provide an auditing capability
+   */
+  public static class AuditedSparkSession_NEW extends SparkSession {
+
+    SparkSqlAuditHelper auditHelper;
+    SparkSession spark;
+
+    public AuditedSparkSession_NEW(SparkSession spark, SparkSqlAuditHelper auditHelper) {
       super(spark.sparkContext());
       this.spark = spark;
       this.auditHelper = auditHelper;

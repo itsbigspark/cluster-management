@@ -3,21 +3,16 @@ package com.bigspark.cloudera.management.jobs.purging;
 import com.bigspark.cloudera.management.common.exceptions.SourceException;
 import com.bigspark.cloudera.management.common.metadata.PurgingMetadata;
 import com.bigspark.cloudera.management.common.model.TableDescriptor;
-import com.bigspark.cloudera.management.helpers.AuditHelper;
-import com.bigspark.cloudera.management.helpers.MetadataHelper;
+import com.bigspark.cloudera.management.helpers.AuditHelper_OLD;
 import com.bigspark.cloudera.management.helpers.SparkHelper;
 import com.bigspark.cloudera.management.jobs.ClusterManagementJob;
-import com.bigspark.cloudera.management.jobs.purging.PurgingJob;
+import com.bigspark.cloudera.management.jobs.ClusterManagementJob_NEW;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 import javax.naming.ConfigurationException;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.spark.sql.Row;
@@ -25,16 +20,10 @@ import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PurgingController {
+public class PurgingController extends ClusterManagementJob_NEW {
 
-  public Properties jobProperties;
   public SparkHelper.AuditedSparkSession spark;
-  public FileSystem fileSystem;
-  public Configuration hadoopConfiguration;
-  public HiveMetaStoreClient hiveMetaStoreClient;
-  public MetadataHelper metadataHelper;
-  public AuditHelper auditHelper;
-  public Boolean isDryRun;
+  public AuditHelper_OLD auditHelperOLD;
 
   Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -42,20 +31,14 @@ public class PurgingController {
       throws MetaException, SourceException, ConfigurationException, IOException {
     this();
     this.isDryRun = isDryRun;
-
   }
 
   public PurgingController()
       throws IOException, MetaException, ConfigurationException, SourceException {
+    super();
     ClusterManagementJob clusterManagementJob = ClusterManagementJob.getInstance();
-    this.auditHelper = new AuditHelper(clusterManagementJob, "Purging job","purging.sqlAuditTable");
-    this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark, auditHelper);
-    this.fileSystem = clusterManagementJob.fileSystem;
-    this.hadoopConfiguration = clusterManagementJob.hadoopConfiguration;
-    this.metadataHelper = clusterManagementJob.metadataHelper;
-    this.isDryRun = clusterManagementJob.isDryRun;
-    this.jobProperties = clusterManagementJob.jobProperties;
-    this.hiveMetaStoreClient = clusterManagementJob.hiveMetaStoreClient;
+    this.auditHelperOLD = new AuditHelper_OLD(clusterManagementJob, "Purging job","purging.sqlAuditTable");
+    this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark, auditHelperOLD);
   }
 
   /**
@@ -152,7 +135,7 @@ public class PurgingController {
   public void execute(List<Row> databases, int executionGroup)
       throws Exception {
     PurgingJob PurgingJob = new PurgingJob();
-    auditHelper.startup();
+    auditHelperOLD.startup();
 
     databases.forEach(retentionRecord -> {
       String database = retentionRecord.get(0).toString();
@@ -174,7 +157,7 @@ public class PurgingController {
         }
       });
     });
-    auditHelper.completion();
+    auditHelperOLD.completion();
   }
 }
 
