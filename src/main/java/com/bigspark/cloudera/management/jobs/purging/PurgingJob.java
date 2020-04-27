@@ -130,6 +130,7 @@ class PurgingJob {
               " FROM %s.%s " +
               "WHERE EDI_BUSINESS_DAY > '" + maxMonthMinBusinessDay.toString() + "' " +
               "AND EDI_BUSINESS_DAY < '" + purgeCeiling.toString() + "' " +
+              "AND to_date(EDI_BUSINESS_DAY) IS NOT NULL " +
               "GROUP BY SRC_SYS_INST_ID, year(EDI_BUSINESS_DAY), month(EDI_BUSINESS_DAY)"
           , dbName, tableName));
       this.partitionMonthEnds = spark.sql(sb.toString()).cache();
@@ -409,7 +410,7 @@ class PurgingJob {
         logger.error("Table pattern not validated");
       }
     } else {
-      logger.warn(String.format("Skipping table '%s.%s' as it has no partitions, or has a non-standard partition key"
+      logger.warn(String.format("Skipping table '%s.%s' as it has no partitions, or has a non-standard partition key  "
           , purgingMetadata.tableDescriptor.getDatabaseName()
           , purgingMetadata.tableDescriptor.getTableName()));
     }

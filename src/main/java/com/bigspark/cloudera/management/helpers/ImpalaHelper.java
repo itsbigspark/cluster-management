@@ -23,7 +23,7 @@ public class ImpalaHelper {
 
   //"jdbc:impala://dh-uwc-impala.server.rbsgrp.net:21051/default;AuthMech=3;transportMode=sasl"
   public ImpalaHelper(String connectionString, String userName, String password) {
-    this.isKerberos = true;
+    this.isKerberos = false;
     logger.debug(String
         .format("Constructed ImpalaHelper with LDAP Connection String: %s", connectionString));
     this.connectionString = String.format("%s;UID=%s;PWD=%s", connectionString, userName, password);
@@ -31,7 +31,7 @@ public class ImpalaHelper {
 
   public ImpalaHelper(String connectionString) {
     this.connectionString = connectionString;
-    this.isKerberos = false;
+    this.isKerberos = true;
     logger.debug(String
         .format("Constructed ImpalaHelper with Connection String: %s", this.connectionString));
   }

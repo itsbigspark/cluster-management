@@ -201,6 +201,26 @@ public class SmokeTest {
     logger.info("Finished Test of testImpalaConnection method");
   }
 
+  private void testImpalaConnection_MANUAL()  {
+    logger.info("Starting test of testImpalaConnection method");
+    try {
+      try (Connection conn = this.impalaHelper.getConnection()) {
+        try (Statement stmnt = conn.createStatement()) {
+          try (ResultSet rs = stmnt.executeQuery("show databases")) {
+            rs.next();
+            logger.info(String.format("1st DB name from 'show databases' command: %s",
+                String.format(rs.getString(1))));
+          }
+        }
+      }
+    } catch (Exception ex) {
+      logger.error("Failed to connect to impala and read databases", ex);
+      System.exit(1);
+    }
+    logger.info("Finished Test of testImpalaConnection method");
+  }
+
+
   private String getPartitionCheckSql(String dbName, String tblName) {
     StringBuilder sb = new StringBuilder();
     sb.append("select t.TBL_NAME, p.part_name, pp.*\r\n");
