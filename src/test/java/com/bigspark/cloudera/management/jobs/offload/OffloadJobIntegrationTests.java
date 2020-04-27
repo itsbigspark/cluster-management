@@ -51,7 +51,9 @@ public class OffloadJobIntegrationTests {
     if (!spark.catalog().tableExists(testingDatabase, metatable.split("\\.")[0])) {
       System.out.println("Creating test metadata table...");
       spark.sql("CREATE TABLE IF NOT EXISTS " + metatable
-          + " (db_name STRING, tbl_name STRING, target_platform STRING, hdfs_retention INT, target_bucket STRING, processing_group INT, active STRING)");
+          + " (db_name STRING, tbl_name STRING, target_platform STRING, retention_period INT, target_bucket STRING, processing_group INT, active STRING)");
+//      spark.sql("INSERT INTO " + metatable + " VALUES " +
+//          "('" + testingDatabase + "','test_table_meters','ECS',1,'s3tab',1,'true')");
       spark.sql("INSERT INTO " + metatable + " VALUES " +
           "('" + testingDatabase + "','test_table_sh','ECS',30,'s3tab',1,'true')," +
           "('" + testingDatabase + "','test_table_eas','ECS',30,'s3tab',2, 'true')");
@@ -65,8 +67,8 @@ public class OffloadJobIntegrationTests {
         .getProperty("offload.testingDatabase");
     this.metatable = jobProperties
         .getProperty("offload.metatable");
-//    TstDataSetup tstDataSetup = new TstDataSetup();
-//    tstDataSetup.setUp(testingDatabase, metatable);
+    TstDataSetup tstDataSetup = new TstDataSetup();
+    tstDataSetup.setUp(testingDatabase, metatable);
     createMetadataTable();
     OffloadController offloadController = new OffloadController();
     offloadController.execute(1);

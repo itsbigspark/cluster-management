@@ -1,30 +1,36 @@
-# EDH - ClusterManagement
+# bigspark - Cloudera Management suite
 ###Compilation 
 
 `mvn package`
 
 Will output 2 jars:  Main artifact and -tests.jar
 
-###Testing
+###Package structure
+All cluster management jobs have been created in a consistent way and comprise of the following structure:
 
-Can test in local mode using embedded derby db
-Should be workable in deploy-mode cluster with appropriate $HADOOP_CONF_DIR set
+_com.bigspark.cloudera.management.jobs   
+| --> Job     
+| -- | -->  JobRunner    
+| -- | -->  JobMistRunner    
+| -- | -->  JobController    
+| -- | -->  Job_     
 
 
-##### purging
+JobRunner - Entry point class for the job type, used to accept input parameters and invoke the controller
+JobMistRunner - Wrapper class to execute the job via the Mist framework
+JobController - This is used to generate the the workload for the respecitve job and contains all the logic for inclusion/exclusion of processing candidates
+Job - The actual job process with operates at some atmoic grain - i.e.  Table or Location
 
-`export SPARK_SUBMIT_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5050 && $SPARK_HOME/bin/spark-submit --master local --class com.bigspark.cloudera.management.services.purging.PurgingJobTestRunner --jars ~/edh-cluster-management/target/cluster-management-1.0-SNAPSHOT.jar  ~/edh-cluster-management/target/cluster-management-1.0-SNAPSHOT-tests.jar
-`
+###Testing 
+Each job type has a corresponding Test runner within the testing jar
+Please refer to each MD file in the respective job package for specific notes on integration testing
 
-######Entry point - PurgingJobTestRunner 
-o Process will check for test data at /tmp/testdata.csv, if not existing, it will generate it
+###Testing / Execution notes
 
-o Process will check for existence of tables:
+1. In order to avoid java dependency issues    
+1a. Ideally use a version of Spark without a compiled Hadoop version.  Even better would be a cloudera Spark version    
+1b. Submit spark jobs in cluster mode (--deploy-mode cluster)     
+3. To execute integration testing jobs from the testing jar, you must also attach the cluster management jar as a --jars arg     
 
-__default.test_table_sh__
-__default.test_table_eas__
-__default.data_retention_configuration__
-
-* database is configurable in config.properties
 
 

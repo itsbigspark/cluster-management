@@ -251,6 +251,11 @@ public class MetadataHelper {
     //todo
   }
 
+  public static String quotePartitionValue(String partitionString){
+    String[] split = partitionString.split("=");
+    return String.format("%s='%s'",split[0],split[1]);
+  }
+
   public static boolean verifyPartitionKey(Table table) {
     //edi_business_day='2020-02-20'
     boolean validPartitionKey = false;

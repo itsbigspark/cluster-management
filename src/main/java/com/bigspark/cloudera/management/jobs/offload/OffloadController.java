@@ -94,7 +94,7 @@ public class OffloadController {
   private List<Row> getMetaDataForDatabase(String database, int group) {
     logger.info("Now pulling configuration metadata for all tables in database : " + database);
     String sql =
-        "SELECT DISTINCT TBL_NAME,TARGET_PLATFORM, TARGET_BUCKET, HDFS_RETENTION FROM " + getMetadataTable()
+        "SELECT DISTINCT TBL_NAME, TARGET_PLATFORM, TARGET_BUCKET, RETENTION_PERIOD FROM " + getMetadataTable()
             + " WHERE DB_NAME = '" + database + "' AND LOWER(ACTIVE)='true'";
     if (group >= 0) {
       sql += " AND PROCESSING_GROUP =" + group;
@@ -105,7 +105,7 @@ public class OffloadController {
 
 
   /**
-   * Method to fetch the Purging metadata for a specific database
+   * Method to fetch the Offload metadata for a specific database
    *
    * @param database
    * @param group
@@ -113,10 +113,10 @@ public class OffloadController {
    */
   private ArrayList<OffloadMetadata> sourceDatabaseTablesFromMetaTable(String database,
       int group) throws SourceException {
-    List<Row> purgeTables = getMetaDataForDatabase(database, group);
+    List<Row> offloadTables = getMetaDataForDatabase(database, group);
     ArrayList<OffloadMetadata> offloadMetadataList = new ArrayList<>();
-    logger.info(purgeTables.size() + " tables returned with a offload configuration");
-    for (Row table : purgeTables) {
+    logger.info(offloadTables.size() + " tables returned with a offload configuration");
+    for (Row table : offloadTables) {
       String tableName = table.get(0).toString();
       Platform platform = Platform.valueOf(table.get(1).toString());
       String bucket = table.get(2).toString();

@@ -24,6 +24,7 @@ import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.catalyst.analysis.NoSuchDatabaseException;
 import org.apache.spark.sql.catalyst.analysis.NoSuchTableException;
 import org.apache.spark.sql.functions;
+import org.apache.thrift.TException;
 
 public class CompactionJobIntegrationTests {
 
@@ -69,7 +70,7 @@ public class CompactionJobIntegrationTests {
   }
 
   void execute()
-      throws ConfigurationException, IOException, MetaException, SourceException, NoSuchTableException, NoSuchDatabaseException, ParseException {
+      throws ConfigurationException, IOException, TException, SourceException, NoSuchTableException, NoSuchDatabaseException, ParseException {
 
     this.testingDatabase = jobProperties
         .getProperty("compaction.testingDatabase");

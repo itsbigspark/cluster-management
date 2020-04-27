@@ -14,12 +14,14 @@ import java.util.Properties;
 import javax.naming.ConfigurationException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.catalyst.analysis.NoSuchDatabaseException;
 import org.apache.spark.sql.catalyst.analysis.NoSuchTableException;
+import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,7 +99,7 @@ public class CompactionController {
 
   /**
    * Method to fetch the purging metadata for a specific database
-   *
+   * Fetch all database tables where * provided in metadata
    * @param database
    * @return RetentionMetadataContainer
    */
@@ -105,29 +107,35 @@ public class CompactionController {
       int group) throws SourceException {
     List<Row> compactionTables = getCompactionDataForDatabase(database, group);
     ArrayList<CompactionMetadata> compactionMetadataList = new ArrayList<>();
-    logger.info(compactionTables.size() + " tables returned with a Compaction configuration");
+    logger.info(compactionTables.size() + " rows returned with a Compaction configuration");
     for (Row table : compactionTables) {
       String tableName = table.get(0).toString();
-      try {
-        Table tableMeta = metadataHelper.getTable(database, tableName);
-        TableDescriptor tableDescriptor = metadataHelper.getTableDescriptor(tableMeta);
-        CompactionMetadata compactionMetadata = new CompactionMetadata(tableDescriptor);
-        compactionMetadataList.add(compactionMetadata);
-      } catch (SourceException e) {
-        logger.error(
-            tableName + " : provided in metadata configuration, but not found in database..");
+      if (tableName.equals("*")){
+        ArrayList<Table> allTablesFromDatabase = metadataHelper.getAllTablesFromDatabase(database);
+        ArrayList<TableDescriptor> allTableDescriptors = metadataHelper
+            .getAllTableDescriptors(allTablesFromDatabase);
+        allTableDescriptors.forEach(tableDescriptor -> compactionMetadataList.add(new CompactionMetadata(tableDescriptor)));
+      } else {
+        try {
+          Table tableMeta = metadataHelper.getTable(database, tableName);
+          TableDescriptor tableDescriptor = metadataHelper.getTableDescriptor(tableMeta);
+          CompactionMetadata compactionMetadata = new CompactionMetadata(tableDescriptor);
+          compactionMetadataList.add(compactionMetadata);
+        } catch (SourceException e) {
+          logger.error(
+              tableName + " : provided in metadata configuration, but not found in database..");
+        }
       }
     }
     return compactionMetadataList;
   }
 
-  public void executeCompactionForDatabase() {
-  }
 
-  public void executeCompactionForTable() {
-  }
-
-  public void executeCompactionForLocation() {
+  public void executeCompactionForLocation(String location)
+      throws SourceException, TException, IOException, ConfigurationException {
+    CompactionJob compactionJob = new CompactionJob();
+    CompactionMetadata compactionMetadata = new CompactionMetadata(new Path(location));
+    compactionJob.execute(compactionMetadata);
   }
 
   public void executeCompactionGroup(int executionGroup)
@@ -146,7 +154,7 @@ public class CompactionController {
       compactionMetadataList.forEach(table -> {
         try {
           CompactionJob.execute(table);
-        } catch (SourceException | NoSuchDatabaseException | IOException | NoSuchTableException e) {
+        } catch (SourceException | IOException | TException e) {
           e.printStackTrace();
         }
       });

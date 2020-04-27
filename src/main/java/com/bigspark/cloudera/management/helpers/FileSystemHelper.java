@@ -104,6 +104,7 @@ public class FileSystemHelper {
 
   public static String getCreateTrashBaseLocation(String jobType) throws IOException {
     FileSystem fileSystem = FileSystemHelper.getConnection();
+
     StringBuilder sb = new StringBuilder();
     String userHomeArea = FileSystemHelper.getUserHomeArea();
     long seconds = System.currentTimeMillis() / 1000l;
@@ -154,7 +155,6 @@ public class FileSystemHelper {
         } else {
           logger.warn(String.format("Source location '%s' does not exists. Skipping", sourceLocation));
         }
-
         return true;
       } catch (Exception e) {
         throw e;

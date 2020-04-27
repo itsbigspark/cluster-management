@@ -1,9 +1,26 @@
 package com.bigspark.cloudera.management.jobs.compaction;
 
+import com.bigspark.cloudera.management.common.utils.PropertyUtils;
+import java.util.Properties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class CompactionRunner {
 
+  static Logger logger = LoggerFactory.getLogger(CompactionRunner.class);
+
   public static void main(String[] args) throws Exception {
-    CompactionJob compactionJob = new CompactionJob();
-//        compactionJob.execute("default","small_files");
+    logger.info("CompactionRunner Initialised");
+    CompactionController CompactionController = new CompactionController();
+    Properties argsp = PropertyUtils.getProgramArgsAsProps(args);
+    int compactionGroup = -1;
+    if (argsp.containsKey("Group")) {
+      compactionGroup = PropertyUtils.getOptionalProperty(argsp, "Group", -1);
+    }
+    if (argsp.containsKey("Group")) {
+
+    }
+    CompactionController.executeCompactionGroup(compactionGroup);
+    logger.info("CompactionRunner Completed");
   }
 }

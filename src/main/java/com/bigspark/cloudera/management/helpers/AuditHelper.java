@@ -23,6 +23,7 @@ public class AuditHelper {
   public AuditHelper(ClusterManagementJob clusterManagementJob, String jobType, String tableConfigKey)
       throws IOException, SourceException {
     this.clusterManagementJob = clusterManagementJob;
+    this.jobType = jobType;
     intitialiseAuditTable(tableConfigKey);
     setLogfile();
 
