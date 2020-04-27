@@ -284,7 +284,7 @@ public class MetadataHelper {
       throws SourceException {
     logger.info("Now processing table " + tableDescriptor.getDatabaseName() + "." + tableDescriptor
         .getTableName());
-    Pattern pattern = null;
+    Pattern pattern = Pattern.UNKNOWN;
     if (tableDescriptor.isPartitioned()) {
       Partition p = tableDescriptor.getPartitionList().get(0);
       //Test that partition name starts with "edi_business_day" and value matches

@@ -384,7 +384,7 @@ class PurgingJob {
 
     if (purgingMetadata.tableDescriptor.hasPartitions()) {
       this.pattern = MetadataHelper.getTableType(purgingMetadata.tableDescriptor);
-      if (this.pattern != null) {
+      if (this.pattern != null && this.pattern != Pattern.UNKNOWN) {
         LocalDate purgeCeiling = this.calculatePurgeCeiling(
             purgingMetadata.retentionPeriod
             , LocalDate.now()
@@ -409,7 +409,7 @@ class PurgingJob {
         logger.error("Table pattern not validated");
       }
     } else {
-      logger.warn(String.format("Skipping table '%s.%s' as it has no partitions"
+      logger.warn(String.format("Skipping table '%s.%s' as it has no partitions, or has a non-standard partition key"
           , purgingMetadata.tableDescriptor.getDatabaseName()
           , purgingMetadata.tableDescriptor.getTableName()));
     }

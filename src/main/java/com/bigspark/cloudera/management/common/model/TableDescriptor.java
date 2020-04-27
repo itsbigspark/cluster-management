@@ -66,6 +66,6 @@ public class TableDescriptor {
       throw new SourceException("Table: " + tableName + " is not partitioned");
     }
   }
-
+  
 
 }
