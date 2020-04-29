@@ -7,11 +7,11 @@ import com.bigspark.cloudera.management.common.metadata.OffloadMetadata;
 import com.bigspark.cloudera.management.common.model.SourceDescriptor;
 import com.bigspark.cloudera.management.helpers.AuditHelper_OLD;
 import com.bigspark.cloudera.management.helpers.FileSystemHelper;
-import com.bigspark.cloudera.management.helpers.GenericAuditHelper;
+import com.bigspark.cloudera.management.helpers.GenericAuditHelper_OLD;
 import com.bigspark.cloudera.management.helpers.ImpalaHelper;
 import com.bigspark.cloudera.management.helpers.MetadataHelper;
 import com.bigspark.cloudera.management.helpers.SparkHelper;
-import com.bigspark.cloudera.management.jobs.ClusterManagementJob;
+import com.bigspark.cloudera.management.jobs.ClusterManagementJob_OLD;
 import java.io.IOException;
 import java.net.URI;
 import java.time.LocalDate;
@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
 public class OffloadJob {
 
   private final ImpalaHelper impalaHelper;
-  private final GenericAuditHelper jobAudit;
+  private final GenericAuditHelper_OLD jobAudit;
   public Properties jobProperties;
   public SparkHelper.AuditedSparkSession spark;
   public FileSystem fileSystem;
@@ -53,7 +53,7 @@ public class OffloadJob {
   public HiveMetaStoreClient hiveMetaStoreClient;
   public MetadataHelper metadataHelper;
   public Boolean isDryRun;
-  public ClusterManagementJob clusterManagementJob;
+  public ClusterManagementJob_OLD clusterManagementJobOLD;
   public AuditHelper_OLD auditHelperOLD;
   public OffloadMetadata offloadMetadata;
   public SourceDescriptor sourceDescriptor;
@@ -72,24 +72,24 @@ public class OffloadJob {
   private Logger logger = LoggerFactory.getLogger(getClass());
 
   public OffloadJob() throws MetaException, SourceException, ConfigurationException, IOException {
-    this.clusterManagementJob = ClusterManagementJob.getInstance();
-    this.auditHelperOLD = new AuditHelper_OLD(clusterManagementJob, "Storage offload job",
+    this.clusterManagementJobOLD = ClusterManagementJob_OLD.getInstance();
+    this.auditHelperOLD = new AuditHelper_OLD(clusterManagementJobOLD, "Storage offload job",
         "offload.auditTable");
-    this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark, auditHelperOLD);
-    this.fileSystem = clusterManagementJob.fileSystem;
-    this.hadoopConfiguration = clusterManagementJob.hadoopConfiguration;
+    this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJobOLD.spark, auditHelperOLD);
+    this.fileSystem = clusterManagementJobOLD.fileSystem;
+    this.hadoopConfiguration = clusterManagementJobOLD.hadoopConfiguration;
     this.hadoopConfiguration.set("fs.s3a.endpoint", "object.ecstestdrive.com");
     this.hadoopConfiguration
         .set("fs.s3a.awsAccessKeyId", "131855586862166345@ecstestdrive.emc.com");
     this.hadoopConfiguration
         .set("fs.s3a.awsSecretAccessKey", "Q+f/ypU/Ii6s2tWLmpxyaIVgxT4+rBLWroAO4ufS");
-    this.metadataHelper = clusterManagementJob.metadataHelper;
-    this.isDryRun = clusterManagementJob.isDryRun;
-    this.jobProperties = clusterManagementJob.jobProperties;
-    this.hiveMetaStoreClient = clusterManagementJob.hiveMetaStoreClient;
+    this.metadataHelper = clusterManagementJobOLD.metadataHelper;
+    this.isDryRun = clusterManagementJobOLD.isDryRun;
+    this.jobProperties = clusterManagementJobOLD.jobProperties;
+    this.hiveMetaStoreClient = clusterManagementJobOLD.hiveMetaStoreClient;
     String connStr = this.jobProperties.getProperty("impala.connStr");
     this.impalaHelper = new ImpalaHelper(connStr);
-    this.jobAudit = new GenericAuditHelper(this.clusterManagementJob, "purging.auditTable",
+    this.jobAudit = new GenericAuditHelper_OLD(this.clusterManagementJobOLD, "purging.auditTable",
         this.impalaHelper);
   }
 
@@ -391,7 +391,7 @@ public class OffloadJob {
 
   private String getAuditLogRecord(String originalLocation, String trashLocation) {
     return String.format("%s~%s~%s~%s~%s~%s~%s\n"
-        , clusterManagementJob.applicationID
+        , clusterManagementJobOLD.applicationID
         , ""
         , ""
         , "specific_location"
@@ -404,7 +404,7 @@ public class OffloadJob {
   private String getAuditLogRecord(String dbName, String tableName, String originalLocation,
       String trashLocation) {
     return String.format("%s~%s~%s~%s~%s~%s~%s\n"
-        , clusterManagementJob.applicationID
+        , clusterManagementJobOLD.applicationID
         , dbName
         , tableName
         , "partition_spec"

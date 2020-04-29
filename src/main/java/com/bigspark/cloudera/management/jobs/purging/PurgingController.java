@@ -3,52 +3,55 @@ package com.bigspark.cloudera.management.jobs.purging;
 import com.bigspark.cloudera.management.common.exceptions.SourceException;
 import com.bigspark.cloudera.management.common.metadata.PurgingMetadata;
 import com.bigspark.cloudera.management.common.model.TableDescriptor;
-import com.bigspark.cloudera.management.helpers.AuditHelper_OLD;
-import com.bigspark.cloudera.management.helpers.SparkHelper;
+import com.bigspark.cloudera.management.helpers.SparkSqlAuditHelper;
 import com.bigspark.cloudera.management.jobs.ClusterManagementJob;
-import com.bigspark.cloudera.management.jobs.ClusterManagementJob_NEW;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.naming.ConfigurationException;
-import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.spark.sql.Row;
-import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-public class PurgingController extends ClusterManagementJob_NEW {
+public class PurgingController extends ClusterManagementJob {
 
-  public SparkHelper.AuditedSparkSession spark;
-  public AuditHelper_OLD auditHelperOLD;
-
+//  public SparkHelper.AuditedSparkSession_NEW spark;
+  public SparkSqlAuditHelper sqlAuditHelper;
+  private final String cPURGING_CONFIG_TABLE="SYS_CM_PURGE_CONFIG";
   Logger logger = LoggerFactory.getLogger(getClass());
 
   public PurgingController(Boolean isDryRun)
-      throws MetaException, SourceException, ConfigurationException, IOException {
+      throws Exception {
     this();
     this.isDryRun = isDryRun;
   }
 
   public PurgingController()
-      throws IOException, MetaException, ConfigurationException, SourceException {
+      throws Exception {
     super();
-    ClusterManagementJob clusterManagementJob = ClusterManagementJob.getInstance();
-    this.auditHelperOLD = new AuditHelper_OLD(clusterManagementJob, "Purging job","purging.sqlAuditTable");
-    this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark, auditHelperOLD);
+    //this.sqlAuditHelper = new SparkSqlAuditHelper(this, "Purging job","purging.sqlAuditTable");
+    //this.spark = new SparkHelper.AuditedSparkSession_NEW(this.spark, sqlAuditHelper);
   }
 
-  /**
-   * Method to fetch metadata table value from properties file
-   *
-   * @return String fully qualified Name ([db].[tbl]) of the Retention table
-   */
+  @Override
+  protected void jobAuditBegin() throws IOException {
+    throw new NotImplementedException();
+  }
+
+  @Override
+  protected void jobAuditEnd() throws IOException {
+    throw new NotImplementedException();
+  }
+
+  @Override
+  protected void jobAuditFail(String error) throws IOException {
+    throw new NotImplementedException();
+  }
+
+
   private String getMetadataTable() {
-    return jobProperties
-        .getProperty("purging.metatable");
+    return String.format("%s.%s", this.managementDb, cPURGING_CONFIG_TABLE);
   }
 
 
@@ -60,7 +63,7 @@ public class PurgingController extends ClusterManagementJob_NEW {
    */
   private List<Row> getGroupDatabases(int group) {
     logger.info("Now pulling list of databases for group : " + group);
-    String sql = "SELECT DISTINCT DB_NAME FROM " + getMetadataTable() + " WHERE ACTIVE='true'";
+    String sql = "SELECT DISTINCT DB_NAME FROM " + this.getMetadataTable() + " WHERE ACTIVE='true'";
     if (group > 0) {
       sql += " and PROCESSING_GROUP=" + group;
     }
@@ -76,9 +79,10 @@ public class PurgingController extends ClusterManagementJob_NEW {
    * @return List<Row> List of Records for the given DB/Group
    */
   private List<Row> getRetentionDataForDatabase(String database, int group) {
+    this.initialiseConfigTableView();
     logger.info("Now pulling configuration metadata for all tables in database : " + database);
     String sql =
-        "SELECT DISTINCT TBL_NAME, RETENTION_PERIOD, RETAIN_MONTH_END FROM " + getMetadataTable()
+        "SELECT DISTINCT TBL_NAME, RETENTION_PERIOD, RETAIN_MONTH_END FROM " + this.getMetadataTable()
             + " WHERE DB_NAME = '" + database + "' AND LOWER(ACTIVE)='true'";
     if (group >= 0) {
       sql += " AND PROCESSING_GROUP =" + group;
@@ -87,6 +91,27 @@ public class PurgingController extends ClusterManagementJob_NEW {
     return spark.sql(sql).collectAsList();
   }
 
+  private void initialiseConfigTableView()  {
+    String viewName = String.format("%s_CURRENT_V ", this.getMetadataTable());
+    if(!this.spark.catalog().tableExists(viewName)) {
+      logger.info(String.format("Job Audit table view does not exist.  Creating view %s "
+          , viewName));
+      spark.sql(this.getConfigTableViewSql(viewName));
+    }
+  }
+
+  private String getConfigTableViewSql(String viewName) {
+    StringBuilder sql = new StringBuilder();
+    sql.append(String.format("CREATE VIEW IF NOT EXISTS %s AS\n", viewName));
+    sql.append("select pc.*, nvl(a.status, 'NOT_RUN') as status, a.log_time\n");
+    sql.append("from bddlsold01p.SYS_CM_PURGE_CONFIG pc\n");
+    sql.append("left outer join bddlsold01p.SYS_CM_JOB_AUDIT_CURRENT_V a\n");
+    sql.append("on pc.db_name=a.database_name\n");
+    sql.append("and pc.tbl_name=a.table_name\n");
+    sql.append("and a.job_type = 'PURGE'\n");
+    logger.trace(String.format("Config Table view SQL:\n%s", sql.toString()));
+    return sql.toString();
+  }
 
   /**
    * Method to fetch the Purging metadata for a specific database
@@ -134,12 +159,12 @@ public class PurgingController extends ClusterManagementJob_NEW {
 
   public void execute(List<Row> databases, int executionGroup)
       throws Exception {
-    PurgingJob PurgingJob = new PurgingJob();
-    auditHelperOLD.startup();
 
     databases.forEach(retentionRecord -> {
       String database = retentionRecord.get(0).toString();
-      logger.info(String.format("Running Purging for database '%s' and processing group : %s ", database, executionGroup));
+      logger.info(String
+          .format("Running Purging for database '%s' and processing group : %s ", database,
+              executionGroup));
       ArrayList<PurgingMetadata> PurgingMetadataList = new ArrayList<>();
       try {
         PurgingMetadataList
@@ -151,13 +176,14 @@ public class PurgingController extends ClusterManagementJob_NEW {
         try {
           logger.info(
               String.format("Running purging for table '%s.%s'", database, table.tableName));
-          PurgingJob.execute(table);
-        } catch (SourceException | IOException | URISyntaxException | TException | ParseException e) {
+          PurgingJob PurgingJob = new PurgingJob(this, table);
+          PurgingJob.execute();
+        } catch (Exception e) {
           e.printStackTrace();
         }
       });
+      this.impalaInvalidateMetadata(this.managementDb, this.cJOB_AUDIT_TABLE_NAME);
     });
-    auditHelperOLD.completion();
   }
 }
 

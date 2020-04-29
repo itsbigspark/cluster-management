@@ -55,6 +55,9 @@ public class ImpalaHelper {
       try (Statement stmnt = conn.createStatement()) {
         stmnt.setQueryTimeout(600);
         stmnt.execute(String
+            .format("refresh  %s.%s partition (%s)", dbName, tableName,
+                partitionSpec));
+        stmnt.execute(String
             .format("compute incremental stats %s.%s partition (%s)", dbName, tableName,
                 partitionSpec));
       }
@@ -95,13 +98,16 @@ public class ImpalaHelper {
     }
   }
 
-
   public Connection getConnection()
       throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, InterruptedException, SQLException {
     UserGroupInformation ugi = UserGroupInformation.getLoginUser();
-    logger.debug(String.format("UGI: %s, keytab based: %s", ugi.toString(), ugi.isFromKeytab()));
     final Driver driver = (Driver) Class.forName("com.cloudera.impala.jdbc41.Driver").newInstance();
-    logger.debug(String.format("Impala JDBC Version %d.%d", driver.getMajorVersion(), driver.getMinorVersion()));
+    logger.trace(String.format("UGI: %s, keytab based: %s (Impala JDBC version: %d.%d)",
+        ugi.toString()
+        , ugi.isFromKeytab()
+        , driver.getMajorVersion()
+        , driver.getMinorVersion()));
+
     final String connectionString = this.connectionString;
     if(this.isKerberos) {
       return ugi.doAs(new PrivilegedExceptionAction<Connection>() {

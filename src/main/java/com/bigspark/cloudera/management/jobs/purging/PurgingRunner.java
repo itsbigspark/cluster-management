@@ -17,9 +17,6 @@ public class   PurgingRunner {
     if (argsp.containsKey("purgingGroup")) {
       purgingGroup = PropertyUtils.getOptionalProperty(argsp, "purgingGroup", -1);
     }
-    if (argsp.containsKey("purgingGroup")) {
-
-    }
     PurgingController.execute(purgingGroup);
     logger.info("PurgingRunner Completed");
   }

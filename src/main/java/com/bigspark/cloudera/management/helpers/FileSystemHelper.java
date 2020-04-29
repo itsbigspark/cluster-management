@@ -140,7 +140,9 @@ public class FileSystemHelper {
     if (!fileSystem.exists(new Path(trashTargetParent))) {
       fileSystem.mkdirs(new Path(trashTargetParent));
     }
-    logger.debug("Trash location : " + trashTarget);
+    logger.trace("Trash location : " + trashTarget);
+    logger.trace("Source location : " + sourceLocation);
+
     if (!isDryRun) {
       try {
         logger.debug("Dropped location :" + sourceLocation + " to Trash");

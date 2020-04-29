@@ -1,7 +1,7 @@
 package com.bigspark.cloudera.management.helpers;
 
 import com.bigspark.cloudera.management.common.exceptions.SourceException;
-import com.bigspark.cloudera.management.jobs.ClusterManagementJob;
+import com.bigspark.cloudera.management.jobs.ClusterManagementJob_OLD;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -13,16 +13,16 @@ import org.slf4j.LoggerFactory;
 public class AuditHelper_OLD {
 
   Logger logger = LoggerFactory.getLogger(getClass());
-  public ClusterManagementJob clusterManagementJob;
+  public ClusterManagementJob_OLD clusterManagementJobOLD;
   public SparkHelper.AuditedSparkSession spark;
   public String logfileLocation;
   public String logfileName;
   public String auditTable;
   public String jobType;
 
-  public AuditHelper_OLD(ClusterManagementJob clusterManagementJob, String jobType, String tableConfigKey)
+  public AuditHelper_OLD(ClusterManagementJob_OLD clusterManagementJobOLD, String jobType, String tableConfigKey)
       throws IOException, SourceException {
-    this.clusterManagementJob = clusterManagementJob;
+    this.clusterManagementJobOLD = clusterManagementJobOLD;
     this.jobType = jobType;
     intitialiseAuditTable(tableConfigKey);
     setLogfile();
@@ -34,10 +34,10 @@ public class AuditHelper_OLD {
   }
 
   private void intitialiseAuditTable(String tableConfigKey) throws IOException {
-    if (this.clusterManagementJob == null) {
+    if (this.clusterManagementJobOLD == null) {
       logger.warn("cmj is null");
     }
-    this.auditTable = clusterManagementJob.jobProperties
+    this.auditTable = clusterManagementJobOLD.jobProperties
         .getProperty(tableConfigKey);
 
 
@@ -62,14 +62,14 @@ public class AuditHelper_OLD {
           , auditTable_[0], auditTable_[1])
       );
     }
-    this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark, this);
+    this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJobOLD.spark, this);
   }
 
   private void setLogfile() throws SourceException {
     String[] auditTable_ = auditTable.split("\\.");
-    Table table = clusterManagementJob.metadataHelper.getTable(auditTable_[0], auditTable_[1]);
-    logfileLocation = clusterManagementJob.metadataHelper.getTableLocation(table);
-    logfileName = clusterManagementJob.applicationID;
+    Table table = clusterManagementJobOLD.metadataHelper.getTable(auditTable_[0], auditTable_[1]);
+    logfileLocation = clusterManagementJobOLD.metadataHelper.getTableLocation(table);
+    logfileName = clusterManagementJobOLD.applicationID;
   }
 
   public void writeAuditLine(String action, String descriptor, String message, boolean isSuccess)
@@ -79,8 +79,8 @@ public class AuditHelper_OLD {
     String payload = String.format("%s~%s~%s~%s~%s~%s~\"%s\"~%s~%s\n"
         , className
         , methodName
-        , clusterManagementJob.applicationID
-        , clusterManagementJob.trackingURL
+        , clusterManagementJobOLD.applicationID
+        , clusterManagementJobOLD.trackingURL
         , action
         , descriptor
         , message

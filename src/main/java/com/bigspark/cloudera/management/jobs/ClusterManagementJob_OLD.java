@@ -21,9 +21,10 @@ import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class ClusterManagementJob_NEW {
+public class ClusterManagementJob_OLD {
 
   Logger logger = LoggerFactory.getLogger(getClass());
+  private static ClusterManagementJob_OLD INSTANCE;
   public Properties jobProperties;
   public SparkSession spark;
   public FileSystem fileSystem;
@@ -36,7 +37,7 @@ public abstract class ClusterManagementJob_NEW {
   public String applicationID;
   public String trackingURL;
 
-  protected ClusterManagementJob_NEW()
+  private ClusterManagementJob_OLD()
       throws IOException, MetaException, ConfigurationException, SourceException {
 
     this.spark = SparkHelper.getSparkSession();
@@ -59,23 +60,21 @@ public abstract class ClusterManagementJob_NEW {
 
   }
 
-  protected ClusterManagementJob_NEW(ClusterManagementJob_NEW existing) {
-    this.spark=existing.spark;
-    this.fileSystem=existing.fileSystem;
-    this.jobProperties=existing.jobProperties;
-    this.isDryRun=existing.isDryRun;
-    this.appPrefix=existing.appPrefix;
-    this.hadoopConfiguration=existing.hadoopConfiguration;
-    this.metadataHelper=existing.metadataHelper;
-    this.hiveMetaStoreClient=existing.hiveMetaStoreClient;
-    this.applicationID=existing.applicationID;
-    this.trackingURL=existing.trackingURL;
+
+  public synchronized static ClusterManagementJob_OLD getInstance()
+      throws IOException, MetaException, ConfigurationException, SourceException {
+    if (INSTANCE == null) {
+      synchronized (ClusterManagementJob_OLD.class) {
+        INSTANCE = new ClusterManagementJob_OLD();
+      }
+    }
+    return INSTANCE;
   }
 
   private synchronized Properties getClusterManagementProperties() throws IOException {
     Properties prop = new Properties();
     try {
-      InputStream input = ClusterManagementJob_NEW.class.getClassLoader()
+      InputStream input = ClusterManagementJob_OLD.class.getClassLoader()
           .getResourceAsStream("config.properties");
       prop.load(input);
     } catch (Exception e) {
@@ -85,6 +84,7 @@ public abstract class ClusterManagementJob_NEW {
       logger.info(String.format("Loading from %s", configSpec));
       prop.load(this.fileSystem.open(new Path(configSpec)));
     }
+
     return prop;
   }
 

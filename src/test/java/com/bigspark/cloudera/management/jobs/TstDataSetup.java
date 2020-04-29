@@ -37,13 +37,13 @@ public class TstDataSetup {
   Logger logger = LoggerFactory.getLogger(getClass());
 
   public TstDataSetup() throws IOException, MetaException, ConfigurationException, SourceException {
-    ClusterManagementJob clusterManagementJob = ClusterManagementJob.getInstance();
-    this.auditHelperOLD = new AuditHelper_OLD(clusterManagementJob, "Test data setup", "purging.auditTable");
-    this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark, auditHelperOLD);
-    this.fileSystem = clusterManagementJob.fileSystem;
-    this.hadoopConfiguration = clusterManagementJob.hadoopConfiguration;
-    this.metadataHelper = clusterManagementJob.metadataHelper;
-    this.isDryRun = clusterManagementJob.isDryRun;
+    ClusterManagementJob_OLD clusterManagementJobOLD = ClusterManagementJob_OLD.getInstance();
+    this.auditHelperOLD = new AuditHelper_OLD(clusterManagementJobOLD, "Test data setup", "purging.auditTable");
+    this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJobOLD.spark, auditHelperOLD);
+    this.fileSystem = clusterManagementJobOLD.fileSystem;
+    this.hadoopConfiguration = clusterManagementJobOLD.hadoopConfiguration;
+    this.metadataHelper = clusterManagementJobOLD.metadataHelper;
+    this.isDryRun = clusterManagementJobOLD.isDryRun;
   }
 
   public void setUp(String testingDatabase, String metatable) throws IOException {

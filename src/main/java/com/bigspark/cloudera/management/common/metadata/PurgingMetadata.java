@@ -4,11 +4,11 @@ import com.bigspark.cloudera.management.common.model.TableDescriptor;
 
 public class PurgingMetadata {
 
-  public String database;
-  public String tableName;
-  public TableDescriptor tableDescriptor;
-  public Integer retentionPeriod;
-  public boolean isRetainMonthEnd;
+  public final String database;
+  public final String tableName;
+  public final TableDescriptor tableDescriptor;
+  public final Integer retentionPeriod;
+  public final boolean isRetainMonthEnd;
 
   public PurgingMetadata(String database, String tableName, Integer retentionPeriod,
       boolean isRetainMonthEnd, TableDescriptor tableDescriptor) {

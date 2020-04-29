@@ -2,7 +2,6 @@ package com.bigspark.cloudera.management.helpers;
 
 import com.bigspark.cloudera.management.common.exceptions.SourceException;
 import com.bigspark.cloudera.management.jobs.ClusterManagementJob;
-import com.bigspark.cloudera.management.jobs.ClusterManagementJob_NEW;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -14,14 +13,14 @@ import org.slf4j.LoggerFactory;
 public class SparkSqlAuditHelper {
 
   Logger logger = LoggerFactory.getLogger(getClass());
-  public ClusterManagementJob_NEW clusterManagementJob;
+  public ClusterManagementJob clusterManagementJob;
   public SparkHelper.AuditedSparkSession_NEW spark;
   public String logfileLocation;
   public String logfileName;
   public String auditTable;
   public String jobType;
 
-  public SparkSqlAuditHelper(ClusterManagementJob_NEW clusterManagementJob, String jobType, String tableConfigKey)
+  public SparkSqlAuditHelper(ClusterManagementJob clusterManagementJob, String jobType, String tableConfigKey)
       throws IOException, SourceException {
     this.clusterManagementJob = clusterManagementJob;
     this.jobType = jobType;

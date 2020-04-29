@@ -1,19 +1,17 @@
 package com.bigspark.cloudera.management.jobs.purging;
 
-import static com.bigspark.cloudera.management.helpers.MetadataHelper.verifyPartitionKey;
 
+import com.bigspark.cloudera.management.common.enums.JobType;
 import com.bigspark.cloudera.management.common.enums.Pattern;
 import com.bigspark.cloudera.management.common.exceptions.SourceException;
 import com.bigspark.cloudera.management.common.metadata.PurgingMetadata;
 import com.bigspark.cloudera.management.common.model.SourceDescriptor;
 import com.bigspark.cloudera.management.common.utils.DateUtils;
-import com.bigspark.cloudera.management.helpers.AuditHelper_OLD;
 import com.bigspark.cloudera.management.helpers.FileSystemHelper;
 import com.bigspark.cloudera.management.helpers.GenericAuditHelper;
-import com.bigspark.cloudera.management.helpers.ImpalaHelper;
 import com.bigspark.cloudera.management.helpers.MetadataHelper;
-import com.bigspark.cloudera.management.helpers.SparkHelper;
 import com.bigspark.cloudera.management.jobs.ClusterManagementJob;
+import com.bigspark.cloudera.management.jobs.ClusterManagementTableJob;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -23,12 +21,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
-import javax.naming.ConfigurationException;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.Partition;
 import org.apache.spark.sql.Dataset;
@@ -44,51 +37,26 @@ import org.slf4j.LoggerFactory;
  *
  * @author Chris Finlayson
  */
-class PurgingJob {
+public class PurgingJob extends ClusterManagementTableJob {
 
-  protected final ImpalaHelper impalaHelper;
-  protected final Properties jobProperties;
-  protected final SparkHelper.AuditedSparkSession spark;
-  protected final FileSystem fileSystem;
-  protected final Configuration hadoopConfiguration;
-  protected final HiveMetaStoreClient hiveMetaStoreClient;
-  protected final MetadataHelper metadataHelper;
-  protected final ClusterManagementJob clusterManagementJob;
-  protected final AuditHelper_OLD auditHelperOLD;
-  protected final GenericAuditHelper jobAudit;
+  protected final String cPURGING_JOB_AUDIT_TABLE_NAME="SYS_CM_PURGE_AUDIT";
+  protected final GenericAuditHelper purgingJobPartitionAudit;
   public SourceDescriptor sourceDescriptor;
-  protected Boolean isDryRun;
   PurgingMetadata purgingMetadata;
   Pattern pattern;
   Dataset<Row> partitionMonthEnds;
 
   Logger logger = LoggerFactory.getLogger(getClass());
 
-  /**
-   * Default Constructor for purging Job
-   *
-   * @throws IOException
-   * @throws MetaException
-   * @throws ConfigurationException
-   * @throws SourceException
-   */
-  PurgingJob() throws Exception {
-    this.clusterManagementJob = ClusterManagementJob.getInstance();
-    this.clusterManagementJob.dumpProperties();
-    this.auditHelperOLD = new AuditHelper_OLD(clusterManagementJob, "Purging job","purging.sqlAuditTable");
-    this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark, auditHelperOLD);
-    this.fileSystem = clusterManagementJob.fileSystem;
-    this.hadoopConfiguration = clusterManagementJob.hadoopConfiguration;
-    this.metadataHelper = clusterManagementJob.metadataHelper;
-    this.setDryRun(clusterManagementJob.isDryRun);
-    this.jobProperties = clusterManagementJob.jobProperties;
-    this.hiveMetaStoreClient = clusterManagementJob.hiveMetaStoreClient;
-    this.impalaHelper = ImpalaHelper.getInstanceFromProperties(this.jobProperties);
-    this.jobAudit = new GenericAuditHelper(this.clusterManagementJob, "purging.auditTable",
-        this.impalaHelper);
+  public PurgingJob(ClusterManagementJob existing, PurgingMetadata purgingMetadata) throws Exception {
+    super(existing, purgingMetadata.database, purgingMetadata.tableName);
+    this.purgingMetadata = purgingMetadata;
+    this.initialisePurgingJobAuditTable();
+    this.purgingJobPartitionAudit = new GenericAuditHelper(
+        this
+        , this.purgingMetadata.database
+        , this.cPURGING_JOB_AUDIT_TABLE_NAME);
   }
-
-
 
   protected void getTablePartitionMonthEnds(String dbName, String tableName,
       List<Partition> partitions, LocalDate purgeCeiling) {
@@ -133,6 +101,7 @@ class PurgingJob {
               "AND to_date(EDI_BUSINESS_DAY) IS NOT NULL " +
               "GROUP BY SRC_SYS_INST_ID, year(EDI_BUSINESS_DAY), month(EDI_BUSINESS_DAY)"
           , dbName, tableName));
+      logger.trace("Month End SQL: " + sb.toString());
       this.partitionMonthEnds = spark.sql(sb.toString()).cache();
       List<String> dates = new ArrayList<>();
       this.partitionMonthEnds.collectAsList().forEach(row -> {
@@ -243,13 +212,13 @@ class PurgingJob {
             .moveDataToUserTrashLocation(partitionLocation.getPath(), trashBaseLocation,
                 getDryRun(),
                 fileSystem);
-        String payload = this.getAuditLogRecord(
+        String payload = this.getPurgingAuditLogRecord(
             this.purgingMetadata.database
             , this.purgingMetadata.tableName
             , partitionLocation.getPath()
             , trashBaseLocation);
 
-        this.jobAudit.write(payload);
+        this.purgingJobPartitionAudit.write(payload);
       }
       this.cleanUpPartitions(purgeCandidates);
     }
@@ -268,7 +237,7 @@ class PurgingJob {
   protected void reinstateMonthEndPartitions(String database, String table) {
     if (this.partitionMonthEnds.count() > 0) {
       logger.debug("Resolving source table by reinstating month end partitions");
-      Dataset<Row> swingTable = clusterManagementJob.spark
+      Dataset<Row> swingTable = this.spark
           .table(String.format("%s.%s_swing", database, table));
       if (pattern == Pattern.SH) {
 //            swingTable.write().partitionBy("EDI_BUSINESS_DAY").insertInto(String.format("%s.%s", database, table));
@@ -308,8 +277,9 @@ class PurgingJob {
     this.impalaInvalidateMetadata(database, table);
     for (Row partition : partitions) {
       String edi_business_day = DateUtils.getFormattedDate(partition.getDate(1), "yyyy-MM-dd");
-
-      this.impalaComputeStats(database, table, String.format("edi_business_day ='%s'", edi_business_day));
+      String partitionSpec = String.format("edi_business_day ='%s'", edi_business_day);
+      logger.debug(String.format("Computing stats for %s.%s (%s)", database, table, partitionSpec));
+      this.impalaComputeStats(database, table, partitionSpec);
     }
 
 
@@ -331,44 +301,7 @@ class PurgingJob {
     }
   }
 
-  protected void impalaInvalidateMetadata(String dbName, String tableName) {
-    this.impalaInvalidateMetadata(dbName, tableName, null);
-  }
 
-  /**
-   * Method to execute an Invalidate metadata statement on a table for Impala
-   */
-  protected void impalaInvalidateMetadata(String dbName, String tableName,
-      List<Partition> purgeCandidates) {
-    if (purgeCandidates == null || purgeCandidates.size() > 0) {
-      try {
-        logger.debug(String.format("Invalidating  Metadata for %s.%s", dbName, tableName));
-        this.impalaHelper.invalidateMetadata(dbName, tableName);
-      } catch (Exception ex) {
-
-        if(logger.isDebugEnabled()) {
-          logger
-              .error(String.format("Unable to invalidate metadata for %s.%s", dbName, tableName), ex);
-        } else {
-          logger
-              .error(String.format("Unable to invalidate metadata for %s.%s.  Turn on DEBUG logging for full Stack Trace", dbName, tableName));
-        }
-      }
-    } else {
-      logger.debug(String.format("Skipping Invalidating  Metadata for %s.%s", dbName, tableName));
-    }
-  }
-
-  protected void impalaComputeStats(String dbName, String tableName, String partitionSpec) {
-    try {
-      this.impalaHelper.computeStats(dbName, tableName, partitionSpec);
-    } catch (Exception ex) {
-      logger
-          .error(String
-              .format("Unable to compute stats for %s.%s partition (partitionSpec)", dbName,
-                  tableName, partitionSpec), ex);
-    }
-  }
 
   /**
    * Main entry point method for executing the purging process
@@ -376,9 +309,9 @@ class PurgingJob {
    * @throws MetaException
    * @throws SourceException
    */
-  void execute(PurgingMetadata purgingMetadata)
+  void execute()
       throws SourceException, IOException, URISyntaxException, TException, ParseException {
-    this.purgingMetadata = purgingMetadata;
+    this.jobAuditBegin();
     this.sourceDescriptor = new SourceDescriptor(
         metadataHelper.getDatabase(purgingMetadata.database)
         , purgingMetadata.tableDescriptor);
@@ -405,15 +338,21 @@ class PurgingJob {
               purgingMetadata.database,
               purgingMetadata.tableName, allPurgeCandidates);
         }
-        this.jobAudit.invalidateAuditTableMetadata();
+        this.jobAuditEnd();
+        this.purgingJobPartitionAudit.invalidateAuditTableMetadata();
       } else {
-        logger.error("Table pattern not validated");
+        String message = "Table pattern not validated";
+        logger.error(message);
+        this.jobAuditFail(message);
       }
     } else {
-      logger.warn(String.format("Skipping table '%s.%s' as it has no partitions, or has a non-standard partition key  "
+      String message = String.format("Skipping table '%s.%s' as it has no partitions, or has a non-standard partition key  "
           , purgingMetadata.tableDescriptor.getDatabaseName()
-          , purgingMetadata.tableDescriptor.getTableName()));
+          , purgingMetadata.tableDescriptor.getTableName());
+      logger.warn(message);
+      this.jobAuditFail(message);
     }
+    this.impalaInvalidateMetadata(this.managementDb, this.cPURGING_JOB_AUDIT_TABLE_NAME);
   }
 
   private void executeMonthEndPurging(List<Partition> allPurgeCandidates,
@@ -445,12 +384,26 @@ class PurgingJob {
     this.manageMonthEndPartitionMetadata(
         purgingMetadata.database,
         purgingMetadata.tableName);
+
+    //Drop the swing table
+    this.dropMonthEndSwingTable();
   }
 
-  private String getAuditLogRecord(String dbName, String tableName, String originalLocation,
+  private void dropMonthEndSwingTable() {
+    try {
+      this.impalaHelper.execute(
+          String.format("drop table if exists %s.%s_swing", this.databaseName, this.tableName));
+    } catch(Exception ex) {
+      logger.warn(String.format("Could not drop month end swing table %s.%s"
+          , this.databaseName
+          , this.tableName), ex);
+    }
+  }
+
+  private String getPurgingAuditLogRecord(String dbName, String tableName, String originalLocation,
       String trashLocation) {
     return String.format("%s~%s~%s~%s~%s~%s~%s\n"
-        , clusterManagementJob.applicationID
+        , this.applicationID
         , dbName
         , tableName
         , "partition_spec"
@@ -466,5 +419,40 @@ class PurgingJob {
 
   public void setDryRun(Boolean dryRun) {
     isDryRun = dryRun;
+  }
+
+  private void initialisePurgingJobAuditTable() throws TException {
+    if(!this.hiveMetaStoreClient.tableExists(this.managementDb, this.cPURGING_JOB_AUDIT_TABLE_NAME)) {
+      logger.info(String.format("Purging Job Audit table does not exist.  Creating %s.%s"
+          , this.managementDb
+          , this.cPURGING_JOB_AUDIT_TABLE_NAME));
+      spark.sql(this.getPurgingJobAuditTableSql());
+    }
+  }
+
+  private String getPurgingJobAuditTableSql() {
+    StringBuilder sql  = new StringBuilder();
+    sql.append(String.format("CREATE EXTERNAL TABLE IF NOT EXISTS %s.%s (\n", this.managementDb, this.cPURGING_JOB_AUDIT_TABLE_NAME));
+    sql.append("application_id STRING\n");
+    sql.append(",database_name STRING\n");
+    sql.append(",table_name STRING\n");
+    sql.append(",partition_spec STRING\n");
+    sql.append(",original_location STRING\n");
+    sql.append(",trash_location STRING\n");
+    sql.append(",log_time TIMESTAMP\n");
+    sql.append(")\n");
+    sql.append(" ROW FORMAT DELIMITED\n");
+    sql.append(" FIELDS TERMINATED BY '~'\n");
+    if(this.managementDbLocation != null  && !this.managementDbLocation.equals("")) {
+      sql.append(String.format("LOCATION '%s/data/%s'\n"
+          , this.managementDbLocation
+          , this.cPURGING_JOB_AUDIT_TABLE_NAME));
+    }
+    return sql.toString();
+  }
+
+  @Override
+  public JobType getJobType() {
+    return JobType.PURGE;
   }
 }

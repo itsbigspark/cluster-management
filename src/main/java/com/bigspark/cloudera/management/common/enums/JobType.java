@@ -1,6 +1,7 @@
 package com.bigspark.cloudera.management.common.enums;
 
-public enum Pattern {
-  EAS, SH, UNKNOWN
+public enum JobType {
+  PURGE
+  ,COMPACT
+  ,OFFLOAD
 }
-

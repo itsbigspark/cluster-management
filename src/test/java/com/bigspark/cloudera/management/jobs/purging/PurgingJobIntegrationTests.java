@@ -4,18 +4,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.bigspark.cloudera.management.Common;
 import com.bigspark.cloudera.management.common.enums.Pattern;
-import com.bigspark.cloudera.management.common.exceptions.SourceException;
 import com.bigspark.cloudera.management.helpers.AuditHelper_OLD;
 import com.bigspark.cloudera.management.helpers.MetadataHelper;
 import com.bigspark.cloudera.management.helpers.SparkHelper;
-import com.bigspark.cloudera.management.jobs.ClusterManagementJob;
+import com.bigspark.cloudera.management.jobs.ClusterManagementJob_OLD;
 import com.bigspark.cloudera.management.jobs.TstDataSetup;
-import java.io.IOException;
 import java.util.Properties;
-import javax.naming.ConfigurationException;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,16 +33,16 @@ public class PurgingJobIntegrationTests {
   Logger logger = LoggerFactory.getLogger(getClass());
 
   public PurgingJobIntegrationTests()
-      throws IOException, MetaException, ConfigurationException, SourceException {
+      throws Exception {
 
-    ClusterManagementJob clusterManagementJob = ClusterManagementJob.getInstance();
+    ClusterManagementJob_OLD clusterManagementJobOLD = ClusterManagementJob_OLD.getInstance();
     this.purgingController = new PurgingController();
-    this.auditHelperOLD = new AuditHelper_OLD(clusterManagementJob, "EDH Cluster purging test","purging.auditTable");
-    this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark, auditHelperOLD);
-    this.fileSystem = clusterManagementJob.fileSystem;
-    this.hadoopConfiguration = clusterManagementJob.hadoopConfiguration;
-    this.metadataHelper = clusterManagementJob.metadataHelper;
-    this.isDryRun = clusterManagementJob.isDryRun;
+    this.auditHelperOLD = new AuditHelper_OLD(clusterManagementJobOLD, "EDH Cluster purging test","purging.auditTable");
+    this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJobOLD.spark, auditHelperOLD);
+    this.fileSystem = clusterManagementJobOLD.fileSystem;
+    this.hadoopConfiguration = clusterManagementJobOLD.hadoopConfiguration;
+    this.metadataHelper = clusterManagementJobOLD.metadataHelper;
+    this.isDryRun = clusterManagementJobOLD.isDryRun;
   }
 
 

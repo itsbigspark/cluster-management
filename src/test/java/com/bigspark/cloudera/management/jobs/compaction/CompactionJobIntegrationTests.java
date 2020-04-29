@@ -6,7 +6,7 @@ import com.bigspark.cloudera.management.common.metadata.CompactionMetadata;
 import com.bigspark.cloudera.management.helpers.AuditHelper_OLD;
 import com.bigspark.cloudera.management.helpers.MetadataHelper;
 import com.bigspark.cloudera.management.helpers.SparkHelper;
-import com.bigspark.cloudera.management.jobs.ClusterManagementJob;
+import com.bigspark.cloudera.management.jobs.ClusterManagementJob_OLD;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
@@ -39,19 +39,19 @@ public class CompactionJobIntegrationTests {
   public String testingTable;
   private String metatable;
   public AuditHelper_OLD auditHelperOLD;
-  public ClusterManagementJob clusterManagementJob;
+  public ClusterManagementJob_OLD clusterManagementJobOLD;
 
 
   public CompactionJobIntegrationTests()
       throws IOException, MetaException, ConfigurationException, SourceException {
-    this.clusterManagementJob = ClusterManagementJob.getInstance();
+    this.clusterManagementJobOLD = ClusterManagementJob_OLD.getInstance();
     this.compactionController = new CompactionController();
-    this.auditHelperOLD = new AuditHelper_OLD(clusterManagementJob, "Small file compaction test", "compaction.auditTable");
-    this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark, auditHelperOLD);
-    this.fileSystem = clusterManagementJob.fileSystem;
-    this.hadoopConfiguration = clusterManagementJob.hadoopConfiguration;
-    this.metadataHelper = clusterManagementJob.metadataHelper;
-    this.isDryRun = clusterManagementJob.isDryRun;
+    this.auditHelperOLD = new AuditHelper_OLD(clusterManagementJobOLD, "Small file compaction test", "compaction.auditTable");
+    this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJobOLD.spark, auditHelperOLD);
+    this.fileSystem = clusterManagementJobOLD.fileSystem;
+    this.hadoopConfiguration = clusterManagementJobOLD.hadoopConfiguration;
+    this.metadataHelper = clusterManagementJobOLD.metadataHelper;
+    this.isDryRun = clusterManagementJobOLD.isDryRun;
   }
 
   void setUp() throws IOException {
@@ -94,7 +94,7 @@ public class CompactionJobIntegrationTests {
 
   void confirmResult() throws IOException, SourceException {
     Table table = this.metadataHelper.getTable(testingDatabase, testingTable);
-    ContentSummary contentSummary = clusterManagementJob.fileSystem
+    ContentSummary contentSummary = clusterManagementJobOLD.fileSystem
         .getContentSummary(new Path(this.metadataHelper.getTableLocation(table)));
     assert contentSummary.getFileCount() < 3;
   }

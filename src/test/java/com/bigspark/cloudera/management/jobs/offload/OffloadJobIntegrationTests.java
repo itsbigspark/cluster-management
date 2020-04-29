@@ -4,7 +4,7 @@ import com.bigspark.cloudera.management.common.exceptions.SourceException;
 import com.bigspark.cloudera.management.helpers.AuditHelper_OLD;
 import com.bigspark.cloudera.management.helpers.MetadataHelper;
 import com.bigspark.cloudera.management.helpers.SparkHelper;
-import com.bigspark.cloudera.management.jobs.ClusterManagementJob;
+import com.bigspark.cloudera.management.jobs.ClusterManagementJob_OLD;
 import com.bigspark.cloudera.management.jobs.TstDataSetup;
 import java.io.IOException;
 import java.text.ParseException;
@@ -37,14 +37,14 @@ public class OffloadJobIntegrationTests {
   public OffloadJobIntegrationTests()
       throws IOException, MetaException, ConfigurationException, SourceException {
 
-    ClusterManagementJob clusterManagementJob = ClusterManagementJob.getInstance();
+    ClusterManagementJob_OLD clusterManagementJobOLD = ClusterManagementJob_OLD.getInstance();
     this.offloadController = new OffloadController();
-    this.auditHelperOLD = new AuditHelper_OLD(clusterManagementJob, "Storage offload job test", "offload.auditTable");
-    this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJob.spark, auditHelperOLD);
-    this.fileSystem = clusterManagementJob.fileSystem;
-    this.hadoopConfiguration = clusterManagementJob.hadoopConfiguration;
-    this.metadataHelper = clusterManagementJob.metadataHelper;
-    this.isDryRun = clusterManagementJob.isDryRun;
+    this.auditHelperOLD = new AuditHelper_OLD(clusterManagementJobOLD, "Storage offload job test", "offload.auditTable");
+    this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJobOLD.spark, auditHelperOLD);
+    this.fileSystem = clusterManagementJobOLD.fileSystem;
+    this.hadoopConfiguration = clusterManagementJobOLD.hadoopConfiguration;
+    this.metadataHelper = clusterManagementJobOLD.metadataHelper;
+    this.isDryRun = clusterManagementJobOLD.isDryRun;
   }
 
   public void createMetadataTable() {

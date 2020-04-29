@@ -3,7 +3,7 @@ package com.bigspark.cloudera.management.jobs.test;
 import com.bigspark.cloudera.management.common.exceptions.SourceException;
 import com.bigspark.cloudera.management.helpers.ImpalaHelper;
 import com.bigspark.cloudera.management.helpers.MetadataHelper;
-import com.bigspark.cloudera.management.jobs.ClusterManagementJob;
+import com.bigspark.cloudera.management.jobs.ClusterManagementJob_OLD;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -33,7 +33,7 @@ public class SmokeTest {
   protected  HiveMetaStoreClient hiveMetaStoreClient;
   protected  MetadataHelper metadataHelper;
   protected  Boolean isDryRun;
-  protected  ClusterManagementJob clusterManagementJob;
+  protected ClusterManagementJob_OLD clusterManagementJobOLD;
   //protected final  AuditHelper auditHelper;
 
   public static void main(String[] args)
@@ -47,15 +47,15 @@ public class SmokeTest {
   public SmokeTest() throws MetaException, SourceException, ConfigurationException, IOException {
     logger.info("Starting constructing SmokeTest Class");
     try {
-      this.clusterManagementJob = ClusterManagementJob.getInstance();
+      this.clusterManagementJobOLD = ClusterManagementJob_OLD.getInstance();
       //this.auditHelper = new AuditHelper(clusterManagementJob,"Storage offload job");
-      this.spark = clusterManagementJob.spark;
-      this.fileSystem = clusterManagementJob.fileSystem;
-      this.hadoopConfiguration = clusterManagementJob.hadoopConfiguration;
-      this.metadataHelper = clusterManagementJob.metadataHelper;
-      this.isDryRun = clusterManagementJob.isDryRun;
-      this.jobProperties = clusterManagementJob.jobProperties;
-      this.hiveMetaStoreClient = clusterManagementJob.hiveMetaStoreClient;
+      this.spark = clusterManagementJobOLD.spark;
+      this.fileSystem = clusterManagementJobOLD.fileSystem;
+      this.hadoopConfiguration = clusterManagementJobOLD.hadoopConfiguration;
+      this.metadataHelper = clusterManagementJobOLD.metadataHelper;
+      this.isDryRun = clusterManagementJobOLD.isDryRun;
+      this.jobProperties = clusterManagementJobOLD.jobProperties;
+      this.hiveMetaStoreClient = clusterManagementJobOLD.hiveMetaStoreClient;
       logger.info("Finished constructing SmokeTest method");
       this.impalaHelper =  ImpalaHelper.getInstanceFromProperties(this.jobProperties);
     } catch (Exception ex) {
@@ -77,7 +77,7 @@ public class SmokeTest {
   private void testJobProperties() {
     logger.info("Starting test of testJobProperties method");
     try {
-      this.clusterManagementJob.jobProperties.forEach((key, value)  -> {
+      this.clusterManagementJobOLD.jobProperties.forEach((key, value)  -> {
         logger.info(String.format("%s=%s", key, value));
       });
     } catch(Exception ex) {
