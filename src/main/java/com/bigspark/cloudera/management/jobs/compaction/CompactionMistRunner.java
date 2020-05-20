@@ -22,11 +22,11 @@ public class CompactionMistRunner extends MistFn {
   public Handle handle() {
 
     CompactionJob compactionJob = null;
-    try {
-      compactionJob = new CompactionJob();
-    } catch (IOException | ConfigurationException | SourceException | MetaException e) {
-      e.printStackTrace();
-    }
+   // try {
+      //compactionJob = new CompactionJob();
+   // } catch (IOException | ConfigurationException | SourceException | MetaException e) {
+  //    e.printStackTrace();
+   // }
     CompactionJob finalCompactionJob = compactionJob;
     return withArgs(stringArg("database"), stringArg("table")).
         withMistExtras().

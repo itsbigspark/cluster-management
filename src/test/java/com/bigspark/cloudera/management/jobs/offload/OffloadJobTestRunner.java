@@ -7,7 +7,7 @@ public class OffloadJobTestRunner {
 
   public static void main(String[] args) throws Exception {
     InputStream input = OffloadJobTestRunner.class.getClassLoader()
-        .getResourceAsStream("config.properties");
+        .getResourceAsStream("to-sort/config.properties");
     Properties prop = new Properties();
     prop.load(input);
     OffloadJobIntegrationTests offloadJobTest = new OffloadJobIntegrationTests();

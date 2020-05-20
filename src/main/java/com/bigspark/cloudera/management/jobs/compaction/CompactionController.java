@@ -3,19 +3,11 @@ package com.bigspark.cloudera.management.jobs.compaction;
 import com.bigspark.cloudera.management.common.exceptions.SourceException;
 import com.bigspark.cloudera.management.common.metadata.CompactionMetadata;
 import com.bigspark.cloudera.management.common.model.TableDescriptor;
-import com.bigspark.cloudera.management.helpers.AuditHelper_OLD;
-import com.bigspark.cloudera.management.helpers.MetadataHelper;
-import com.bigspark.cloudera.management.helpers.SparkHelper;
-import com.bigspark.cloudera.management.jobs.ClusterManagementJob_OLD;
+import com.bigspark.cloudera.management.jobs.ClusterManagementJob;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 import javax.naming.ConfigurationException;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.spark.sql.Row;
@@ -23,30 +15,29 @@ import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CompactionController {
+public class CompactionController extends ClusterManagementJob {
 
-  public Properties jobProperties;
-  public SparkHelper.AuditedSparkSession spark;
-  public FileSystem fileSystem;
-  public Configuration hadoopConfiguration;
-  public HiveMetaStoreClient hiveMetaStoreClient;
-  public MetadataHelper metadataHelper;
-  public AuditHelper_OLD auditHelperOLD;
-  public Boolean isDryRun;
-
+  private final String cCOMPACTION_CONFIG_TABLE = "SYS_CM_COMPACTION_CONFIG";
   Logger logger = LoggerFactory.getLogger(getClass());
 
-  public CompactionController()
-      throws IOException, MetaException, ConfigurationException, SourceException {
-    ClusterManagementJob_OLD clusterManagementJobOLD = ClusterManagementJob_OLD.getInstance();
-    this.auditHelperOLD = new AuditHelper_OLD(clusterManagementJobOLD, "Small file compaction job","compaction.AuditTable");
-    this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJobOLD.spark, auditHelperOLD);
-    this.fileSystem = clusterManagementJobOLD.fileSystem;
-    this.hadoopConfiguration = clusterManagementJobOLD.hadoopConfiguration;
-    this.metadataHelper = clusterManagementJobOLD.metadataHelper;
-    this.isDryRun = clusterManagementJobOLD.isDryRun;
-    this.jobProperties = clusterManagementJobOLD.jobProperties;
-    this.hiveMetaStoreClient = clusterManagementJobOLD.hiveMetaStoreClient;
+  public CompactionController ()
+      throws Exception {
+    super();
+  }
+
+  @Override
+  protected void jobAuditBegin() throws IOException {
+
+  }
+
+  @Override
+  protected void jobAuditEnd() throws IOException {
+
+  }
+
+  @Override
+  protected void jobAuditFail(String error) throws IOException {
+
   }
 
   /**
@@ -55,8 +46,8 @@ public class CompactionController {
    * @return String
    */
   private String getCompactionTable() {
-    return jobProperties
-        .getProperty("com.bigspark.cloudera.management.services.Compaction.metatable");
+    //
+    return String.format("%s.%s", this.managementDb, cCOMPACTION_CONFIG_TABLE);
   }
 
   /**
@@ -65,9 +56,7 @@ public class CompactionController {
    * @return List<Row>
    */
   private List<Row> getRetentionDatabases() {
-    return spark
-        .sql("SELECT DISTINCT DATABASE FROM " + getCompactionTable() + " WHERE ACTIVE='true'")
-        .collectAsList();
+    return this.getCompactionGroupDatabases(-1);
   }
 
   /**
@@ -77,9 +66,12 @@ public class CompactionController {
    */
   private List<Row> getCompactionGroupDatabases(int group) {
     logger.info("Now pulling list of databases for group : " + group);
-    return spark.sql(
-        "SELECT DISTINCT DATABASE FROM " + getCompactionTable() + " WHERE ACTIVE='true' and GROUP="
-            + group).collectAsList();
+    String sql = "SELECT DISTINCT DB_NAME FROM " + this.getCompactionTable() + " WHERE ACTIVE='true'";
+    if (group > 0) {
+      sql += " and PROCESSING_GROUP=" + group;
+    }
+    logger.debug("Returning DB Config SQL: " + sql);
+    return spark.sql(sql).collectAsList();
   }
 
   /**
@@ -88,10 +80,20 @@ public class CompactionController {
    * @return List<Row>
    */
   private List<Row> getCompactionDataForDatabase(String database, int group) {
+    this.initialiseConfigTableView();
+    StringBuilder sql = new StringBuilder();
     logger.info("Now pulling configuration metadata for all tables in database : " + database);
-    return spark.sql("SELECT TABLE, RETENTION_PERIOD, RETAIN_MONTH_END FROM " + getCompactionTable()
-        + " WHERE DATABASE = '" + database + "' AND ACTIVE='true' AND GROUP =" + group)
-        .collectAsList();
+
+    sql.append("SELECT DISTINCT TBL_NAME, RETENTION_PERIOD, RETAIN_MONTH_END\n");
+    sql.append(String.format ("FROM %s_CURRENT_V\n", this.getCompactionTable()));
+    sql.append(String.format("WHERE DB_NAME = '%s'\n",database));
+    sql.append(String.format("AND LOWER(ACTIVE)='true'\n"));
+    sql.append("AND status in ('FINISHED', 'FIXED', 'NOT_RUN')\n");
+    if (group >= 0) {
+      sql.append(String.format("AND PROCESSING_GROUP = %d", group));
+    }
+    logger.debug("Returning DB Table Config SQL:\n" + sql.toString());
+    return spark.sql(sql.toString()).collectAsList();
   }
 
 
@@ -131,15 +133,18 @@ public class CompactionController {
 
   public void executeCompactionForLocation(String location)
       throws SourceException, TException, IOException, ConfigurationException {
-    CompactionJob compactionJob = new CompactionJob();
-    CompactionMetadata compactionMetadata = new CompactionMetadata(new Path(location));
-    compactionJob.execute(compactionMetadata);
+  //  CompactionJob compactionJob = new CompactionJob();
+  //////  CompactionMetadata compactionMetadata = new CompactionMetadata(new Path(location));
+  //  compactionJob.execute(compactionMetadata);
   }
 
-  public void executeCompactionGroup(int executionGroup)
+  public void execute() throws MetaException, SourceException, ConfigurationException, IOException {
+    execute(-1);
+  }
+  public void execute(int executionGroup)
       throws ConfigurationException, IOException, MetaException, SourceException {
-    CompactionJob CompactionJob = new CompactionJob();
-    auditHelperOLD.startup();
+
+    //auditHelperOLD.startup();
     List<Row> retentionGroup = getCompactionGroupDatabases(executionGroup);
     retentionGroup.forEach(retentionRecord -> {
       String database = retentionRecord.get(0).toString();
@@ -151,13 +156,36 @@ public class CompactionController {
       }
       compactionMetadataList.forEach(table -> {
         try {
-          CompactionJob.execute(table);
-        } catch (SourceException | IOException | TException e) {
+          CompactionJob compactionJob = new CompactionJob(this, table);
+          compactionJob.execute(table);
+        } catch (Exception e) {
           e.printStackTrace();
         }
       });
     });
-    auditHelperOLD.completion();
+    //auditHelperOLD.completion();
+  }
+
+  private void initialiseConfigTableView() {
+    String viewName = String.format("%s_CURRENT_V ", this.getCompactionTable());
+    if (!this.spark.catalog().tableExists(viewName  )) {
+      logger.info(String.format("Job Audit table view does not exist.  Creating view %s "
+          , viewName));
+      spark.sql(this.getConfigTableViewSql(viewName));
+    }
+  }
+
+  private String getConfigTableViewSql(String viewName) {
+    StringBuilder sql = new StringBuilder();
+    sql.append(String.format("CREATE VIEW IF NOT EXISTS %s AS\n", viewName));
+    sql.append("select pc.*, nvl(a.status, 'NOT_RUN') as status, a.log_time\n");
+    sql.append(String.format("from %s.SYS_CM_COMPACTION_CONFIG pc\n", this.managementDb));
+    sql.append(String.format("left outer join %s.SYS_CM_JOB_AUDIT_CURRENT_V a\n", this.managementDb));
+    sql.append("on pc.db_name=a.database_name\n");
+    sql.append("and pc.tbl_name=a.table_name\n");
+    sql.append("and a.job_type = 'COMPACT'\n");
+    logger.trace(String.format("Config Table view SQL:\n%s", sql.toString()));
+    return sql.toString();
   }
 }
 

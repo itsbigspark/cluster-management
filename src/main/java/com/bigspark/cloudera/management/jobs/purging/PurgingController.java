@@ -16,9 +16,9 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class PurgingController extends ClusterManagementJob {
 
-//  public SparkHelper.AuditedSparkSession_NEW spark;
-  public SparkSqlAuditHelper sqlAuditHelper;
-  private final String cPURGING_CONFIG_TABLE="SYS_CM_PURGE_CONFIG";
+  private final String cPURGING_CONFIG_TABLE = "SYS_CM_PURGE_CONFIG";
+  //  public SparkHelper.AuditedSparkSession_NEW spark;
+  //public SparkSqlAuditHelper sqlAuditHelper;
   Logger logger = LoggerFactory.getLogger(getClass());
 
   public PurgingController(Boolean isDryRun)
@@ -80,20 +80,24 @@ public class PurgingController extends ClusterManagementJob {
    */
   private List<Row> getRetentionDataForDatabase(String database, int group) {
     this.initialiseConfigTableView();
+    StringBuilder sql = new StringBuilder();
     logger.info("Now pulling configuration metadata for all tables in database : " + database);
-    String sql =
-        "SELECT DISTINCT TBL_NAME, RETENTION_PERIOD, RETAIN_MONTH_END FROM " + this.getMetadataTable()
-            + " WHERE DB_NAME = '" + database + "' AND LOWER(ACTIVE)='true'";
+
+    sql.append("SELECT DISTINCT TBL_NAME, RETENTION_PERIOD, RETAIN_MONTH_END\n");
+    sql.append(String.format ("FROM %s_CURRENT_V\n", this.getMetadataTable()));
+    sql.append(String.format("WHERE DB_NAME = '%s'\n",database));
+    sql.append(String.format("AND LOWER(ACTIVE)='true'\n"));
+    sql.append("AND status in ('FINISHED', 'FIXED', 'NOT_RUN')\n");
     if (group >= 0) {
-      sql += " AND PROCESSING_GROUP =" + group;
+      sql.append(String.format("AND PROCESSING_GROUP = %d", group));
     }
-    logger.debug("Returning DB Table Config SQL: " + sql);
-    return spark.sql(sql).collectAsList();
+    logger.debug("Returning DB Table Config SQL:\n" + sql.toString());
+    return spark.sql(sql.toString()).collectAsList();
   }
 
-  private void initialiseConfigTableView()  {
+  private void initialiseConfigTableView() {
     String viewName = String.format("%s_CURRENT_V ", this.getMetadataTable());
-    if(!this.spark.catalog().tableExists(viewName)) {
+    if (!this.spark.catalog().tableExists(viewName  )) {
       logger.info(String.format("Job Audit table view does not exist.  Creating view %s "
           , viewName));
       spark.sql(this.getConfigTableViewSql(viewName));
@@ -104,8 +108,8 @@ public class PurgingController extends ClusterManagementJob {
     StringBuilder sql = new StringBuilder();
     sql.append(String.format("CREATE VIEW IF NOT EXISTS %s AS\n", viewName));
     sql.append("select pc.*, nvl(a.status, 'NOT_RUN') as status, a.log_time\n");
-    sql.append("from bddlsold01p.SYS_CM_PURGE_CONFIG pc\n");
-    sql.append("left outer join bddlsold01p.SYS_CM_JOB_AUDIT_CURRENT_V a\n");
+    sql.append(String.format("from %s.SYS_CM_PURGE_CONFIG pc\n", this.managementDb));
+    sql.append(String.format("left outer join %s.SYS_CM_JOB_AUDIT_CURRENT_V a\n", this.managementDb));
     sql.append("on pc.db_name=a.database_name\n");
     sql.append("and pc.tbl_name=a.table_name\n");
     sql.append("and a.job_type = 'PURGE'\n");
@@ -178,11 +182,12 @@ public class PurgingController extends ClusterManagementJob {
               String.format("Running purging for table '%s.%s'", database, table.tableName));
           PurgingJob PurgingJob = new PurgingJob(this, table);
           PurgingJob.execute();
+          this.impalaInvalidateMetadata(this.managementDb, this.cJOB_AUDIT_TABLE_NAME);
         } catch (Exception e) {
           e.printStackTrace();
         }
       });
-      this.impalaInvalidateMetadata(this.managementDb, this.cJOB_AUDIT_TABLE_NAME);
+
     });
   }
 }

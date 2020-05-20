@@ -199,6 +199,7 @@ public abstract class ClusterManagementJob {
     sql.append(",message STRING\n");
     sql.append(",status STRING\n");
     sql.append(",log_time TIMESTAMP\n");
+    sql.append(",log_nos bigint\n");
     sql.append(")\n");
     sql.append(" ROW FORMAT DELIMITED\n");
     sql.append(" FIELDS TERMINATED BY '~'\n");
@@ -219,7 +220,7 @@ public abstract class ClusterManagementJob {
     sql.append("from\n");
     sql.append(" (\n");
     sql.append("select *\n");
-    sql.append(", row_number() over (partition by job_type, database_name, table_name order by log_time desc) as row_num\n");
+    sql.append(", row_number() over (partition by job_type, database_name, table_name order by log_time desc, log_nos desc) as row_num\n");
     sql.append(String.format("from %s.%s\n", this.managementDb, this.cJOB_AUDIT_TABLE_NAME));
     sql.append(") tbl\n");
     sql.append("where row_num = 1");

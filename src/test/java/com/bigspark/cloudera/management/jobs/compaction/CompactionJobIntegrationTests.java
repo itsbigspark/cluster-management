@@ -45,7 +45,7 @@ public class CompactionJobIntegrationTests {
   public CompactionJobIntegrationTests()
       throws IOException, MetaException, ConfigurationException, SourceException {
     this.clusterManagementJobOLD = ClusterManagementJob_OLD.getInstance();
-    this.compactionController = new CompactionController();
+   // this.compactionController = new CompactionController();
     this.auditHelperOLD = new AuditHelper_OLD(clusterManagementJobOLD, "Small file compaction test", "compaction.auditTable");
     this.spark = new SparkHelper.AuditedSparkSession(clusterManagementJobOLD.spark, auditHelperOLD);
     this.fileSystem = clusterManagementJobOLD.fileSystem;
@@ -80,14 +80,14 @@ public class CompactionJobIntegrationTests {
 //        testDataSetup.setUp(testingDatabase, metatable);
     setUp();
     InputStream input = CompactionJobIntegrationTests.class.getClassLoader()
-        .getResourceAsStream("config.properties");
+        .getResourceAsStream("to-sort/config.properties");
     Properties prop = new Properties();
     prop.load(input);
-    CompactionJob compactionJob = new CompactionJob();
-    compactionJob.jobProperties = prop;
+  //  CompactionJob compactionJob = new CompactionJob();
+   // compactionJob.jobProperties = prop;
     System.out.print(Common.getBannerStart("Compaction testing"));
-    compactionJob.execute(
-        new CompactionMetadata(metadataHelper.getTableDescriptor(testingDatabase, testingTable)));
+  //  compactionJob.execute(
+   //     new CompactionMetadata(metadataHelper.getTableDescriptor(testingDatabase, testingTable)));
     confirmResult();
     System.out.print(Common.getBannerFinish("Compaction testing complete"));
   }

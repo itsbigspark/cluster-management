@@ -20,7 +20,7 @@ public class CompactionRunner {
     if (argsp.containsKey("Group")) {
 
     }
-    CompactionController.executeCompactionGroup(compactionGroup);
+    CompactionController.execute(compactionGroup);
     logger.info("CompactionRunner Completed");
   }
 }

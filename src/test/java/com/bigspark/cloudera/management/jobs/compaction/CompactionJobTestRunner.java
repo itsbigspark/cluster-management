@@ -7,7 +7,7 @@ public class CompactionJobTestRunner {
 
   public static void main(String[] args) throws Exception {
     InputStream input = CompactionJobTestRunner.class.getClassLoader()
-        .getResourceAsStream("config.properties");
+        .getResourceAsStream("to-sort/config.properties");
     Properties prop = new Properties();
     prop.load(input);
     CompactionJobIntegrationTests compactionJobIntegrationTests = new CompactionJobIntegrationTests();

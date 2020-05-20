@@ -212,6 +212,17 @@ public class MetadataHelper {
     return isMonthEnd;
   }
 
+  public Boolean isCompacted(Partition p) {
+    Boolean isCompacted = false;
+    String key = "compacted";
+    if (p.getParameters().containsKey(key) && p.getParameters().get(key).toLowerCase()
+        .equals("true")) {
+      isCompacted = true;
+    }
+
+    return isCompacted;
+  }
+
   public Date getPartitionDate(Partition partition, Pattern pattern) throws ParseException {
     String partitionDateString = getPartitionDateString(partition, pattern);
     return stringToDate(partitionDateString);

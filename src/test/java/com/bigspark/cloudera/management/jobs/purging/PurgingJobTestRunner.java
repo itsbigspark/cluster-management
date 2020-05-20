@@ -7,7 +7,7 @@ public class PurgingJobTestRunner {
 
   public static void main(String[] args) throws Exception {
     InputStream input = PurgingJobTestRunner.class.getClassLoader()
-        .getResourceAsStream("config.properties");
+        .getResourceAsStream("to-sort/config.properties");
     Properties prop = new Properties();
     prop.load(input);
     PurgingJobIntegrationTests PurgingJobTest = new PurgingJobIntegrationTests();
