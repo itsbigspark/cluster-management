@@ -36,7 +36,7 @@ public class CompactionMistRunner extends MistFn {
                   .jobId() + ", args : ");
           logger.info("database : " + d);
           logger.info("table : " + t);
-          finalCompactionJob.executeMist(d, t, spark);
+          //finalCompactionJob.executeMist(d, t, spark);
           return "complete";
         }).toHandle(JEncoders.stringEncoder());
   }

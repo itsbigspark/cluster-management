@@ -157,7 +157,7 @@ public class CompactionController extends ClusterManagementJob {
       compactionMetadataList.forEach(table -> {
         try {
           CompactionJob compactionJob = new CompactionJob(this, table);
-          compactionJob.execute(table);
+          compactionJob.execute();
         } catch (Exception e) {
           e.printStackTrace();
         }

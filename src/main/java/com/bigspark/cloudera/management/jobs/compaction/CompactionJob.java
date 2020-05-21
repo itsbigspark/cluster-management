@@ -5,35 +5,23 @@ import static com.bigspark.cloudera.management.helpers.FileSystemHelper.getCreat
 import com.bigspark.cloudera.management.common.enums.JobType;
 import com.bigspark.cloudera.management.common.exceptions.SourceException;
 import com.bigspark.cloudera.management.common.metadata.CompactionMetadata;
-import com.bigspark.cloudera.management.common.metadata.PurgingMetadata;
 import com.bigspark.cloudera.management.common.model.SourceDescriptor;
 import com.bigspark.cloudera.management.common.model.TableDescriptor;
-import com.bigspark.cloudera.management.helpers.AuditHelper_OLD;
 import com.bigspark.cloudera.management.helpers.FileSystemHelper;
-import com.bigspark.cloudera.management.helpers.MetadataHelper;
-import com.bigspark.cloudera.management.helpers.SparkHelper;
 import com.bigspark.cloudera.management.jobs.ClusterManagementJob;
-import com.bigspark.cloudera.management.jobs.ClusterManagementJob_OLD;
 import com.bigspark.cloudera.management.jobs.ClusterManagementTableJob;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
-import javax.naming.ConfigurationException;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.ContentSummary;
-import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
-import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.api.Partition;
 import org.apache.spark.sql.AnalysisException;
 import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.catalog.Database;
 import org.apache.spark.sql.catalog.Table;
 import org.apache.spark.sql.catalyst.TableIdentifier;
@@ -51,15 +39,24 @@ import scala.Some;
  * @JIRA BIG-4
  */
 public class CompactionJob extends ClusterManagementTableJob {
+  protected static final String cCOMPACTION_JOB_AUDIT_TABLE_NAME ="SYS_CM_COMPACTION_AUDIT";
   Logger logger = LoggerFactory.getLogger(getClass());
   protected SourceDescriptor sourceDescriptor;
-String trashBaseLocation;
-String database;
-String table;
 
-  public CompactionJob(ClusterManagementJob existing, CompactionMetadata purgingMetadata) throws Exception {
-    super(existing, purgingMetadata.database, purgingMetadata.tableName);
-    trashBaseLocation = FileSystemHelper.getCreateTrashBaseLocation("compact");
+  public final CompactionMetadata compactionMetadata;
+
+  protected final String trashBaseLocation;
+
+  public CompactionJob(ClusterManagementJob existing, CompactionMetadata compactionMetadata) throws Exception {
+    super(existing, compactionMetadata.database, compactionMetadata.tableName, CompactionJob.cCOMPACTION_JOB_AUDIT_TABLE_NAME);
+    this.compactionMetadata = compactionMetadata;
+    this.trashBaseLocation = FileSystemHelper.getCreateTrashBaseLocation("compact");
+  }
+
+  public CompactionJob(CompactionMetadata compactionMetadata) throws Exception {
+    super(compactionMetadata.database, compactionMetadata.tableName, CompactionJob.cCOMPACTION_JOB_AUDIT_TABLE_NAME);
+    this.compactionMetadata = compactionMetadata;
+    this.trashBaseLocation = FileSystemHelper.getCreateTrashBaseLocation("compact");
   }
 
   /**
@@ -71,25 +68,7 @@ String table;
     return Long.parseLong(spark.sparkContext().hadoopConfiguration().get("dfs.blocksize"));
   }
 
-  /**
-   * Method to extract database listing from Hive metastore via catalog
-   *
-   * @return Dataset<Database>
-   */
-  protected Dataset<Database> getDatabases() {
-    return spark.catalog().listDatabases();
-  }
 
-  /**
-   * Method to extract table listing of  supplied database from Hive metastore via catalog
-   *
-   * @param dbName
-   * @return Dataset<Table>
-   * @throws AnalysisException
-   */
-  protected Dataset<Table> getTables(String dbName) throws AnalysisException {
-    return spark.catalog().listTables(dbName);
-  }
 
   /**
    * Method to pull partition list of supplied database table from Hive metastore via Catalyst
@@ -102,34 +81,7 @@ String table;
     return metadataHelper.getTablePartitions(dbName, tableName);
   }
 
-  /**
-   * Method to pull table location of supplied database table from Hive metastore via catalog
-   *
-   * @param dbName
-   * @param tableName
-   * @return String
-   * @throws NoSuchDatabaseException
-   * @throws NoSuchTableException
-   */
-  protected String getTableLocation(String dbName, String tableName)
-      throws NoSuchDatabaseException, NoSuchTableException {
-    Some<String> schema = new Some<String>(dbName);
-    TableIdentifier tableIdentifier = new TableIdentifier(tableName, schema);
-    return spark.sessionState().catalog().getTableMetadata(tableIdentifier).location().getRawPath();
-  }
 
-  /**
-   * Method to return object count and total size of contents for a given HDFS location i
-   *
-   * @param location
-   * @return Pair<Long, Long>
-   * @throws IOException
-   */
-  protected Pair<Long, Long> getFileCountTotalSizePair(String location) throws IOException {
-    ContentSummary cs = fileSystem.getContentSummary(new Path(location));
-    ImmutablePair<Long, Long> pair = new ImmutablePair<>(cs.getFileCount(), cs.getLength());
-    return pair;
-  }
 
   /**
    * Method to return object count and total size of contents for a given HDFS location
@@ -183,44 +135,6 @@ String table;
     float num = (float) totalSize / bs;
     Integer factor = (int) Math.ceil(num);
     return factor;
-  }
-
-  /**
-   * Method to execute all required actions against a table Iterating over each table partition and
-   * compacting
-   *
-   * @param dbName
-   * @param tableName
-   * @throws NoSuchDatabaseException
-   * @throws NoSuchTableException
-   * @throws IOException
-   */
-  protected void processTable(String dbName, String tableName)
-      throws IOException, SourceException, TException {
-    logger.info("Now processing table : " + dbName + "." + tableName);
-    org.apache.hadoop.hive.metastore.api.Table tableMeta = metadataHelper
-        .getTable(dbName, tableName);
-    TableDescriptor tableDescriptor = metadataHelper.getTableDescriptor(tableMeta);
-    this.sourceDescriptor = new SourceDescriptor(metadataHelper.getDatabase(dbName),
-        tableDescriptor);
-    List<Partition> partitions = getTablePartitions(dbName, tableName);
-    logger.info("Partitions returned for checking : " + partitions.size());
-    ArrayList<Partition> eligiblePartitions = new ArrayList<>();
-    partitions.forEach( partition -> {
-      if (this.metadataHelper.isCompacted(partition)) {
-        logger.debug("Partition already previously compacted : "+ partition.toString());
-      } else {
-        logger.trace("Adding partition : "+partition.toString());
-        eligiblePartitions.add(partition);
-      }
-    });
-    for (Partition partition : eligiblePartitions) {
-      try {
-        processPartition(partition);
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-    }
   }
 
   /**
@@ -285,20 +199,15 @@ String table;
     }
   }
 
-  protected void setTrashBaseLocation() throws IOException {
-    StringBuilder sb = new StringBuilder();
-    String userHomeArea = FileSystemHelper.getUserHomeArea();
-    sb.append(userHomeArea).append("/.ClusterManagementTrash/compaction");
-    trashBaseLocation = sb.toString();
-    if (!fileSystem.exists(new Path(trashBaseLocation))) {
-      fileSystem.mkdirs(new Path(trashBaseLocation));
-    }
-  }
 
   protected void moveDataToTrash(String trashBaseLocation, String itemLocation,
       SourceDescriptor sourceDescriptor) throws IOException, URISyntaxException {
     FileSystemHelper
         .moveDataToUserTrashLocation(itemLocation, trashBaseLocation, isDryRun, fileSystem);
+    String payload = this.getJobAuditLogRecord(
+        itemLocation
+        , trashBaseLocation);
+    this.JobPartitionAudit.write(payload);
   }
 
 
@@ -310,6 +219,7 @@ String table;
    */
   protected void resolveLocation(String location) throws IOException {
     String trashLocation = null;
+    //Move original data to trash
     try {
       this.moveDataToTrash(trashBaseLocation, location, sourceDescriptor);
     } catch (Exception e) {
@@ -318,36 +228,28 @@ String table;
       e.printStackTrace();
       System.exit(1);
     }
+    //Move _tmp location to oriinal localtion
     try {
       boolean rename = fileSystem
           .rename(new Path(location + "_tmp"), new Path(location));
       if (rename) {
-       // auditHelperOLD.writeAuditLine("Move", sourceDescriptor.toString(),
-       //     String.format("Moved : %s ==> %s", location + "_tmp", location),
-      //      true);
       } else {
         throw new IOException("Failed to move files");
       }
     } catch (Exception e) {
       logger.error("ERROR: Unable to move files from temp : " + location
           + "_tmp to partition location");
-    //  auditHelperOLD.writeAuditLine("Move", sourceDescriptor.toString(),
-      //    String.format("Moving : %s ==> %s", location + "_tmp", location),
-      //    false);
       e.printStackTrace();
-      // If this happens, we need to try and resolve, otherwise the partition is impacted
+
+      //Not sure what this does
       try {
         trashLocation = trashBaseLocation + location;
         boolean rename = fileSystem.rename(new Path(trashLocation), new Path(location));
         if (rename) {
-   //       auditHelperOLD.writeAuditLine("Move", sourceDescriptor.toString(),
-     //         String.format("Moving : %s ==> %s", trashLocation, location), true);
         } else {
           throw new IOException("Failed to move files");
         }
       } catch (Exception e_) {
-    //    auditHelperOLD.writeAuditLine("Move", sourceDescriptor.toString(),
-      //      String.format("Moving : %s ==> %s", trashLocation, location), false);
         logger.error("FATAL: Error while reinstating location at " + location);
         logger.error("FATAL: !!!  Locaion is now impacted, resolution required  !!!!");
         e_.printStackTrace();
@@ -363,35 +265,51 @@ String table;
    * @throws NoSuchTableException
    * @throws NoSuchDatabaseException
    */
-  void executeMist(String database, String table, SparkSession spark)
-      throws IOException,SourceException, TException {
-    processTable(database, table);
-  }
-
-  /**
-   * Main method to execute the compaction process, called by the Runner class
-   *
-   * @throws IOException
-   * @throws NoSuchTableException
-   * @throws NoSuchDatabaseException
-   */
-  void execute(CompactionMetadata tm)
+  void execute()
       throws IOException, SourceException, TException {
-    if (tm.constructor == 1) {
+    if (this.compactionMetadata.constructor == 1) {
       this.jobAuditBegin();
-      this.table = tm.tableName;
-      this.database = tm.database;
-      this.trashBaseLocation = getCreateTrashBaseLocation("Compaction");
-      processTable(database, table);
+      logger.info("Now processing table : " + this.databaseName + "." + tableName);
+      org.apache.hadoop.hive.metastore.api.Table tableMeta = this.metadataHelper
+          .getTable(this.databaseName, this.tableName);
+      TableDescriptor tableDescriptor = metadataHelper.getTableDescriptor(tableMeta);
+      this.sourceDescriptor = new SourceDescriptor(metadataHelper.getDatabase(this.databaseName),
+          tableDescriptor);
+      List<Partition> partitions = getTablePartitions(this.databaseName, this.tableName);
+      logger.info("Partitions returned for checking : " + partitions.size());
+      ArrayList<Partition> eligiblePartitions = this.removeCompactedPartitions(partitions);
+
+      for (Partition partition : eligiblePartitions) {
+        try {
+          processPartition(partition);
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+      }
       this.jobAuditEnd();
     }
-    if (tm.constructor == 2)
-      processLocation(tm.path.toString());
+    if (this.compactionMetadata.constructor == 2)
+      processLocation(this.compactionMetadata.path.toString());
   }
 
   @Override
   public JobType getJobType() {
     return JobType.COMPACT;
   }
+
+
+  public ArrayList<Partition>  removeCompactedPartitions(List<Partition> partitions ) {
+    ArrayList<Partition> eligiblePartitions = new ArrayList<>();
+    partitions.forEach( partition -> {
+      if (this.metadataHelper.isCompacted(partition)) {
+        logger.debug("Partition already previously compacted : "+ partition.toString());
+      } else {
+        logger.trace("Adding partition : "+partition.toString());
+        eligiblePartitions.add(partition);
+      }
+    });
+    return eligiblePartitions;
+  }
+
 }
 

@@ -8,7 +8,6 @@ import com.bigspark.cloudera.management.common.metadata.PurgingMetadata;
 import com.bigspark.cloudera.management.common.model.SourceDescriptor;
 import com.bigspark.cloudera.management.common.utils.DateUtils;
 import com.bigspark.cloudera.management.helpers.FileSystemHelper;
-import com.bigspark.cloudera.management.helpers.GenericAuditHelper;
 import com.bigspark.cloudera.management.helpers.MetadataHelper;
 import com.bigspark.cloudera.management.jobs.ClusterManagementJob;
 import com.bigspark.cloudera.management.jobs.ClusterManagementTableJob;
@@ -17,8 +16,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.hadoop.fs.Path;
@@ -39,8 +36,7 @@ import org.slf4j.LoggerFactory;
  */
 public class PurgingJob extends ClusterManagementTableJob {
 
-  protected final String cPURGING_JOB_AUDIT_TABLE_NAME="SYS_CM_PURGE_AUDIT";
-  protected final GenericAuditHelper purgingJobPartitionAudit;
+  protected static final String cPURGING_JOB_AUDIT_TABLE_NAME="SYS_CM_PURGE_AUDIT";
   public SourceDescriptor sourceDescriptor;
   PurgingMetadata purgingMetadata;
   Pattern pattern;
@@ -48,14 +44,15 @@ public class PurgingJob extends ClusterManagementTableJob {
 
   Logger logger = LoggerFactory.getLogger(getClass());
 
-  public PurgingJob(ClusterManagementJob existing, PurgingMetadata purgingMetadata) throws Exception {
-    super(existing, purgingMetadata.database, purgingMetadata.tableName);
+  public PurgingJob(PurgingMetadata purgingMetadata) throws Exception {
+    super(purgingMetadata.database, purgingMetadata.tableName, PurgingJob.cPURGING_JOB_AUDIT_TABLE_NAME);
     this.purgingMetadata = purgingMetadata;
-    this.initialisePurgingJobAuditTable();
-    this.purgingJobPartitionAudit = new GenericAuditHelper(
-        this
-        , this.purgingMetadata.database
-        , this.cPURGING_JOB_AUDIT_TABLE_NAME);
+
+  }
+
+  public PurgingJob(ClusterManagementJob existing, PurgingMetadata purgingMetadata) throws Exception {
+    super(existing, purgingMetadata.database, purgingMetadata.tableName, PurgingJob.cPURGING_JOB_AUDIT_TABLE_NAME);
+    this.purgingMetadata = purgingMetadata;
   }
 
   protected void getTablePartitionMonthEnds(String dbName, String tableName,
@@ -212,13 +209,11 @@ public class PurgingJob extends ClusterManagementTableJob {
             .moveDataToUserTrashLocation(partitionLocation.getPath(), trashBaseLocation,
                 getDryRun(),
                 fileSystem);
-        String payload = this.getPurgingAuditLogRecord(
-            this.purgingMetadata.database
-            , this.purgingMetadata.tableName
-            , partitionLocation.getPath()
+        String payload = this.getJobAuditLogRecord(
+            partitionLocation.getPath()
             , trashBaseLocation);
 
-        this.purgingJobPartitionAudit.write(payload);
+        this.JobPartitionAudit.write(payload);
       }
       this.cleanUpPartitions(purgeCandidates);
     }
@@ -339,7 +334,7 @@ public class PurgingJob extends ClusterManagementTableJob {
               purgingMetadata.tableName, allPurgeCandidates);
         }
         this.jobAuditEnd();
-        this.purgingJobPartitionAudit.invalidateAuditTableMetadata();
+        this.JobPartitionAudit.invalidateAuditTableMetadata();
       } else {
         String message = "Table pattern not validated";
         logger.error(message);
@@ -400,18 +395,6 @@ public class PurgingJob extends ClusterManagementTableJob {
     }
   }
 
-  private String getPurgingAuditLogRecord(String dbName, String tableName, String originalLocation,
-      String trashLocation) {
-    return String.format("%s~%s~%s~%s~%s~%s~%s\n"
-        , this.applicationID
-        , dbName
-        , tableName
-        , "partition_spec"
-        , originalLocation
-        , trashLocation
-        , LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-    );
-  }
 
   public Boolean getDryRun() {
     return isDryRun;
@@ -421,35 +404,7 @@ public class PurgingJob extends ClusterManagementTableJob {
     isDryRun = dryRun;
   }
 
-  private void initialisePurgingJobAuditTable() throws TException {
-    if(!this.hiveMetaStoreClient.tableExists(this.managementDb, this.cPURGING_JOB_AUDIT_TABLE_NAME)) {
-      logger.info(String.format("Purging Job Audit table does not exist.  Creating %s.%s"
-          , this.managementDb
-          , this.cPURGING_JOB_AUDIT_TABLE_NAME));
-      spark.sql(this.getPurgingJobAuditTableSql());
-    }
-  }
 
-  private String getPurgingJobAuditTableSql() {
-    StringBuilder sql  = new StringBuilder();
-    sql.append(String.format("CREATE EXTERNAL TABLE IF NOT EXISTS %s.%s (\n", this.managementDb, this.cPURGING_JOB_AUDIT_TABLE_NAME));
-    sql.append("application_id STRING\n");
-    sql.append(",database_name STRING\n");
-    sql.append(",table_name STRING\n");
-    sql.append(",partition_spec STRING\n");
-    sql.append(",original_location STRING\n");
-    sql.append(",trash_location STRING\n");
-    sql.append(",log_time TIMESTAMP\n");
-    sql.append(")\n");
-    sql.append(" ROW FORMAT DELIMITED\n");
-    sql.append(" FIELDS TERMINATED BY '~'\n");
-    if(this.managementDbLocation != null  && !this.managementDbLocation.equals("")) {
-      sql.append(String.format("LOCATION '%s/data/%s'\n"
-          , this.managementDbLocation
-          , this.cPURGING_JOB_AUDIT_TABLE_NAME));
-    }
-    return sql.toString();
-  }
 
   @Override
   public JobType getJobType() {
