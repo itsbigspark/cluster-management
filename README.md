@@ -13,7 +13,7 @@ Should be workable in deploy-mode cluster with appropriate $HADOOP_CONF_DIR set
 
 ##### purging
 
-`export SPARK_SUBMIT_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5050 && $SPARK_HOME/bin/spark-submit --master local --class com.bigspark.cloudera.management.services.purging.PurgingJobTestRunner --jars ~/edh-cluster-management/target/cluster-management-1.0-SNAPSHOT.jar  ~/edh-cluster-management/target/cluster-management-1.0-SNAPSHOT-tests.jar
+`export SPARK_SUBMIT_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5050 && $SPARK_HOME/bin/spark-submit --master local --class dev.bigspark.cloudera.management.services.purging.PurgingJobTestRunner --jars ~/edh-cluster-management/target/cluster-management-1.0-SNAPSHOT.jar  ~/edh-cluster-management/target/cluster-management-1.0-SNAPSHOT-tests.jar
 `
 
 ######Entry point - PurgingJobTestRunner 

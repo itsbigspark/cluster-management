@@ -12,7 +12,7 @@ $SPARK_HOME/bin/spark-submit \
     --master yarn \
     --deploy-mode cluster \
     --conf spark.yarn.archive=hdfs:///user/cloudera/spark-libs-cdh.jar \
-    --class com.bigspark.cloudera.management.jobs.offload.OffloadRunner \
+    --class dev.bigspark.cloudera.management.jobs.offload.OffloadRunner \
     "file:///${HOME_DIR}/cluster-management/target/cluster-management-1.0-SNAPSHOT.jar" \
     "fs.s3a.access.key=$key" \
     "fs.s3a.secret.key=$secret" \

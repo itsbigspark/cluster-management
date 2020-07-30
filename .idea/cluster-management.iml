@@ -215,5 +215,60 @@
     <orderEntry type="library" scope="TEST" name="Maven: org.junit.jupiter:junit-jupiter-params:5.6.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.junit.jupiter:junit-jupiter-engine:5.6.1" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.junit.platform:junit-platform-engine:1.6.1" level="project" />
+    <orderEntry type="library" name="Maven: dev.bigspark:bigspark-utils:3.0.1-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-beans:5.0.7.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-core:5.0.7.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-jcl:5.0.7.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-context:5.0.7.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-aop:5.0.7.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-expression:5.0.7.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.commons:commons-dbcp2:2.4.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.commons:commons-pool2:2.5.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.hive:hive-jdbc:1.1.0-cdh5.12.1" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.hive:hive-common:1.1.0-cdh5.12.1" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty.aggregate:jetty-all:7.6.0.v20120127" level="project" />
+    <orderEntry type="library" name="Maven: javax.servlet:servlet-api:2.5" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.geronimo.specs:geronimo-jta_1.1_spec:1.1.1" level="project" />
+    <orderEntry type="library" name="Maven: javax.mail:mail:1.4.1" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.geronimo.specs:geronimo-jaspic_1.0_spec:1.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.geronimo.specs:geronimo-annotation_1.0_spec:1.1.1" level="project" />
+    <orderEntry type="library" name="Maven: asm:asm-commons:3.1" level="project" />
+    <orderEntry type="library" name="Maven: asm:asm-tree:3.1" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.ant:ant:1.9.1" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.ant:ant-launcher:1.9.1" level="project" />
+    <orderEntry type="library" name="Maven: com.codahale.metrics:metrics-core:3.0.2" level="project" />
+    <orderEntry type="library" name="Maven: com.codahale.metrics:metrics-jvm:3.0.2" level="project" />
+    <orderEntry type="library" name="Maven: com.codahale.metrics:metrics-json:3.0.2" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.hive:hive-service:1.1.0-cdh5.12.1" level="project" />
+    <orderEntry type="library" name="Maven: net.sf.jpam:jpam:1.1" level="project" />
+    <orderEntry type="library" name="Maven: tomcat:jasper-compiler:5.5.23" level="project" />
+    <orderEntry type="library" name="Maven: tomcat:jasper-runtime:5.5.23" level="project" />
+    <orderEntry type="library" name="Maven: commons-el:commons-el:1.0" level="project" />
+    <orderEntry type="library" name="Maven: javax.servlet.jsp:jsp-api:2.1" level="project" />
+    <orderEntry type="library" name="Maven: org.jamon:jamon-runtime:2.3.1" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.hive:hive-serde:1.1.0-cdh5.12.1" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.jersey:jersey-servlet:1.14" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.jersey:jersey-server:1.14" level="project" />
+    <orderEntry type="library" name="Maven: asm:asm:3.1" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.jersey:jersey-core:1.14" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.hive:hive-metastore:1.1.0-cdh5.12.1" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.hive:hive-shims:1.1.0-cdh5.12.1" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.hive.shims:hive-shims-common:1.1.0-cdh5.12.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.hive.shims:hive-shims-0.23:1.1.0-cdh5.12.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.hadoop:hadoop-yarn-server-resourcemanager:2.6.0-cdh5.12.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.sun.jersey:jersey-json:1.9" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.sun.xml.bind:jaxb-impl:2.2.3-1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.sun.jersey.contribs:jersey-guice:1.9" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.sun.jersey:jersey-client:1.9" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.hadoop:hadoop-yarn-server-applicationhistoryservice:2.6.0-cdh5.12.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.hive.shims:hive-shims-scheduler:1.1.0-cdh5.12.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: org.mockito:mockito-all:1.9.5" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.oozie:oozie-client:4.1.0-cdh5.12.1" level="project" />
+    <orderEntry type="library" name="Maven: com.googlecode.json-simple:json-simple:1.1" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.activemq:activemq-client:5.13.3" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.geronimo.specs:geronimo-jms_1.1_spec:1.1.1" level="project" />
+    <orderEntry type="library" name="Maven: org.fusesource.hawtbuf:hawtbuf:1.11" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.geronimo.specs:geronimo-j2ee-management_1.1_spec:1.0.1" level="project" />
+    <orderEntry type="library" name="Maven: org.codehaus.jettison:jettison:1.4.0" level="project" />
   </component>
 </module>
